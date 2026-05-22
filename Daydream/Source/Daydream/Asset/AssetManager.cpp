@@ -454,10 +454,10 @@ namespace Daydream
 		out << YAML::Key << "Name" << YAML::Value << _metadata.name;
 		out << YAML::EndMap;
 
-		FileSystem::MakeYamlFile(metaFilePath, out);
-		/*std::ofstream fout(metaFilePath.ToString());
+		
+		std::ofstream fout(metaFilePath.ToString());
 		fout << out.c_str();
-		fout.close();*/
+		fout.close();
 	}
 }
 

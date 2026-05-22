@@ -10,7 +10,7 @@ namespace Daydream
 	class D3D11TextureView : public TextureView
 	{
 	public:
-		D3D11TextureView(D3D11RenderDevice* _device, Shared<D3D11GPUTexture> _texture, const TextureViewDesc& _desc);
+		D3D11TextureView(D3D11RenderDevice* _device, D3D11GPUTexture* _texture, const TextureViewDesc& _desc);
 		virtual ~D3D11TextureView();
 
 		virtual void* GetUIHandle() const override { return view.Get(); }

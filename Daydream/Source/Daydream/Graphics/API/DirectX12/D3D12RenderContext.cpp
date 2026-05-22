@@ -43,52 +43,15 @@ namespace Daydream
 	{
 		GetD3D12ActiveCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		GetD3D12ActiveCommandList()->DrawIndexedInstanced(_indexCount, 1, _startIndex, _baseVertex, 0);
-		//GetD3D12ActiveCommandList()->DrawInstanced(3, 1, 0, 0);
-	}
-	/*void D3D12RenderContext::BeginRenderPass(Shared<RenderPass> _renderPass, Shared<Framebuffer> _framebuffer)
-	{
-
-		SetViewport(0, 0, currentFramebuffer->GetWidth(), currentFramebuffer->GetHeight());
 	}
 
-	void D3D12RenderContext::EndRenderPass(Shared<RenderPass> _renderPass)
-	{
-		if (!currentFramebuffer->IsSwapchainBuffer())
-		{
-			for (Shared<D3D12Texture2D> texture : currentFramebuffer->GetColorAttachments())
-			{
-				D3D12_RESOURCE_BARRIER barrier = {};
-				barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-				barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-				barrier.Transition.pResource = texture->GetID3D12Resource();
-				barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-				barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-				barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-				GetD3D12ActiveCommandList()->ResourceBarrier(1, &barrier);
-			}
-
-			if (currentFramebuffer->HasDepthAttachment())
-			{
-				auto depthStencilView = currentFramebuffer->GetDepthAttachment();
-				D3D12_RESOURCE_BARRIER barrier = {};
-				barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-				barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-				barrier.Transition.pResource = depthStencilView->GetID3D12Resource();
-				barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-				barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_DEPTH_WRITE;
-				barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_DEPTH_READ;
-				GetD3D12ActiveCommandList()->ResourceBarrier(1, &barrier);
-			}
-		}
-	}*/
 	void D3D12RenderContext::BeginRendering(const RenderingInfo& _renderingInfo)
 	{
 		Array<D3D12_CPU_DESCRIPTOR_HANDLE> rtHandles;
 		for (const AttachmentDesc& attachmentDesc : _renderingInfo.colorAttachments)
 		{
-			Shared<GPUTexture> origin = attachmentDesc.view->GetOriginTexture();
 			ClearValue rtvClearValue = attachmentDesc.clearValue;
-			Shared<D3D12TextureView> d3d12View = SharedCast<D3D12TextureView>(attachmentDesc.view);
+			D3D12TextureView* d3d12View = Cast<D3D12TextureView*>(attachmentDesc.view);
 			if (attachmentDesc.loadOp == AttachmentLoadOp::Clear)
 			{
 				GetD3D12ActiveCommandList()->ClearRenderTargetView(d3d12View->GetCPUHandle(), &rtvClearValue.colorClearValue.color[0], 0, nullptr);
@@ -100,7 +63,7 @@ namespace Daydream
 		if (_renderingInfo.depthAttachment.view != nullptr)
 		{
 			ClearValue dsvClearValue = _renderingInfo.depthAttachment.clearValue;
-			Shared<D3D12TextureView> d3d12View = SharedCast<D3D12TextureView>(_renderingInfo.depthAttachment.view);
+			D3D12TextureView* d3d12View = Cast<D3D12TextureView*>(_renderingInfo.depthAttachment.view);
 			D3D12_CPU_DESCRIPTOR_HANDLE dsv = d3d12View->GetCPUHandle();
 			dsvPtr = (dsv.ptr != 0) ? &dsv : nullptr;
 			if (_renderingInfo.depthAttachment.loadOp == AttachmentLoadOp::Clear)
@@ -155,7 +118,7 @@ namespace Daydream
 		ID3D12Resource* d3d12Resource = vertexBuffer->GetID3D12Resource();
 		D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
 		vertexBufferView.BufferLocation = d3d12Resource->GetGPUVirtualAddress();
-		vertexBufferView.SizeInBytes = vertexBuffer->GetSize();
+		vertexBufferView.SizeInBytes = (UInt32)vertexBuffer->GetSize();
 		vertexBufferView.StrideInBytes = _vertexBuffer->GetStride();
 
 		GetD3D12ActiveCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView);
@@ -293,7 +256,6 @@ namespace Daydream
 
 		Shared<UploadBuffer> stagingBuffer = UploadBuffer::Create(uploadSize);
 		CaptureResource(stagingBuffer->GetGPUBuffer());
-		CaptureResource(_target->GetGPUTexture());
 		ID3D12Resource* stagingResource = Cast<D3D12GPUBuffer*>(stagingBuffer->GetGPUBuffer().get())->GetID3D12Resource();
 
 		void* mappedData = nullptr;

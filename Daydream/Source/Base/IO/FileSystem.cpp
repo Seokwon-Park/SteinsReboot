@@ -65,17 +65,17 @@ namespace Daydream
 
 		return true;
 	}
-	bool FileSystem::MakeYamlFile(const Path& _filePath, const YAML::Node& _node)
-	{
-		std::string yamlString = YAML::Dump(_node);
+	//bool FileSystem::MakeYamlFile(const Path& _filePath, const YAML::Node& _node)
+	//{
+	//	std::string yamlString = YAML::Dump(_node);
 
-		return MakeTextFile(_filePath, yamlString);
-	}
-	bool FileSystem::MakeYamlFile(const Path& _filePath, const YAML::Emitter& _emitter)
-	{
-		StringView yamlView(_emitter.c_str(), _emitter.size());
+	//	return MakeTextFile(_filePath, yamlString);
+	//}
+	//bool FileSystem::MakeYamlFile(const Path& _filePath, const YAML::Emitter& _emitter)
+	//{
+	//	StringView yamlView(_emitter.c_str(), _emitter.size());
 
-		return MakeTextFile(_filePath, yamlView);
-	}
+	//	return MakeTextFile(_filePath, yamlView);
+	//}
 }
 

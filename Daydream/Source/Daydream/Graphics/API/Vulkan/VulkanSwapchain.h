@@ -34,7 +34,7 @@ namespace Daydream
 		//virtual void BeginRenderPass() override;
 		//virtual void EndRenderPass() override;
 
-		inline virtual Shared<TextureView> GetCurrentRenderTargetView() const { return backBufferRTVs[currentFrame]; };
+		inline virtual TextureView* GetCurrentRenderTargetView() const { return backBufferRTVs[currentFrame].get(); };
 		inline virtual Shared<RenderCommandList> GetCurrentCommandList() const override { return commandLists[currentFrame]; }
 
 

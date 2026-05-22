@@ -27,7 +27,7 @@ namespace Daydream
 		ApplicationSpecification spec;
 		spec.Name = "Daydream Engine Editor";
 		spec.WorkingDirectory = "../Lab";
-		spec.rendererAPI = RendererAPIType::DirectX12;
+		spec.rendererAPI = RendererAPIType::Vulkan;
 		return new EditorApplication(spec);
 	}
 }

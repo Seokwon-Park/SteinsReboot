@@ -8,7 +8,7 @@ namespace Daydream
 	class OpenGLTextureView : public TextureView
 	{
 	public:
-		OpenGLTextureView(Shared<OpenGLGPUTexture> _texture, const TextureViewDesc& _desc);
+		OpenGLTextureView(OpenGLGPUTexture* _texture, const TextureViewDesc& _desc);
 		~OpenGLTextureView() override = default;
 
 		virtual void* GetUIHandle() const override { return reinterpret_cast<void*>(static_cast<UInt64>(textureViewID)); }

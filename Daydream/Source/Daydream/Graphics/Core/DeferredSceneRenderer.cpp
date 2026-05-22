@@ -1,6 +1,10 @@
 #include "DaydreamPCH.h"
 #include "DeferredSceneRenderer.h"
 
+#include "Renderer.h"
+#include "Daydream/Graphics/Manager/PipelineStateRegistry.h"
+
+
 namespace Daydream
 {
 	DeferredSceneRenderer::DeferredSceneRenderer()
@@ -9,6 +13,132 @@ namespace Daydream
 
 	DeferredSceneRenderer::~DeferredSceneRenderer()
 	{
+	}
+
+	void DeferredSceneRenderer::RenderScene(const SceneData& _sceneData)
+	{
+		UInt32 width = _sceneData.width;
+		UInt32 height = _sceneData.height;
+
+		Shared<Scene> scene = _sceneData.scene;
+		Shared<Camera> camera = _sceneData.camera;
+
+		renderGraph->Reset();
+
+		Shared<RenderGraphDrawList> opaqueDrawList = CreateDrawListFromScene(_sceneData.scene.get(), _sceneData.camera.get());
+
+		RenderGraphResourceDesc resourceDesc{};
+
+		RenderGraphResourceHandle position = renderGraph->AddResource("GBufferPos", { RenderFormat::R16G16B16A16_FLOAT, width, height });
+		RenderGraphResourceHandle normal = renderGraph->AddResource("GBufferNormal", { RenderFormat::R16G16B16A16_FLOAT, width, height });
+		RenderGraphResourceHandle albedo = renderGraph->AddResource("GBufferAlbedo", { RenderFormat::R8G8B8A8_UNORM, width, height });
+		RenderGraphResourceHandle mrao = renderGraph->AddResource("GBufferMRAO", { RenderFormat::R8G8B8A8_UNORM, width, height });
+
+		RenderGraphResourceHandle depth = renderGraph->AddResource("GBufferDepth", { RenderFormat::D24_UNORM_S8_UINT, width, height });
+
+		RenderGraphResourceHandle finalResource;
+
+		RenderGraphPassDesc passDesc{};
+		passDesc.pipelineState = PipelineStateRegistry::DepthPSO;
+		passDesc.drawType = PassDrawType::Geometry;
+		passDesc.drawList = opaqueDrawList;
+		RenderGraphPassHandle depthPass = renderGraph->AddPass("DepthPass", passDesc);
+		//RenderGraphPassHandle depthPass = renderGraph->AddPass("DepthPass", [=]()
+		//	{
+
+		//		Renderer::BindPipelineState(PipelineStateRegistry::DepthPSO);
+		//		if (scene->GetLightComponent())
+		//		{
+		//			Renderer::BindConstantBuffer("LightSpace", scene->GetLightComponent()->GetLight().lightViewProjectionBuffer);
+		//		}
+		//		for (const auto entityHandle : scene->GetAllEntities())
+		//		{
+		//			GameEntity* entity = scene->GetEntity(entityHandle);
+
+		//			MeshRendererComponent* meshRenderer = entity->GetComponent<MeshRendererComponent>();
+		//			if (meshRenderer)
+		//			{
+		//				Renderer::BindConstantBuffer("World", meshRenderer->GetWorldMatrixConstantBuffer());
+		//				auto mesh = AssetManager::GetAsset<Mesh>(meshRenderer->GetMesh());
+		//				if (mesh)
+		//				{
+		//					Renderer::BindMesh(mesh);
+		//					Renderer::DrawIndexed(mesh->GetIndexCount());
+		//				}
+		//			}
+		//		}
+		//		//Renderer::EndRenderPass(depthRenderPass);
+		//	});
+		renderGraph->Write(depthPass, depth);
+
+		RenderGraphPassHandle gBufferPass = renderGraph->AddPass("GBufferPass", passDesc);
+		//	{
+		//		//Renderer::Submit(squareIB->GetCount());
+		//		//Renderer::BeginRenderPass(gBufferRenderPass, gBufferFramebuffer);
+		//		Renderer::BindPipelineState(PipelineStateRegistry::GBufferPSO);
+		//		Renderer::BindConstantBuffer("Camera", camera->GetViewProjectionConstantBuffer());
+		//		for (const auto entityHandle : scene->GetAllEntities())
+		//		{
+		//			GameEntity* entity = scene->GetEntity(entityHandle);
+		//			MeshRendererComponent* meshRenderer = entity->GetComponent<MeshRendererComponent>();
+		//			if (meshRenderer == nullptr) continue;
+		//			Renderer::BindConstantBuffer("World", meshRenderer->GetWorldMatrixConstantBuffer());
+		//			Renderer::BindConstantBuffer("Entity", meshRenderer->GetEntityHandleConstantBuffer());
+		//			auto mesh = AssetManager::GetAsset<Mesh>(meshRenderer->GetMesh());
+		//			auto material = AssetManager::GetAsset<Material>(meshRenderer->GetMaterial());
+		//			if (mesh && material)
+		//			{
+		//				Renderer::BindMesh(mesh);
+		//				Renderer::BindMaterial(material);
+		//				Renderer::DrawIndexed(mesh->GetIndexCount());
+		//			}
+		//		}
+		//	});
+		renderGraph->Write(gBufferPass, position);
+		renderGraph->Write(gBufferPass, normal);
+		renderGraph->Write(gBufferPass, albedo);
+		renderGraph->Write(gBufferPass, mrao);
+
+
+		//RenderGraphPassHandle lightingPass = renderGraph->AddPass("DeferredLightingPass", [=]()
+		//	{
+		//		//Renderer::BeginRenderPass(renderPass, viewportFramebuffer);
+
+		//		Renderer::BindPipelineState(PipelineStateRegistry::DeferredPSO);
+		//		//Renderer::SetTextureView("PositionTexture", gBufferFramebuffer->GetColorAttachmentTexture(0));
+		//		//Renderer::SetTextureView("NormalTexture", gBufferFramebuffer->GetColorAttachmentTexture(1));
+		//		//Renderer::SetTextureView("AlbedoTexture", gBufferFramebuffer->GetColorAttachmentTexture(2));
+		//		//Renderer::SetTextureView("RMAOTexture", gBufferFramebuffer->GetColorAttachmentTexture(3));
+		//		//Renderer::SetTextureView("BRDFLUT", Renderer::GetSkybox()->GetBRDF());
+		//		//Renderer::SetTextureView("EntityIDTexture", gBufferFramebuffer->GetColorAttachmentTexture(4));
+		//		//Renderer::SetTextureView("OutlineTexture", maskFramebuffer->GetColorAttachmentTexture(0));
+		//		//Renderer::SetTextureView("DepthTexture", depthFramebuffer->GetDepthAttachmentTexture());
+		//		Renderer::BindConstantBuffer("Lights", activeScene->GetLightConstantBuffer());
+		//		Renderer::BindConstantBuffer("EditorData", entityBuffer);
+		//		//Renderer::SetTextureCube("IrradianceTexture", Renderer::GetSkybox()->GetIrradianceTexture());
+		//		//Renderer::SetTextureCube("Prefilter", Renderer::GetSkybox()->GetPrefilterTexture());
+		//		//deferredLightingMaterial->Bind();
+		//		Renderer::BindMesh(ResourceManager::GetResource<Mesh>("Quad"));
+		//		Renderer::DrawIndexed(ResourceManager::GetResource<Mesh>("Quad")->GetIndexCount());
+
+		//		////pso3d->Bind();
+		//		////activeScene->Update(_deltaTime);
+
+		//		if (skyboxPanel->IsUsingSkybox())
+		//		{
+		//			Renderer::BindPipelineState(skyboxPipeline);
+		//			Renderer::BindMesh(cubeMesh);
+		//			Renderer::SetConstantBuffer("Camera", viewProjMat);
+		//			//Renderer::SetTextureCube("TextureCubemap", activeScene->GetSkybox()->GetSkyboxTexture());
+		//			Renderer::DrawIndexed(cubeMesh->GetIndexCount());
+		//		}
+		//		//Renderer::EndRenderPass(renderPass);
+		//	});
+
+		//renderGraph->Read(lightingPass, position);
+		//renderGraph->Read(lightingPass, normal);
+		//renderGraph->Read(lightingPass, albedo);
+		//renderGraph->Write(lightingPass, finalResource);
 	}
 }
 

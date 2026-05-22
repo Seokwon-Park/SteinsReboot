@@ -6,7 +6,7 @@
 
 namespace Daydream
 {
-	OpenGLTextureView::OpenGLTextureView(Shared<OpenGLGPUTexture> _texture, const TextureViewDesc& _desc)
+	OpenGLTextureView::OpenGLTextureView(OpenGLGPUTexture* _texture, const TextureViewDesc& _desc)
 		:TextureView(_texture, _desc)
 	{
 		glGenTextures(1, &textureViewID);

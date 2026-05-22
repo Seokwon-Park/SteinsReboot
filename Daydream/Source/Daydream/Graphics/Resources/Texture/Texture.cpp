@@ -36,7 +36,7 @@ namespace Daydream
 			srvDesc.baseLayer = 0;
 			srvDesc.layerCount = GetLayerCount();
 
-			defaultSRV = TextureView::Create(shared_from_this(), srvDesc);
+			defaultSRV = TextureView::Create(this, srvDesc);
 		}
 
 		return defaultSRV;

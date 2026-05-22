@@ -1,15 +1,32 @@
 #pragma once
 
+#include "RenderGraphDrawList.h"
+#include "Daydream/Graphics/Core/RenderTargetPool/RenderTargetPool.h"
+#include "Daydream/Graphics/Resources/PipelineState/GraphicsPipelineState.h"
+
 namespace Daydream
 {
+	enum class PassDrawType
+	{
+		Geometry,       // 3D 메쉬들을 그리는 패스 (예: GBuffer)
+		FullScreenQuad, // 화면 전체를 덮는 2D 후처리 패스 (예: Lighting, Bloom)
+		Compute         // 컴퓨트 셰이더 패스
+	};
+
 	struct RenderGraphResourceDesc
 	{
-		// Texture2DDesc 또는 사용자 정의 간소화 구조체
 		RenderFormat format;
 		UInt32 width;
 		UInt32 height;
-		// ...
 	};
+
+	struct RenderGraphPassDesc
+	{
+		Shared<GraphicsPipelineState> pipelineState;
+		Shared<RenderGraphDrawList> drawList;
+		PassDrawType drawType;
+	};
+
 
 	struct RenderGraphResourceHandle
 	{
@@ -30,7 +47,7 @@ namespace Daydream
 		~RenderGraph();
 
 		RenderGraphResourceHandle AddResource(const String& _name, const RenderGraphResourceDesc& _desc);
-		RenderGraphPassHandle AddPass(const String& _name, FunctionPtr<void()> _execute);
+		RenderGraphPassHandle AddPass(const String& _name, const RenderGraphPassDesc& _desc);
 
 		void Read(RenderGraphPassHandle _pass, RenderGraphResourceHandle _resource);
 		void Write(RenderGraphPassHandle _pass, RenderGraphResourceHandle _resource);
@@ -43,12 +60,22 @@ namespace Daydream
 		struct ResourceNode
 		{
 			String name;
+			RenderFormat format;
+			UInt32 width;
+			UInt32 height;
+
+			UInt32 firstPass;
+			UInt32 lastPass;
+
+			RenderTargetPoolHandle resourceHandle;
 		};
 
 		struct PassNode
 		{
 			String name;
-			FunctionPtr<void()> execute;
+			Shared<GraphicsPipelineState> pipelineState;
+			Shared<RenderGraphDrawList> drawList;
+			PassDrawType drawType;
 			Array<UInt32> reads;
 			Array<UInt32> writes;
 		};

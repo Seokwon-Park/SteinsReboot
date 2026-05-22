@@ -310,7 +310,7 @@ namespace Daydream
 		for (UInt32 i = 0; i < desc.imageCount; i++)
 		{
 			backBufferTextures[i] = MakeShared<VulkanGPUTexture>(device, textureDesc, swapchainImages[i]);
-			backBufferRTVs[i] = MakeShared<VulkanTextureView>(device, backBufferTextures[i], viewDesc);
+			backBufferRTVs[i] = MakeShared<VulkanTextureView>(device, backBufferTextures[i].get(), viewDesc);
 		}
 	}
 }

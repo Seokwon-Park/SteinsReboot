@@ -97,7 +97,7 @@ namespace Daydream
 		for (auto renderingDesc : _renderingInfo.colorAttachments)
 		{
 			vk::RenderingAttachmentInfo attachmentInfo{};
-			VulkanTextureView* textureView = Cast<VulkanTextureView*>(renderingDesc.view.get());
+			VulkanTextureView* textureView = Cast<VulkanTextureView*>(renderingDesc.view);
 			attachmentInfo.imageView = textureView->GetVkImageView();
 			attachmentInfo.imageLayout = vk::ImageLayout::eColorAttachmentOptimal;
 			attachmentInfo.resolveMode = vk::ResolveModeFlagBits::eNone;
@@ -124,7 +124,7 @@ namespace Daydream
 
 		if (useDepth)
 		{
-			VulkanTextureView* depthView = Cast<VulkanTextureView*>(_renderingInfo.depthAttachment.view.get());
+			VulkanTextureView* depthView = Cast<VulkanTextureView*>(_renderingInfo.depthAttachment.view);
 			depthAttachmentInfo.imageView = depthView->GetVkImageView();
 
 			// ±íÀÌ ¹öÆÛ ·»´õ¸µ¿ë ·¹ÀÌ¾Æ¿ô
@@ -150,7 +150,7 @@ namespace Daydream
 		renderingInfo.renderArea.extent.height = _renderingInfo.renderArea.height;
 		renderingInfo.layerCount = 1;
 		renderingInfo.viewMask;
-		renderingInfo.colorAttachmentCount = colorAttachmentInfos.size();
+		renderingInfo.colorAttachmentCount = (UInt32)colorAttachmentInfos.size();
 		renderingInfo.pColorAttachments = colorAttachmentInfos.data();
 		if (useDepth)
 		{

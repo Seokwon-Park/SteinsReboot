@@ -46,7 +46,7 @@ namespace Daydream
 		virtual Shared<RenderCommandList> CreateRenderCommandList() override;
 		virtual Shared<GPUBuffer> CreateGPUBuffer(const BufferDesc& _desc) override;
 		virtual Shared<GPUTexture> CreateGPUTexture(const TextureDesc & _desc) override;
-		virtual Shared<TextureView> CreateTextureView(Shared<Texture> _texture, const TextureViewDesc& _desc) override;
+		virtual Shared<TextureView> CreateTextureView(Texture* _texture, const TextureViewDesc& _desc) override;
 
 		//virtual Shared<VertexBuffer> CreateDynamicVertexBuffer(UInt32 _size, UInt32 _stride, UInt32 _initialDataSize = 0, const void* _initialData = nullptr) override;
 		//virtual Shared<VertexBuffer> CreateStaticVertexBuffer(UInt32 _size, UInt32 _stride, const void * _initialData) override;

@@ -15,6 +15,6 @@ namespace Daydream
 	protected:
 
 	private:
-		
+
 	};
 }

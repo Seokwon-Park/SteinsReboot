@@ -50,7 +50,7 @@ namespace Daydream
 		TextureDesc desc;
 	};
 
-	class Texture : public Asset, public std::enable_shared_from_this<Texture>
+	class Texture : public Asset
 	{
 	public:
 		Texture(Shared<GPUTexture> _texture);

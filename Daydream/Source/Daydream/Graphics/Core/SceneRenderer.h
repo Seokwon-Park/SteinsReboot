@@ -1,11 +1,18 @@
 #pragma once
 
-#include "RenderGraph.h"
+#include "RenderGraph/RenderGraph.h"
+#include "Daydream/Scene/Scene.h"
 #include "Daydream/Graphics/Camera/Camera.h"
 
 namespace Daydream
 {
-	class Scene;
+    struct SceneData
+    {
+        Shared<Scene> scene;
+        Shared<Camera> camera;
+        UInt32 width;
+        UInt32 height;
+    };
 
     class SceneRenderer
     {
@@ -13,15 +20,10 @@ namespace Daydream
         SceneRenderer();
         virtual ~SceneRenderer();
 
-        void Init();
-
-        void RenderScene(Shared<Scene> _scene, Shared<Camera> _camera) {};
-
-    private:
+        virtual void RenderScene(const SceneData& _sceneData) {};
+    protected:
+        Shared<RenderGraphDrawList> CreateDrawListFromScene(Scene* _scene, Camera* _camera);
+       
         Shared<RenderGraph> renderGraph;
-
-        RenderGraphResourceHandle depthResource;
-        RenderGraphResourceHandle gBufferResource;
-        RenderGraphResourceHandle finalResource;
     };
 }

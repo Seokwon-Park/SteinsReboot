@@ -21,7 +21,7 @@ namespace Daydream
 
 	struct AttachmentDesc
 	{
-		Shared<TextureView> view; // 여기에 포맷이 이미 내장되어 있음
+		TextureView* view; // 여기에 포맷이 이미 내장되어 있음
 		AttachmentLoadOp  loadOp = AttachmentLoadOp::Clear;
 		AttachmentStoreOp storeOp = AttachmentStoreOp::Store;
 		ClearValue clearValue = ClearValue();

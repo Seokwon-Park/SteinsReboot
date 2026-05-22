@@ -18,7 +18,7 @@ namespace Daydream
 
 		bool operator==(const AssetHandle& _other) const;
 		bool operator!=(const AssetHandle& _other) const;
-		bool operator<(const AssetHandle& _other) const; 
+		bool operator<(const AssetHandle& _other) const;
 
 		static AssetHandle Generate();
 	private:
@@ -29,14 +29,11 @@ namespace Daydream
 	};
 }
 
-namespace std
+template <>
+struct std::hash<Daydream::AssetHandle>
 {
-	template <>
-	struct hash<Daydream::AssetHandle>
+	Daydream::UInt64 operator()(const Daydream::AssetHandle& _id) const
 	{
-		Daydream::UInt64 operator()(const Daydream::AssetHandle& _id) const
-		{
-			return std::hash<uuids::uuid>{}(_id.uuid);
-		}
-	};
-}
+		return std::hash<uuids::uuid>{}(_id.uuid);
+	}
+};

@@ -1,6 +1,8 @@
 #include "DaydreamPCH.h"
 #include "ViewportPanel.h"
 
+#include "Daydream/Core/Application.h"
+
 namespace Daydream
 {
 	ViewportPanel::ViewportPanel()
@@ -8,7 +10,11 @@ namespace Daydream
 	}
 	void ViewportPanel::OnImGuiRender()
 	{
+	
 	}
+
+
+
 }
 
 

@@ -11,6 +11,7 @@ namespace Daydream
 		virtual ~UIPanel() = default;
 
 		virtual void OnImGuiRender() = 0;
+	protected:
 	private:
 	};
 }

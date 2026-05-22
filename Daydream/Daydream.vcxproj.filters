@@ -1950,7 +1950,7 @@
     <ClInclude Include="Vendor\stb\stb_image.h">
       <Filter>Vendor\stb</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Daydream\Graphics\Core\RenderGraph.h" />
+    <ClInclude Include="Source\Daydream\Graphics\Core\RenderGraph\RenderGraph.h" />
     <ClInclude Include="Source\Daydream\Graphics\Resources\Texture\TextureView.h" />
     <ClInclude Include="Source\Daydream\Graphics\API\DirectX11\D3D11TextureView.h" />
     <ClInclude Include="Source\Daydream\Graphics\Resources\GPUResource.h" />
@@ -1962,6 +1962,12 @@
     <ClInclude Include="Source\Daydream\Graphics\Resources\PipelineState\ComputePipelineState.h" />
     <ClInclude Include="Source\Daydream\Graphics\Core\DeferredSceneRenderer.h" />
     <ClInclude Include="Source\Base\IO\FileSystem.h" />
+    <ClInclude Include="Source\Daydream\Asset\AssetSerializer.h" />
+    <ClInclude Include="Source\Daydream\Graphics\Core\RenderGraph\RenderGraphDrawList.h" />
+    <ClInclude Include="Source\Daydream\Graphics\Core\RenderTargetPool\RenderTargetPool.h" />
+    <ClInclude Include="Source\Base\Container\PriorityQueue.h" />
+    <ClInclude Include="Source\Daydream\Graphics\Core\RenderTargetPool\RenderTargetPoolKey.h" />
+    <ClInclude Include="Source\Daydream\Graphics\Core\RenderTargetPool\RenderTargetPoolHandle.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Base\IO\File.cpp">
@@ -2373,7 +2379,7 @@
       <Filter>Vendor\stb</Filter>
     </ClCompile>
     <ClCompile Include="Source\Daydream\Enum\RendererEnums.cpp" />
-    <ClCompile Include="Source\Daydream\Graphics\Core\RenderGraph.cpp" />
+    <ClCompile Include="Source\Daydream\Graphics\Core\RenderGraph\RenderGraph.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Resources\Texture\TextureView.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\API\DirectX11\D3D11TextureView.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Resources\GPUResource.cpp" />
@@ -2385,5 +2391,10 @@
     <ClCompile Include="Source\Daydream\Graphics\Resources\PipelineState\ComputePipelineState.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Core\DeferredSceneRenderer.cpp" />
     <ClCompile Include="Source\Base\IO\FileSystem.cpp" />
+    <ClCompile Include="Source\Daydream\Asset\AssetSerializer.cpp" />
+    <ClCompile Include="Source\Daydream\Graphics\Core\RenderGraph\RenderGraphDrawList.cpp" />
+    <ClCompile Include="Source\Daydream\Graphics\Core\RenderTargetPool\RenderTargetPool.cpp" />
+    <ClCompile Include="Source\Daydream\Graphics\Core\RenderTargetPool\RenderTargetPoolKey.cpp" />
+    <ClCompile Include="Source\Daydream\Graphics\Core\RenderTargetPool\RenderTargetPoolHandle.cpp" />
   </ItemGroup>
 </Project>

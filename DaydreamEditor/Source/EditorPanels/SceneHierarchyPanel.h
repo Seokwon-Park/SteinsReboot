@@ -11,7 +11,7 @@ namespace Daydream
 	public:
 		SceneHierarchyPanel();
 
-		void SetCurrentScene(Scene* _scene);
+		void SetCurrentContext(Shared<Scene> _scene);
 		void SetSelectedEntity(GameEntity* _entity) { selectedEntity = _entity; }
 		GameEntity* GetSelectedEntity() { return selectedEntity; }
 
@@ -29,7 +29,7 @@ namespace Daydream
 
 		GameEntity* selectedEntity = nullptr;
 		GameEntity* entityToDelete = nullptr;
-		Scene* scene = nullptr;
+		Shared<Scene> scene = nullptr;
 		char searchQuery[256] = "";
 
 		bool isDropTargetEnabled = false;

@@ -20,9 +20,12 @@ namespace Daydream
 		AssetManager::LoadAssets(LoadPhase::Early);
 
 		editorCamera = MakeShared<EditorCamera>();
+		editorCamera->SetPosition({ 0.0f,0.0f,-2.0f });
+
 		activeScene = MakeShared<Scene>("MainScene");
 
-		editorCamera->SetPosition({ 0.0f,0.0f,-2.0f });
+		sceneRenderer = MakeShared<DeferredSceneRenderer>();
+
 		viewProjMat = ConstantBuffer::Create(sizeof(Daydream::Matrix4x4));
 
 		entityBuffer = ConstantBuffer::Create(sizeof(EntityInfo));
@@ -41,17 +44,6 @@ namespace Daydream
 		deferredLightingPSO = ResourceManager::GetResource<GraphicsPipelineState>("DeferredPSO");
 		depthPSO = ResourceManager::GetResource<GraphicsPipelineState>("DepthPSO");
 		maskPSO = ResourceManager::GetResource<GraphicsPipelineState>("MaskPSO");
-
-		material = Material::Create(pso);
-		//material->SetTexture2D("Texture", texture);
-		//material->SetConstantBuffer("Camera", viewProjMat);
-
-		material3d = Material::Create(pso3d);
-
-		//material3d->SetConstantBuffer("Camera", viewProjMat);
-
-		deferredLightingMaterial = Material::Create(deferredLightingPSO);
-
 
 		///////////////////////////////////////////////////////
 		auto entity = activeScene->CreateGameEntity();
@@ -75,14 +67,6 @@ namespace Daydream
 		cubeMesh = Mesh::Create(cubeVBO, cubeIBO);
 		/////////////////////////////////////////////////////////////////////////////////////
 
-		//cubeIBO = IndexBuffer::Create(squareIndices2, sizeof(squareIndices2) / sizeof(uint32_t));
-
-		////model = MakeShared<Model>(mesh);
-		//model = MakeShared<Model>();
-		////model->Load("Asset/Model/Lowpoly_tree_sample.fbx");
-		////model->Load("Asset/Model/cerberusgun/scene.gltf");
-		//model->Load("Asset/Model/scene.gltf");
-
 		ModelRendererComponent* component = entity->AddComponent<ModelRendererComponent>();
 		component->SetModel(model);
 
@@ -101,12 +85,16 @@ namespace Daydream
 		viewportPanel = MakeUnique<ViewportPanel>();
 		propertyPanel = MakeUnique<PropertyPanel>();
 		sceneHierarchyPanel = MakeUnique<SceneHierarchyPanel>();
-		sceneHierarchyPanel->SetCurrentScene(activeScene.get());
-
+		sceneHierarchyPanel->SetCurrentContext(activeScene);
 		assetBrowserPanel = MakeUnique<AssetBrowserPanel>();
 		skyboxPanel = MakeUnique<SkyboxPanel>();
-
 		skyboxPanel->SetSkybox(activeScene->GetSkybox());
+
+		editorPanels.push_back(viewportPanel.get());
+		editorPanels.push_back(propertyPanel.get());
+		editorPanels.push_back(sceneHierarchyPanel.get());
+		editorPanels.push_back(assetBrowserPanel.get());
+		editorPanels.push_back(skyboxPanel.get());
 	}
 
 	void EditorLayer::OnUpdate(Float32 _deltaTime)
@@ -116,27 +104,17 @@ namespace Daydream
 		Matrix4x4 mat = editorCamera->GetViewProjectionMatrix();
 		Renderer::UpdateConstantBuffer(viewProjMat, mat);
 
-		static bool isViewControlled = false;
-		if (isViewportHovered && Input::GetMouseDown(Mouse::ButtonRight))
-		{
-			isViewControlled = true;
-		}
-		if (Input::GetMouseReleased(Mouse::ButtonRight))
-		{
-			isViewControlled = false;
-		}
 		if (isViewControlled)
 		{
 			editorCamera->ControlCameraView(_deltaTime);
 		}
 
 		info.entityID = 0;
-		auto entity = sceneHierarchyPanel->GetSelectedEntity();
+		GameEntity* entity = sceneHierarchyPanel->GetSelectedEntity();
 		if (entity != nullptr)
 		{
 			info.entityID = entity->GetHandle().GetID();
 		}
-
 		Renderer::UpdateConstantBuffer(entityBuffer, info);
 
 		activeScene->Update(_deltaTime);
@@ -332,40 +310,7 @@ namespace Daydream
 
 		//ImGui::End();
 
-		ImGui::ShowDemoWindow();
-
-		// 예시: 메인 메뉴 바
-		if (ImGui::BeginMainMenuBar())
-		{
-			if (ImGui::BeginMenu("File"))
-			{
-				if (ImGui::MenuItem("New Project", "Ctrl+N"))
-				{
-					CreateProject();
-				}
-				if (ImGui::MenuItem("Open Project...", "Ctrl+O")) { /* 씬 열기 로직 */ }
-				if (ImGui::MenuItem("Save Scene", "Ctrl+S")) { /* 씬 저장 로직 */ }
-				if (ImGui::MenuItem("Save Scene As...", "Ctrl+Shift+S")) { /* 씬 다른 이름으로 저장 로직 */ }
-				ImGui::Separator();
-				if (ImGui::MenuItem("Exit")) {
-					//Daydream::Application::GetInstance(); // 애플리케이션 종료 요청
-				}
-				ImGui::EndMenu();
-			}
-			if (ImGui::BeginMenu("Edit"))
-			{
-				if (ImGui::MenuItem("Undo", "Ctrl+Z")) {}
-				if (ImGui::MenuItem("Redo", "Ctrl+Y", false, false)) {} // 비활성화 예시
-				ImGui::EndMenu();
-			}
-			// 다른 메뉴들 (View, Tools, Help 등)
-			ImGui::EndMainMenuBar();
-		}
-
-		// 예시: 씬 뷰포트 (실제 렌더링 결과가 여기에 표시될 영역)
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 }); // 뷰포트 창 패딩 제거
-
-
 		ImGui::Begin("Viewport", nullptr,
 			ImGuiWindowFlags_NoScrollbar |
 			ImGuiWindowFlags_NoScrollWithMouse // | ImGuiWindowFlags_NoTitleBar
@@ -390,7 +335,7 @@ namespace Daydream
 		//	break;
 		//}
 		//case 1:
-		//{
+		//{	
 		//	viewportTexture = gBufferFramebuffer->GetColorAttachmentTexture(0);
 		//	if (viewportTexture)
 		//	{
@@ -501,18 +446,49 @@ namespace Daydream
 		ImGui::End();
 		ImGui::PopStyleVar();
 
+		ImGui::ShowDemoWindow();
+
+		// 예시: 메인 메뉴 바
+		if (ImGui::BeginMainMenuBar())
+		{
+			if (ImGui::BeginMenu("File"))
+			{
+				if (ImGui::MenuItem("New Project", "Ctrl+N"))
+				{
+					CreateProject();
+				}
+				if (ImGui::MenuItem("Open Project...", "Ctrl+O")) { /* 씬 열기 로직 */ }
+				if (ImGui::MenuItem("Save Scene", "Ctrl+S")) { /* 씬 저장 로직 */ }
+				if (ImGui::MenuItem("Save Scene As...", "Ctrl+Shift+S")) { /* 씬 다른 이름으로 저장 로직 */ }
+				ImGui::Separator();
+				if (ImGui::MenuItem("Exit")) {
+					//Daydream::Application::GetInstance(); // 애플리케이션 종료 요청
+				}
+				ImGui::EndMenu();
+			}
+			if (ImGui::BeginMenu("Edit"))
+			{
+				if (ImGui::MenuItem("Undo", "Ctrl+Z")) {}
+				if (ImGui::MenuItem("Redo", "Ctrl+Y", false, false)) {} // 비활성화 예시
+				ImGui::EndMenu();
+			}
+			// 다른 메뉴들 (View, Tools, Help 등)
+			ImGui::EndMainMenuBar();
+		}
+
+
+
 		// 예시: 콘솔/로그 패널
 		ImGui::Begin("Console");
 		ImGui::Text("Engine Logs and Messages");
 		ImGui::DragInt("test", &info.thickness);
 		// 엔진의 로그 메시지를 출력
 		ImGui::End();
-
-		sceneHierarchyPanel->OnImGuiRender();
 		propertyPanel->SetSelectedEntity(selectedEntity);
-		propertyPanel->OnImGuiRender();
-		assetBrowserPanel->OnImGuiRender();
-		skyboxPanel->OnImGuiRender();
+		for (UIPanel* panel : editorPanels)
+		{
+			panel->OnImGuiRender();
+		}
 	}
 
 	void EditorLayer::UpdateViewportSize()
@@ -661,6 +637,15 @@ namespace Daydream
 
 	bool EditorLayer::OnMouseButtonPressed(MouseButtonPressedEvent& _e)
 	{
+		if (isViewportHovered && Input::GetMouseDown(Mouse::ButtonRight))
+		{
+			isViewControlled = true;
+		}
+		if (Input::GetMouseReleased(Mouse::ButtonRight))
+		{
+			isViewControlled = false;
+		}
+
 		if (isViewportHovered && !isGuizmoInteract && Input::GetMouseDown(Mouse::ButtonLeft))
 		{
 			//DAYDREAM_INFO("{}", gBufferFramebuffer->ReadEntityHandleFromPixel(GetViewportMousePos()));

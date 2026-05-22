@@ -10,6 +10,13 @@ namespace Daydream
 	{
 	}
 
+    PipelineStateRegistry::~PipelineStateRegistry()
+    {
+        DepthPSO = nullptr;
+        GBufferPSO = nullptr;
+        DeferredPSO = nullptr;
+    }
+
 	void PipelineStateRegistry::CreateBuiltinResources()
 	{
 		RasterizerStateDesc defaultRastDesc = {};

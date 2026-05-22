@@ -27,14 +27,11 @@ namespace Daydream
 	}
 	void OpenGLRenderContext::BeginRendering(const RenderingInfo& _renderingInfo)
 	{
-		std::vector<GLenum> drawBuffers;
-		for (UInt64 i = 0; i < _renderingInfo.colorAttachments.size(); i++)
+		Array<GLenum> drawBuffers;
+		for (UInt32 i = 0; i < (UInt32)_renderingInfo.colorAttachments.size(); i++)
 		{
 			const AttachmentDesc& attachmentDesc = _renderingInfo.colorAttachments[i];
-			Shared<OpenGLTextureView> openGLTextureView = SharedCast<OpenGLTextureView>(attachmentDesc.view);
-			Shared<OpenGLGPUTexture> texture = SharedCast<OpenGLGPUTexture>(attachmentDesc.view->GetOriginTexture());
-
-			const TextureDesc& textureDesc = texture->GetDesc();
+			OpenGLTextureView* openGLTextureView = Cast<OpenGLTextureView*>(attachmentDesc.view);
 
 			glNamedFramebufferTexture(
 				framebufferID,
@@ -49,14 +46,13 @@ namespace Daydream
 		// Depth attachment 연결
 		if (_renderingInfo.depthAttachment.view != nullptr)
 		{
-			Shared<OpenGLTextureView> openGLTextureView = SharedCast<OpenGLTextureView>(_renderingInfo.depthAttachment.view);
+			OpenGLTextureView* openGLTextureView = Cast<OpenGLTextureView*>(_renderingInfo.depthAttachment.view);
 
 			glNamedFramebufferTexture(framebufferID,
 				GL_DEPTH_STENCIL_ATTACHMENT,
 				openGLTextureView->GetTextureViewID(),
 				0);
 		}
-
 
 		// Draw buffers 설정 (multiple render targets용)
 		glNamedFramebufferDrawBuffers(framebufferID,
@@ -81,7 +77,7 @@ namespace Daydream
 		if (_renderingInfo.depthAttachment.view != nullptr)
 		{
 			ClearValue dsvClearValue = _renderingInfo.depthAttachment.clearValue;
-			Shared<OpenGLTextureView> openGLTextureView = SharedCast<OpenGLTextureView>(_renderingInfo.depthAttachment.view);
+			OpenGLTextureView* openGLTextureView = Cast<OpenGLTextureView*>(_renderingInfo.depthAttachment.view);
 
 			float depthValue = _renderingInfo.depthAttachment.clearValue.depthClearValue;
 			int stencilValue = _renderingInfo.depthAttachment.clearValue.stencilClearValue;
@@ -175,7 +171,7 @@ namespace Daydream
 		if (bindingInfo == nullptr) return;
 
 		OpenGLTextureView* glView = Cast<OpenGLTextureView*>(_textureView.get());
-		OpenGLSampler* glSampler= Cast<OpenGLSampler*>(_sampler.get());
+		OpenGLSampler* glSampler = Cast<OpenGLSampler*>(_sampler.get());
 		glBindTextureUnit(bindingInfo->binding, glView->GetTextureViewID());
 		glBindSampler(bindingInfo->binding, glSampler->GetSamplerID());
 

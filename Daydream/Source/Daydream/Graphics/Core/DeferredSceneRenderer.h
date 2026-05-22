@@ -9,6 +9,8 @@ namespace Daydream
 	public:
 		DeferredSceneRenderer();
 		virtual ~DeferredSceneRenderer();
+
+		virtual void RenderScene(const SceneData& _sceneData) override;
 	protected:
 
 	private:

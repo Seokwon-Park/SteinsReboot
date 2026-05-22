@@ -9,16 +9,22 @@
 #include "Daydream/Graphics/Camera/Camera.h"
 #include "Daydream/Graphics/Resources/Skybox.h"
 #include "Daydream/Graphics/Resources/Texture/TextureView.h"
+#include "Daydream/Graphics/Core/RenderTargetPool/RenderTargetPool.h"
 
 namespace Daydream
 {
+	struct ResourceCapturedData
+	{
+		UInt64 capturedLoop;            
+		Array<Shared<GPUResource>> resources; 
+	};
 
 	class Scene;
 	class Renderer
 	{
 	public:
 		static constexpr UInt32 MaxFramesInFlight = 3;
-		static constexpr UInt32 MaxCommandListsInFlight = 2;
+		static constexpr UInt32 MaxCommandListsInFlight = 3;
 
 		template<typename RenderFunction>
 		static void EnqueueCommand(RenderFunction&& _command)
@@ -94,7 +100,7 @@ namespace Daydream
 
 		static void CopyTexture2D(const Shared<Texture2D>& _src, const Shared<Texture2D>& _dst);
 		static void CopyTexture2DToTextureCube(const Shared<Texture2D>& _srcTexture2D, const Shared<TextureCube>& _dstCubemap, UInt32 _faceIndex, UInt32 _mipLevel = 0);
-		static void CopyTextureCubeToTexture2D(const Shared<TextureCube>& _srcCubemap,  const Shared<Texture2D>& _dstTexture2D, UInt32 _faceIndex, UInt32 _mipLevel = 0);
+		static void CopyTextureCubeToTexture2D(const Shared<TextureCube>& _srcCubemap, const Shared<Texture2D>& _dstTexture2D, UInt32 _faceIndex, UInt32 _mipLevel = 0);
 
 
 		static void TransitionTextureState(const Shared<GPUTexture>& _texture,
@@ -126,6 +132,11 @@ namespace Daydream
 
 		static void Submit();
 
+		inline static void CaptureResource(Array<Shared<GPUResource>> _resources)
+		{
+			capturedResourcesQueue.push({ currentLoop, std::move(_resources) });
+		}
+
 		inline static ImGuiRenderer* GetImGuiRenderer() { return imguiRenderer.get(); }
 
 		//static Renderer& Get() { return *instance; }
@@ -134,6 +145,7 @@ namespace Daydream
 		inline static RenderContext* GetRenderContext() { return renderContext.get(); }
 		inline static Skybox* GetSkybox() { return skybox.get(); }
 		inline static RenderCommandList* GetActiveCommandList() { return renderContext->GetActiveCommandList().get(); }
+		inline static RenderTargetPool* GetRenderTargetPool() { return renderTargetPool.get(); }
 	private:
 		Renderer() = default;
 		static void InitRenderDevice(Daydream::RendererAPIType _API);
@@ -142,6 +154,9 @@ namespace Daydream
 		inline static Unique<RenderContext> renderContext = nullptr;
 		inline static Unique<ImGuiRenderer> imguiRenderer = nullptr;
 		inline static Unique<Skybox> skybox = nullptr;
+
+		inline static Queue<ResourceCapturedData> capturedResourcesQueue;
+		inline static Unique<RenderTargetPool> renderTargetPool;
 
 		/////////////////////////////////  RenderThread  ///////////////////////////////// 
 		inline static bool useRenderThread = 0;
@@ -157,6 +172,8 @@ namespace Daydream
 		inline static Unique<RenderThread> renderThread = nullptr;
 		inline static UInt32 recordingQueueIndex = 0;
 		//////////////////////////////////////////////////////////////////////////////////
+
+		inline static UInt32 currentLoop = 0;
 
 	};
 }

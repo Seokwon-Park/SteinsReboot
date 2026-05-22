@@ -163,9 +163,9 @@ namespace Daydream
 		return MakeShared<VulkanGPUTexture>(this, _desc);
 	}
 
-	Shared<TextureView> VulkanRenderDevice::CreateTextureView(Shared<Texture> _texture, const TextureViewDesc& _desc)
+	Shared<TextureView> VulkanRenderDevice::CreateTextureView(Texture* _texture, const TextureViewDesc& _desc)
 	{
-		Shared<VulkanGPUTexture> texture = SharedCast<VulkanGPUTexture>(_texture->GetGPUTexture());
+		VulkanGPUTexture* texture = Cast<VulkanGPUTexture*>(_texture->GetGPUTexturePtr());
 		return MakeShared<VulkanTextureView>(this, texture, _desc);
 	}
 

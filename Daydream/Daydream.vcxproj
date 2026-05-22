@@ -107,6 +107,7 @@
     <ClInclude Include="Source\Base\Base.h" />
     <ClInclude Include="Source\Base\Container\Array.h" />
     <ClInclude Include="Source\Base\Container\HashMap.h" />
+    <ClInclude Include="Source\Base\Container\PriorityQueue.h" />
     <ClInclude Include="Source\Base\Container\Queue.h" />
     <ClInclude Include="Source\Base\Container\SortedMap.h" />
     <ClInclude Include="Source\Base\IO\File.h" />
@@ -126,6 +127,10 @@
     <ClInclude Include="Source\Daydream\Asset\AssetDefaults.h" />
     <ClInclude Include="Source\Daydream\Asset\AssetImporter.h" />
     <ClInclude Include="Source\Daydream\Asset\AssetManager.h" />
+    <ClInclude Include="Source\Daydream\Asset\AssetSerializer.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
     <ClInclude Include="Source\Daydream\Asset\MaterialManager.h" />
     <ClInclude Include="Source\Daydream\Asset\ModelRegistry.h" />
     <ClInclude Include="Source\Daydream\Asset\Texture2DRegistry.h" />
@@ -234,11 +239,27 @@
     <ClInclude Include="Source\Daydream\Graphics\Core\RenderCommandQueue.h" />
     <ClInclude Include="Source\Daydream\Graphics\Core\RenderContext.h" />
     <ClInclude Include="Source\Daydream\Graphics\Core\RenderDevice.h" />
-    <ClInclude Include="Source\Daydream\Graphics\Core\RenderGraph.h">
+    <ClInclude Include="Source\Daydream\Graphics\Core\RenderGraph\RenderGraph.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="Source\Daydream\Graphics\Core\RenderGraph\RenderGraphDrawList.h">
       <SubType>
       </SubType>
     </ClInclude>
     <ClInclude Include="Source\Daydream\Graphics\Core\RenderingInfo.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="Source\Daydream\Graphics\Core\RenderTargetPool\RenderTargetPool.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="Source\Daydream\Graphics\Core\RenderTargetPool\RenderTargetPoolHandle.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="Source\Daydream\Graphics\Core\RenderTargetPool\RenderTargetPoolKey.h">
       <SubType>
       </SubType>
     </ClInclude>
@@ -769,6 +790,10 @@
     <ClCompile Include="Source\Daydream\Asset\AssetDefaults.cpp" />
     <ClCompile Include="Source\Daydream\Asset\AssetImporter.cpp" />
     <ClCompile Include="Source\Daydream\Asset\AssetManager.cpp" />
+    <ClCompile Include="Source\Daydream\Asset\AssetSerializer.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Daydream\Asset\ModelRegistry.cpp" />
     <ClCompile Include="Source\Daydream\Asset\Texture2DRegistry.cpp" />
     <ClCompile Include="Source\Daydream\Core\Application.cpp" />
@@ -865,11 +890,27 @@
     <ClCompile Include="Source\Daydream\Graphics\Core\RenderCommandQueue.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Core\RenderContext.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Core\RenderDevice.cpp" />
-    <ClCompile Include="Source\Daydream\Graphics\Core\RenderGraph.cpp">
+    <ClCompile Include="Source\Daydream\Graphics\Core\RenderGraph\RenderGraph.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Daydream\Graphics\Core\RenderGraph\RenderGraphDrawList.cpp">
       <SubType>
       </SubType>
     </ClCompile>
     <ClCompile Include="Source\Daydream\Graphics\Core\RenderingInfo.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Daydream\Graphics\Core\RenderTargetPool\RenderTargetPool.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Daydream\Graphics\Core\RenderTargetPool\RenderTargetPoolHandle.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Daydream\Graphics\Core\RenderTargetPool\RenderTargetPoolKey.cpp">
       <SubType>
       </SubType>
     </ClCompile>

@@ -28,12 +28,5 @@ namespace Daydream
         CopyBufferToTexture(uploadBuffer->GetGPUBuffer(), _target->GetGPUTexture());
     }
 
-    void RenderContext::CaptureResource(Shared<GPUResource> _resource)
-    {
-        captureStorage.push_back(_resource);
-    }
-    void RenderContext::ReleaseCapturedBuffer()
-    {
-        captureStorage.clear();
-    }
+
 }

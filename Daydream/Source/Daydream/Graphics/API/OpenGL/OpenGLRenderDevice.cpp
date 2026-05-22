@@ -81,14 +81,14 @@ namespace Daydream
 		return MakeShared<OpenGLGPUBuffer>(_desc);
 	}
 
-	Shared<GPUTexture> Daydream::OpenGLRenderDevice::CreateGPUTexture(const TextureDesc & _desc)
+	Shared<GPUTexture> OpenGLRenderDevice::CreateGPUTexture(const TextureDesc& _desc)
 	{
 		return MakeShared<OpenGLGPUTexture>(_desc);
 	}
 
-	Shared<TextureView> OpenGLRenderDevice::CreateTextureView(Shared<Texture> _texture, const TextureViewDesc& _desc)
+	Shared<TextureView> OpenGLRenderDevice::CreateTextureView(Texture* _texture, const TextureViewDesc& _desc)
 	{
-		Shared<OpenGLGPUTexture> texture = SharedCast<OpenGLGPUTexture>(_texture->GetGPUTexture());
+		OpenGLGPUTexture* texture = Cast<OpenGLGPUTexture*>(_texture->GetGPUTexturePtr());
 		return MakeShared<OpenGLTextureView>(texture, _desc);
 	}
 

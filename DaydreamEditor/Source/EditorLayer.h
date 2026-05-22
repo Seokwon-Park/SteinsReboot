@@ -34,6 +34,7 @@ namespace Daydream
 		void CreateProject();
 
 		void BeginDockspace();
+
 		void UpdateViewportSize();
 
 		Pair<Int32, Int32> GetViewportMousePos();
@@ -44,10 +45,13 @@ namespace Daydream
 
 		bool isViewportHovered = false;
 		bool isViewportFocused = false;
+
 		bool isGuizmoInteract = false;
 		bool viewportShouldResize = true;
 
-		Unique<SceneRenderer> sceneRenderer;
+		bool isViewControlled = false;
+
+		Shared<SceneRenderer> sceneRenderer;
 
 		Shared<VertexBuffer> cubeVBO;
 		Shared<IndexBuffer> cubeIBO;
@@ -68,24 +72,21 @@ namespace Daydream
 		Shared<GraphicsPipelineState> equirectangleToCubePipeline;
 		Shared<GraphicsPipelineState> maskPSO;
 
-		Shared<Material> deferredLightingMaterial;
-		Shared<Material> material;
-		Shared<Material> material3d;
-		Shared<Material> maskMaterial;
-
 		Shared<Mesh> cubeMesh;
 		Shared<Model> model;
-
+				
 		Shared<Scene> activeScene;
 
 		Shared<EditorCamera> editorCamera;
-
 		Shared<Project> currentProject;
-		Unique<AssetManager> eidtorAssetManager;
+
+		Unique<AssetManager> editorAssetManager;
 
 		UInt32 viewIndex = 0;
 
 		//Panels
+		Array<UIPanel*> editorPanels;
+
 		Unique<ViewportPanel> viewportPanel;
 		Unique<PropertyPanel> propertyPanel;
 		Unique<SceneHierarchyPanel> sceneHierarchyPanel;

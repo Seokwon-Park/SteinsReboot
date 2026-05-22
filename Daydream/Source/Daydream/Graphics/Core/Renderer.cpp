@@ -23,6 +23,7 @@ namespace Daydream
 
 		imguiRenderer = renderDevice->CreateImGuiRenderer();
 
+		renderTargetPool = MakeUnique<RenderTargetPool>();
 
 		commandQueues.resize(MaxCommandListsInFlight);
 		for (auto& commandList : commandQueues)
@@ -298,6 +299,7 @@ namespace Daydream
 
 	void Renderer::CopyBuffer(const Shared<GPUBuffer>& _src, const Shared<GPUBuffer>& _dst, UInt32 _copySize)
 	{
+
 		EnqueueCommand([_src, _dst, _copySize]()
 			{
 				renderContext->CaptureResource(_src);
@@ -309,6 +311,7 @@ namespace Daydream
 
 	void Renderer::CopyBufferToTexture(const Shared<GPUBuffer>& _src, const Shared<GPUTexture>& _dst)
 	{
+
 		EnqueueCommand([_src, _dst]()
 			{
 				renderContext->CaptureResource(_src);
@@ -317,10 +320,11 @@ namespace Daydream
 			});
 	}
 
-	void Daydream::Renderer::CopyDataToTexture2D(const Shared<Texture2D>& _target, const Shared<Array<Byte>>& _data)
+	void Renderer::CopyDataToTexture2D(const Shared<Texture2D>& _target, const Shared<Array<Byte>>& _data)
 	{
 		EnqueueCommand([_target, _data]()
 			{
+				renderContext->CaptureResource(_target->GetGPUTexture());
 				renderContext->CopyDataToTexture2D(_target, _data);
 			});
 	}
@@ -434,7 +438,17 @@ namespace Daydream
 			//싱글 스레드일 경우 그냥 실행
 			submittedQueue->Execute();
 		}
+
+		auto capturedResources = renderContext->GetCapturedResources();
+		if (!capturedResources.empty())
+		{
+			capturedResourcesQueue.push({ currentLoop, std::move(capturedResources) });
+			capturedResources.clear();
+		}
+		currentLoop += 1;
+		while (!capturedResourcesQueue.empty() && capturedResourcesQueue.front().capturedLoop + MaxFramesInFlight <= currentLoop)
+		{
+			capturedResourcesQueue.pop();
+		}
 	}
-
-
 }

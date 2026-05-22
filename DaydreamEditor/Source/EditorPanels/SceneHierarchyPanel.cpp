@@ -7,7 +7,7 @@ namespace Daydream
 	SceneHierarchyPanel::SceneHierarchyPanel()
 	{
 	}
-	void SceneHierarchyPanel::SetCurrentScene(Scene* _scene)
+	void SceneHierarchyPanel::SetCurrentContext(Shared<Scene> _scene)
 	{
 		scene = _scene;
 	}

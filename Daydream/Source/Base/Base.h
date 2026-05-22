@@ -19,5 +19,6 @@
 #include "Base/Time/TimeStep.h"
 #include "Base/Container/Array.h"
 #include "Base/Container/Queue.h"
+#include "Base/Container/PriorityQueue.h"
 #include "Base/Container/HashMap.h"
 #include "Base/Container/SortedMap.h"

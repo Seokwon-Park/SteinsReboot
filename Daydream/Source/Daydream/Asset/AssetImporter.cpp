@@ -135,10 +135,9 @@ namespace Daydream
 
 		if (isMetaDirty)
 		{
-			FileSystem::MakeYamlFile(metaFilePathString, metaNode);
-			//std::ofstream fout(metaFilePathString);
-			//fout << metaNode;
-			//fout.close();
+			std::ofstream fout(metaFilePathString);
+			fout << metaNode;
+			fout.close();
 		}
 
 		Path materialDir = modelPath.GetParentPath() / "Materials";
@@ -248,10 +247,9 @@ namespace Daydream
 				out << YAML::EndMap;
 				out << YAML::EndMap;
 
-				FileSystem::MakeYamlFile(materialPath, out);
-				/*std::ofstream fout(materialPath.ToString());
+				std::ofstream fout(materialPath.ToString());
 				fout << out.c_str();
-				fout.close();*/
+				fout.close();
 			}
 			newModel->AddMaterial(materialHandle);
 			//Shared<Material> newMat = Material::Create(ResourceManager::GetResource<PipelineState>("ForwardPSO"));

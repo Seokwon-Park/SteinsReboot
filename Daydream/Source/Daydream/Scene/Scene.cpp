@@ -13,6 +13,8 @@ namespace Daydream
 {
 	Scene::Scene(const String& _name)
 	{
+		name = _name;
+
 		lightBuffer = ConstantBuffer::Create(sizeof(LightData));
 		skybox = Renderer::GetSkybox();
 		//skybox->Init();
@@ -67,8 +69,6 @@ namespace Daydream
 
 		return root;
 	}
-
-
 
 	void Scene::DestroyEntity(EntityHandle _handle)
 	{

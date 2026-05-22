@@ -4,7 +4,7 @@
 
 namespace Daydream
 {
-	D3D11TextureView::D3D11TextureView(D3D11RenderDevice* _device, Shared<D3D11GPUTexture> _texture, const TextureViewDesc& _desc)
+	D3D11TextureView::D3D11TextureView(D3D11RenderDevice* _device, D3D11GPUTexture* _texture, const TextureViewDesc& _desc)
 		:TextureView(_texture, _desc)
 	{
         ID3D11Device* d3dDevice = _device->GetDevice();

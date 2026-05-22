@@ -18,9 +18,9 @@ namespace Daydream
 		virtual void Update(Float32 _deltaTime) override;
 
 		inline void SetMesh(const AssetHandle _meshHandle) { meshHandle = _meshHandle; }
-		inline AssetHandle GetMesh() { return meshHandle; }
+		inline AssetHandle GetMeshHandle() { return meshHandle; }
 		inline void SetMaterial(const AssetHandle _materialHandle) { materialHandle = _materialHandle; }
-		inline AssetHandle GetMaterial() { return materialHandle; }
+		inline AssetHandle GetMaterialHandle() { return materialHandle; }
 
 		inline Shared<ConstantBuffer> GetWorldMatrixConstantBuffer() { return worldMatrixConstantBuffer; }
 		Shared<ConstantBuffer> GetEntityHandleConstantBuffer() { return entityHandleConstantBuffer; }

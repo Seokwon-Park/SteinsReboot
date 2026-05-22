@@ -31,7 +31,7 @@ namespace Daydream
 		virtual void BeginFrame() = 0;
 		virtual void EndFrame() = 0;
 
-		virtual Shared<TextureView> GetCurrentRenderTargetView() const = 0;
+		virtual TextureView* GetCurrentRenderTargetView() const = 0;
 		virtual Shared<RenderCommandList> GetCurrentCommandList() const = 0;
 
 		inline const UInt32 GetWidth() const { return desc.width; }

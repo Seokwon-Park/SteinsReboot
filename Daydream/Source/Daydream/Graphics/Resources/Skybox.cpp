@@ -284,10 +284,9 @@ namespace Daydream
 			renderingInfo.renderArea.height = skyboxResolution;
 
 			AttachmentDesc attachDesc{};
-			attachDesc.view = skyboxFaceRTVs[i];
+			attachDesc.view = skyboxFaceRTVs[i].get();
 
 			renderingInfo.colorAttachments.push_back(attachDesc);
-
 			
 			Renderer::BeginRendering(renderingInfo);
 			Renderer::BindPipelineState(equirectangularPSO);
@@ -312,7 +311,7 @@ namespace Daydream
 			renderingInfo.renderArea.height = diffuseResolution;
 
 			AttachmentDesc attachDesc{};
-			attachDesc.view = irradianceRTVs[i];
+			attachDesc.view = irradianceRTVs[i].get();
 
 			renderingInfo.colorAttachments.push_back(attachDesc);
 
@@ -348,7 +347,7 @@ namespace Daydream
 				renderingInfo.renderArea = renderArea;
 
 				AttachmentDesc attachDesc{};
-				attachDesc.view = prefilterRTVs[index];
+				attachDesc.view = prefilterRTVs[index].get();
 
 				renderingInfo.colorAttachments.push_back(attachDesc);
 
@@ -374,7 +373,7 @@ namespace Daydream
 		renderingInfo.renderArea.height = skyboxResolution;
 
 		AttachmentDesc attachDesc{};
-		attachDesc.view = BRDFRTV;
+		attachDesc.view = BRDFRTV.get();
 
 		renderingInfo.colorAttachments.push_back(attachDesc);
 		Renderer::BeginRendering(renderingInfo);

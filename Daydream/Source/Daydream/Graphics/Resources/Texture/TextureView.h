@@ -22,7 +22,7 @@ namespace Daydream
 	class TextureView
 	{
 	public:
-		TextureView(Shared<GPUTexture> _texture, const TextureViewDesc& _desc);
+		TextureView(GPUTexture* _texture, const TextureViewDesc& _desc);
 		virtual ~TextureView();
 
 		virtual inline void* GetUIHandle() const { return nullptr; };
@@ -30,13 +30,14 @@ namespace Daydream
 		inline UInt32 GetWidth() const { return Math::Max(1u, originTexture->GetWidth() >> desc.baseMip); }
 		inline UInt32 GetHeight() const { return Math::Max(1u, originTexture->GetHeight() >> desc.baseMip); }
 
-		inline Shared<GPUTexture> GetOriginTexture() const { return originTexture; }
+		inline GPUTexture* GetOriginTexture() const { return originTexture; }
 		inline const TextureViewDesc& GetDesc() { return desc; }
 
-		static Shared<TextureView> Create(Shared<Texture> _texture, const TextureViewDesc& _desc);
+		static Shared<TextureView> Create(Texture* _texture, const TextureViewDesc& _desc);
+		static Shared<TextureView> Create(const Shared<Texture>& _texture, const TextureViewDesc& _desc);
 	protected:
 		TextureViewDesc desc;
-		Shared<GPUTexture> originTexture;
+		GPUTexture* originTexture;
 	private:
 
 	};

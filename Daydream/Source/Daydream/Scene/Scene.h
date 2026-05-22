@@ -59,6 +59,7 @@ namespace Daydream
 		LightComponent* GetLightComponent() { return firstLightComponent; }
 	private:
 		void ProcessModelNode(GameEntity* _parentEntity, const NodeData& _curNode, const Shared<Model>& _model);
+		String name;
 
 		Array<Unique<GameEntity>> entityPool;
 

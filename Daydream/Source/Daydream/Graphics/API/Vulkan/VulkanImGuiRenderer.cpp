@@ -34,6 +34,8 @@ namespace Daydream
 		info.PipelineInfoMain.PipelineRenderingCreateInfo.pColorAttachmentFormats = &colorFormat;
 		info.PipelineInfoMain.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
 
+		info.UsePushDescriptorSet = true;
+
 		ImGui_ImplVulkan_Init(&info);
 	}
 	void VulkanImGuiRenderer::Shutdown()

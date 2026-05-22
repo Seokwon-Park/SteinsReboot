@@ -42,7 +42,7 @@ namespace Daydream
 		for (const AttachmentDesc& attachmentDesc : _renderingInfo.colorAttachments)
 		{
 			ClearValue rtvClearValue = attachmentDesc.clearValue;
-			Shared<D3D11TextureView> d3d11TextureView = SharedCast<D3D11TextureView>(attachmentDesc.view);
+			D3D11TextureView* d3d11TextureView = Cast<D3D11TextureView*>(attachmentDesc.view);
 			if (attachmentDesc.loadOp == AttachmentLoadOp::Clear)
 			{
 				device->GetContext()->ClearRenderTargetView(d3d11TextureView->GetRTV(), &rtvClearValue.colorClearValue.color[0]);
@@ -54,7 +54,7 @@ namespace Daydream
 		if (_renderingInfo.depthAttachment.view != nullptr)
 		{
 			ClearValue dsvClearValue = _renderingInfo.depthAttachment.clearValue;
-			D3D11TextureView* d3d11TextureView = Cast<D3D11TextureView*>(_renderingInfo.depthAttachment.view.get());
+			D3D11TextureView* d3d11TextureView = Cast<D3D11TextureView*>(_renderingInfo.depthAttachment.view);
 			dsv = d3d11TextureView->GetDSV();
 			if (_renderingInfo.depthAttachment.loadOp == AttachmentLoadOp::Clear)
 			{

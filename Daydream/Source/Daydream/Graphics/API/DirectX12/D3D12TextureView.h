@@ -9,7 +9,7 @@ namespace Daydream
 	class D3D12TextureView : public TextureView
 	{
 	public:
-		explicit D3D12TextureView(D3D12RenderDevice* _device, Shared<D3D12GPUTexture> _texture,const TextureViewDesc& _desc);
+		explicit D3D12TextureView(D3D12RenderDevice* _device, D3D12GPUTexture* _texture,const TextureViewDesc& _desc);
 		~D3D12TextureView() = default;
 
 		virtual void* GetUIHandle() const override { return reinterpret_cast<void*>(GetGPUHandle().ptr); }

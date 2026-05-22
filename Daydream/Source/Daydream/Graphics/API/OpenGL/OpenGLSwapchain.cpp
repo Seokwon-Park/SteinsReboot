@@ -45,24 +45,7 @@ namespace Daydream
 
 		if(isSwapchainResized)
 		{
-			TextureDesc textureDesc{};
-			textureDesc.width = desc.width;
-			textureDesc.height = desc.height;
-			textureDesc.mipLevels = 1;
-			textureDesc.sampleCount = 1;
-			textureDesc.format = desc.format;
-			textureDesc.textureUsage = TextureUsage::RenderTarget;
-			textureDesc.type = TextureType::Texture2D;
-
-			backBufferTexture = MakeShared<OpenGLGPUTexture>(textureDesc);
-
-			TextureViewDesc viewDesc;
-			viewDesc.format = desc.format;
-			viewDesc.type = TextureViewType::RenderTarget;
-
-			backBufferRTV = MakeShared<OpenGLTextureView>(backBufferTexture, viewDesc);
-
-			glNamedFramebufferTexture(blitFBO, GL_COLOR_ATTACHMENT0, backBufferRTV->GetTextureViewID(), 0);
+			CreateBackBufferView();
 		}
 	}
 	void OpenGLSwapchain::EndFrame()
@@ -95,7 +78,7 @@ namespace Daydream
 		viewDesc.format = desc.format;
 		viewDesc.type = TextureViewType::RenderTarget;
 
-		backBufferRTV = MakeShared<OpenGLTextureView>(backBufferTexture, viewDesc);
+		backBufferRTV = MakeShared<OpenGLTextureView>(backBufferTexture.get(), viewDesc);
 
 		glNamedFramebufferTexture(blitFBO, GL_COLOR_ATTACHMENT0, backBufferRTV->GetTextureViewID(), 0);
 	}

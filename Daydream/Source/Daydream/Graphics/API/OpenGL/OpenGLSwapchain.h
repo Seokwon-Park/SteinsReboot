@@ -21,7 +21,7 @@ namespace Daydream
 		virtual void BeginFrame() override;
 		virtual void EndFrame() override;
 
-		virtual Shared<TextureView> GetCurrentRenderTargetView() const { return backBufferRTV; };
+		virtual TextureView* GetCurrentRenderTargetView() const { return backBufferRTV.get(); };
 		virtual Shared<RenderCommandList> GetCurrentCommandList() const { return nullptr; };
 
 	private:

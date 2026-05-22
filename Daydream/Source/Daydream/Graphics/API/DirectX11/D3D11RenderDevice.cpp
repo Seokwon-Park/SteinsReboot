@@ -149,9 +149,9 @@ namespace Daydream
 	{
 		return MakeShared<D3D11GPUTexture>(this, _desc);
 	}
-	Shared<TextureView> D3D11RenderDevice::CreateTextureView(Shared<Texture> _texture, const TextureViewDesc& _desc)
+	Shared<TextureView> D3D11RenderDevice::CreateTextureView(Texture* _texture, const TextureViewDesc& _desc)
 	{
-		Shared<D3D11GPUTexture> texture = SharedCast<D3D11GPUTexture>(_texture->GetGPUTexture());
+		D3D11GPUTexture* texture = Cast<D3D11GPUTexture*>(_texture->GetGPUTexturePtr());
 		return MakeShared<D3D11TextureView>(this, texture, _desc);
 	}
 	//Shared<VertexBuffer> D3D11RenderDevice::CreateDynamicVertexBuffer(UInt32 _size, UInt32 _stride, UInt32 _initialDataSize, const void* _initialData)

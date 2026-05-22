@@ -10,7 +10,7 @@ namespace Daydream
 	class VulkanTextureView : public TextureView
 	{
 	public:
-		VulkanTextureView(VulkanRenderDevice* _device, Shared<VulkanGPUTexture> _texture, const TextureViewDesc& _desc);
+		VulkanTextureView(VulkanRenderDevice* _device, VulkanGPUTexture* _texture, const TextureViewDesc& _desc);
 		~VulkanTextureView() override = default;
 
 		virtual void* GetUIHandle() const { return imageView.get(); }

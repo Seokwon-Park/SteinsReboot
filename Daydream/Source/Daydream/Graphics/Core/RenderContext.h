@@ -77,16 +77,22 @@ namespace Daydream
 		) {};
 
 		virtual void SetActiveCommandList(Shared<RenderCommandList> _commandList) {};
-
-		void CaptureResource(Shared<GPUResource> _resource);
-		void ReleaseCapturedBuffer();
-
 		Shared<RenderCommandList> GetActiveCommandList() const { return activeCommandList; }
+
+		inline void CaptureResource(Shared<GPUResource> _resource)
+		{
+			capturedResources.push_back(_resource);
+		}
+		inline Array<Shared<GPUResource>> GetCapturedResources()
+		{
+			return std::move(capturedResources);
+		}
 	protected:
 		Shared<GraphicsPipelineState> currentGraphicsPipelineState;
 		Shared<RenderCommandList> activeCommandList;
 
-		Array<Shared<GPUResource>> captureStorage;
+		Array<Shared<GPUResource>> capturedResources;
+
 	private:
 	};
 }

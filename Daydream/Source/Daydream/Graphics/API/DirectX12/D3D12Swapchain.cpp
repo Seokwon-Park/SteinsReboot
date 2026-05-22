@@ -241,7 +241,7 @@ namespace Daydream
 			swapchain->GetBuffer(i, IID_PPV_ARGS(backBuffer.GetAddressOf()));
 			backBuffer->SetName(L"Swapchain Buffer");
 			backBufferTextures[i] = MakeShared<D3D12GPUTexture>(device, textureDesc, backBuffer);
-			backBufferRTVs[i] = MakeShared<D3D12TextureView>(device, backBufferTextures[i], viewDesc);
+			backBufferRTVs[i] = MakeShared<D3D12TextureView>(device, backBufferTextures[i].get(), viewDesc);
 		}
 	}
 }

@@ -28,9 +28,10 @@
 // ---Renderer------------------------------------
 #include "Daydream/Graphics/Core/Renderer.h"
 #include "Daydream/Graphics/Core/Renderer2D.h"
-#include "Daydream/Graphics/Core/RenderGraph.h"
+#include "Daydream/Graphics/Core/RenderGraph/RenderGraph.h"
 #include "Daydream/Graphics/Core/RenderingInfo.h"
 #include "Daydream/Graphics/Core/SceneRenderer.h"
+#include "Daydream/Graphics/Core/DeferredSceneRenderer.h"
 #include "Daydream/Graphics/Resources/PipelineState/GraphicsPipelineState.h"
 
 #include "Daydream/Graphics/Camera/Camera.h"

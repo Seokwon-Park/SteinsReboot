@@ -121,7 +121,7 @@ namespace Daydream
 		viewDesc.format = desc.format;
 		viewDesc.type = TextureViewType::RenderTarget;
 
-		backBufferRTV = MakeShared<D3D11TextureView>(device, backBufferTexture, viewDesc);
+		backBufferRTV = MakeShared<D3D11TextureView>(device, backBufferTexture.get(), viewDesc);
 	}
 
 }

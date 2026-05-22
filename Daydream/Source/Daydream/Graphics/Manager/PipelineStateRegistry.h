@@ -11,8 +11,13 @@ namespace Daydream
 	{
 	public:
 		PipelineStateRegistry();
+		virtual ~PipelineStateRegistry();
 
 		virtual void CreateBuiltinResources() override;
+
+		inline static Shared<GraphicsPipelineState> DepthPSO;
+		inline static Shared<GraphicsPipelineState> GBufferPSO;
+		inline static Shared<GraphicsPipelineState> DeferredPSO;
 	private:
 	};
 }
