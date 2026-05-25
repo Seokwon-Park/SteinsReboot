@@ -12,8 +12,9 @@ namespace Daydream
         static const AssetHandle DefaultMetallicHandle;  // 보통 검은색
         static const AssetHandle DefaultAOHandle;        // 보통 흰색
 
-        static const AssetHandle DefaultMaterial;        // 보통 흰색
+        static const AssetHandle DefaultMaterialHandle;  
 
-        static const AssetHandle QuadMesh;        // 보통 흰색
+        static const AssetHandle DefaultQuadMeshHandle;        
+        static const AssetHandle DefaultBoxMeshHandle;        
     };
 }

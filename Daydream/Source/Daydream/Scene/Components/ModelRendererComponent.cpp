@@ -12,7 +12,6 @@ namespace Daydream
 {
 	ModelRendererComponent::ModelRendererComponent()
 	{
-		worldMatrix = ConstantBuffer::Create(sizeof(TransformConstantBufferData));
 		materialCB = ConstantBuffer::Create(sizeof(MaterialConstantBufferData));
 		entityHandle = ConstantBuffer::Create(16);
 
@@ -28,9 +27,9 @@ namespace Daydream
 		Renderer::UpdateConstantBuffer(entityHandle, GetOwner()->GetHandle().id);
 	}
 
-	void ModelRendererComponent::SetModel(Shared<Model> _model)
+	void ModelRendererComponent::SetModel(Model* _model)
 	{
-		model = _model.get();
+		model = _model;
 	}
 
 	//void ModelRendererComponent::Render()

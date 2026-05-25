@@ -31,7 +31,7 @@ namespace Daydream
 		{
 			aspectMask = vk::ImageAspectFlagBits::eDepth | vk::ImageAspectFlagBits::eStencil;
 		}
-
+				
 		vk::ImageViewCreateInfo viewInfo{};
 		viewInfo.image = _texture->GetVkImage();
 		viewInfo.viewType = viewType;

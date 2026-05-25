@@ -63,14 +63,14 @@ namespace Daydream
 		EntityInfo info;
 		Shared<ConstantBuffer> entityBuffer;
 
-		Shared<GraphicsPipelineState> depthPSO;
-		Shared<GraphicsPipelineState> gBufferPSO;
-		Shared<GraphicsPipelineState> deferredLightingPSO;
-		Shared<GraphicsPipelineState> pso;
-		Shared<GraphicsPipelineState> pso3d;
-		Shared<GraphicsPipelineState> skyboxPipeline;
-		Shared<GraphicsPipelineState> equirectangleToCubePipeline;
-		Shared<GraphicsPipelineState> maskPSO;
+		GraphicsPipelineState* depthPSO;
+		GraphicsPipelineState* gBufferPSO;
+		GraphicsPipelineState* deferredLightingPSO;
+		GraphicsPipelineState* pso;
+		GraphicsPipelineState* pso3d;
+		GraphicsPipelineState* skyboxPipeline;
+		GraphicsPipelineState* equirectangleToCubePipeline;
+		GraphicsPipelineState* maskPSO;
 
 		Shared<Mesh> cubeMesh;
 		Shared<Model> model;

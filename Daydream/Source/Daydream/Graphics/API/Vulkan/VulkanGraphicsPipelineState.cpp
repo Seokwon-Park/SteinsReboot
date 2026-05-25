@@ -53,14 +53,14 @@ namespace Daydream
 			attribDescArray.push_back(attribDesc);
 		}
 
-		for (const Shared<Shader>& shader : shaderGroup->GetShaders())
+		for (Shader* shader : shaderGroup->GetShaders())
 		{
 			entryPoints[shader->GetType()] = GraphicsUtility::GetShaderEntryPointName(shader->GetType());
 
-			Shared<VulkanShader> vulkanShader = static_pointer_cast<VulkanShader>(shader);
+			VulkanShader* vulkanShader = Cast<VulkanShader*>(shader);
 
 			vk::PipelineShaderStageCreateInfo shaderStageInfo{};
-			shaderStageInfo.module = vulkanShader->GetShaderHandle();
+			shaderStageInfo.module = vulkanShader->GetVkShaderModule();
 			shaderStageInfo.pName = entryPoints[shader->GetType()].c_str();
 			shaderStageInfo.stage = GraphicsUtility::Vulkan::ConvertToShaderStageFlagBit(shader->GetType());
 
@@ -247,11 +247,6 @@ namespace Daydream
 	void VulkanGraphicsPipelineState::Bind() const
 	{
 		//vkCmdBindDescriptorSets(device->GetCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, descriptorSets.data(), 0, nullptr);
-	}
-
-	void VulkanGraphicsPipelineState::CreateShaderStageInfo(const Shared<Shader>& _shader)
-	{
-
 	}
 	//Shared<Material> VulkanPipelineState::CreateMaterial()
 	//{

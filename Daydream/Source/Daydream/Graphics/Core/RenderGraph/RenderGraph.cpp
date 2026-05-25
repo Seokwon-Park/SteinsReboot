@@ -2,12 +2,14 @@
 #include "RenderGraph.h"
 
 #include "Daydream/Graphics/Core/Renderer.h"
+#include "Daydream/Graphics/Resources/Struct/TransformConstantBufferData.h"
+#include "Daydream/Graphics/Utility/GraphicsUtility.h"
 
 namespace Daydream
 {
 	RenderGraph::RenderGraph()
 	{
-
+		transformCB = ConstantBuffer::Create(sizeof(TransformConstantBufferData));
 	}
 
 	RenderGraph::~RenderGraph()
@@ -20,6 +22,8 @@ namespace Daydream
 		ResourceNode node{};
 		node.name = _name;
 		node.format = _desc.format;
+		node.width = _desc.width;
+		node.height = _desc.height;
 		node.firstPass = UINT32_MAX;
 		node.lastPass = 0;
 
@@ -100,11 +104,8 @@ namespace Daydream
 					res.lastPass = passId;
 				};
 
-			for (UInt32 resId : pass.reads)
-			{
-				for (UInt32 resId : pass.reads) updateLifetime(resId);
-				for (UInt32 resId : pass.writes) updateLifetime(resId);
-			}
+			for (UInt32 resId : pass.reads) updateLifetime(resId);
+			for (UInt32 resId : pass.writes) updateLifetime(resId);
 		}
 
 		return executionOrder.size() == passes.size();
@@ -114,45 +115,98 @@ namespace Daydream
 	{
 		for (UInt32 passId : executionOrder)
 		{
-			auto allocateRenderTargetHandle = [&](UInt32 _resId)
-				{
-					auto& res = resources[_resId];
-					// 만약 리소스가 이번 패스부터 쓰이기 시작한다면
-					if (res.firstPass == passId)
-					{
-						// 렌더타겟 풀에서 할당받음
-						res.resourceHandle = Renderer::GetRenderTargetPool()->RequestRenderTargetView(
-							res.width, res.height, res.format
-						);
-					}
-					
-				};
-
 			PassNode& pass = passes[passId];
+			
+			RenderingInfo renderingInfo{};
+			UInt32 passWidth = resources[pass.writes[0]].width;
+			UInt32 passHeight = resources[pass.writes[0]].height;
 			for (UInt32 resId : pass.writes)
 			{
 				ResourceNode& resource = resources[resId];
-				RenderingInfo renderingInfo{};
+				if (passWidth != resource.width || passHeight != resource.height)
+				{
+					DAYDREAM_RENDERER_ERROR("Resource {} has different size!", resource.name);
+					return;
+				}
 
-				renderingInfo.renderArea.x = 0;
-				renderingInfo.renderArea.y = 0;
-				renderingInfo.renderArea.width = resource.width;
-				renderingInfo.renderArea.height = resource.height;
-
+				if (resource.firstPass == passId)
+				{
+					resource.resourceHandle = Renderer::GetRenderTargetPool()->RequestTexture2DHandle(
+						resource.width, resource.height, resource.format
+					);
+				}
+								
 				AttachmentDesc attachDesc{};
-				attachDesc.view = resource.resourceHandle.GetRenderTargetView();
+				if (!GraphicsUtility::IsDepthFormat(resource.format))
+				{
+					attachDesc.view = resource.resourceHandle.GetRenderTargetView();
+					renderingInfo.colorAttachments.push_back(attachDesc);
 
-				renderingInfo.colorAttachments.push_back(attachDesc);
+					Renderer::TransitionTextureState(resource.resourceHandle.GetTexture(), ResourceState::Undefined, ResourceState::RenderTarget);
+				}
+				else
+				{
+					attachDesc.view = resource.resourceHandle.GetDepthStencilView();
+					renderingInfo.depthAttachment = attachDesc;
+					Renderer::TransitionTextureState(resource.resourceHandle.GetTexture(), ResourceState::Undefined, ResourceState::DepthWrite);
+				}
 			}
-			
 
+			renderingInfo.renderArea.x = 0;
+			renderingInfo.renderArea.y = 0;
+			renderingInfo.renderArea.width = passWidth;
+			renderingInfo.renderArea.height = passHeight;
 
 			Renderer::BindPipelineState(passes[passId].pipelineState);
-			//if (passIndex >= passes.size()) continue;
-			//if (passes[passIndex].execute)
-			//{
-			//	passes[passIndex].execute();
-			//}
+
+			switch (pass.drawType)
+			{
+			case PassDrawType::DrawMesh:
+			{
+				for (auto& renderItem : pass.drawList)
+				{
+					TransformConstantBufferData transformData;
+					transformData.world = renderItem.worldMatrix.Transposed();
+					transformData.worldInverseTranspose = transformData.world.Inversed().Transposed();
+					Renderer::UpdateConstantBuffer(transformCB, transformData);
+					Renderer::BindConstantBuffer("World", transformCB);
+					Renderer::BindMesh(renderItem.mesh);
+					Renderer::BindMaterial(renderItem.material);
+					Renderer::DrawIndexed(renderItem.mesh->GetIndexCount());
+				}
+				break;
+			}
+			case PassDrawType::DrawDepthStencil:
+			{
+				for (auto& renderItem : pass.drawList)
+				{
+					TransformConstantBufferData transformData;
+					transformData.world = renderItem.worldMatrix.Transposed();
+					transformData.worldInverseTranspose = transformData.world.Inversed().Transposed();
+					Renderer::UpdateConstantBuffer(transformCB, transformData);
+					Renderer::BindConstantBuffer("World", transformCB);
+					Renderer::BindMesh(renderItem.mesh);
+					Renderer::DrawIndexed(renderItem.mesh->GetIndexCount());
+				}
+				break;
+			}
+			case PassDrawType::FullScreenQuad:
+				break;
+			case PassDrawType::Compute:
+				break;
+			default:
+				break;
+			}
+
+			//pass를 그리고 난 다음 읽는데 쓴 resource들이 더이상 필요가 없는지 확인
+			for (UInt32 resId : pass.reads)
+			{
+				ResourceNode& resource = resources[resId];
+				if (resource.lastPass == passId)
+				{
+					Renderer::GetRenderTargetPool()->ReturnTexture2DHandle(std::move(resource.resourceHandle), Renderer::GetCurrentLoop());
+				}
+			}
 		}
 	}
 

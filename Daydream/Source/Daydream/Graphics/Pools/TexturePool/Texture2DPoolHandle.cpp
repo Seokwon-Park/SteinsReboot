@@ -1,5 +1,5 @@
 #include "DaydreamPCH.h"
-#include "RenderTargetPoolKey.h"
+#include "Texture2DPoolHandle.h"
 
 namespace Daydream
 {

@@ -11,8 +11,8 @@ namespace Daydream
 	{
 		glGenTextures(1, &textureViewID);
 
-		GLenum target = GraphicsUtility::OpenGL::ConvertToOpenGLTextureTarget(_texture->GetDesc().type);
-		GLenum internalFormat = GraphicsUtility::OpenGL::ConvertRenderFormatToGLFormat(_texture->GetDesc().format);
+		GLenum target = GraphicsUtility::OpenGL::ConvertToOpenGLTextureTarget(_texture->GetType());
+		GLenum internalFormat = GraphicsUtility::OpenGL::ConvertRenderFormatToGLFormat(_texture->GetFormat());
 
 		if (_texture->GetDesc().type == TextureType::TextureCube && desc.layerCount == 1)
 		{

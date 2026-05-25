@@ -39,9 +39,9 @@ namespace Daydream
 		void AddMesh(AssetHandle _meshHandle) { meshes.push_back(_meshHandle); }
 		void AddMaterial(AssetHandle _materialHandle) { materials.push_back(_materialHandle); }
 
-		const Array<AssetHandle>& GetMeshes() { return meshes; }
-		const Array<AssetHandle>& GetMaterials() { return materials; }
-		const Shared<ModelData>& GetModelData() { return modelData; }
+		const Array<AssetHandle>& GetMeshes() const { return meshes; }
+		const Array<AssetHandle>& GetMaterials() const { return materials; }
+		const ModelData* GetModelData() const { return modelData.get(); }
 		static Shared<Model> Create(Shared<ModelData> _data);
 		//static Shared<Model> Create(Shared<Mesh> _mesh);
 	private:

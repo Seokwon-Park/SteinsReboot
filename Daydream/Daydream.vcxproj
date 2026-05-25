@@ -251,15 +251,19 @@
       <SubType>
       </SubType>
     </ClInclude>
-    <ClInclude Include="Source\Daydream\Graphics\Core\RenderTargetPool\RenderTargetPool.h">
+    <ClInclude Include="Source\Daydream\Graphics\Resources\BuiltInResources.h">
       <SubType>
       </SubType>
     </ClInclude>
-    <ClInclude Include="Source\Daydream\Graphics\Core\RenderTargetPool\RenderTargetPoolHandle.h">
+    <ClInclude Include="Source\Daydream\Graphics\Pools\TexturePool\Texture2DPool.h">
       <SubType>
       </SubType>
     </ClInclude>
-    <ClInclude Include="Source\Daydream\Graphics\Core\RenderTargetPool\RenderTargetPoolKey.h">
+    <ClInclude Include="Source\Daydream\Graphics\Pools\TexturePool\Texture2DPoolHandle.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="Source\Daydream\Graphics\Pools\TexturePool\Texture2DPoolKey.h">
       <SubType>
       </SubType>
     </ClInclude>
@@ -270,14 +274,13 @@
     <ClInclude Include="Source\Daydream\Graphics\Core\Swapchain.h" />
     <ClInclude Include="Source\Daydream\Graphics\Manager\MeshRegistry.h" />
     <ClInclude Include="Source\Daydream\Graphics\Manager\PipelineStateRegistry.h" />
-    <ClInclude Include="Source\Daydream\Graphics\Manager\RenderPassRegistry.h" />
     <ClInclude Include="Source\Daydream\Graphics\Manager\ResourceManager.h" />
     <ClInclude Include="Source\Daydream\Graphics\Manager\ResourceRegistry.h" />
     <ClInclude Include="Source\Daydream\Graphics\Manager\SamplerRegistry.h" />
     <ClInclude Include="Source\Daydream\Graphics\Manager\ShaderGroupRegistry.h" />
     <ClInclude Include="Source\Daydream\Graphics\Manager\ShaderRegistry.h" />
     <ClInclude Include="Source\Daydream\Graphics\Resources\Buffer.h" />
-    <ClInclude Include="Source\Daydream\Graphics\Resources\PipelineState\ComputePipelineState.h">
+    <ClInclude Include="Source\Daydream\Graphics\States\PipelineState\ComputePipelineState.h">
       <SubType>
       </SubType>
     </ClInclude>
@@ -290,13 +293,17 @@
     <ClInclude Include="Source\Daydream\Graphics\Resources\Material.h" />
     <ClInclude Include="Source\Daydream\Graphics\Resources\Mesh.h" />
     <ClInclude Include="Source\Daydream\Graphics\Resources\Model.h" />
-    <ClInclude Include="Source\Daydream\Graphics\Resources\PipelineState\GraphicsPipelineState.h" />
+    <ClInclude Include="Source\Daydream\Graphics\States\PipelineState\GraphicsPipelineState.h" />
     <ClInclude Include="Source\Daydream\Graphics\Resources\Sampler.h" />
     <ClInclude Include="Source\Daydream\Graphics\Resources\Shader.h" />
     <ClInclude Include="Source\Daydream\Graphics\Resources\ShaderGroup.h" />
     <ClInclude Include="Source\Daydream\Graphics\Resources\SkeletalModel.h" />
     <ClInclude Include="Source\Daydream\Graphics\Resources\Skybox.h" />
     <ClInclude Include="Source\Daydream\Graphics\Resources\Sprite.h" />
+    <ClInclude Include="Source\Daydream\Graphics\Resources\Struct\TransformConstantBufferData.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
     <ClInclude Include="Source\Daydream\Graphics\Resources\Texture\Texture.h" />
     <ClInclude Include="Source\Daydream\Graphics\Resources\Texture\TextureCube.h" />
     <ClInclude Include="Source\Daydream\Graphics\Resources\Texture\TextureView.h">
@@ -902,15 +909,19 @@
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Daydream\Graphics\Core\RenderTargetPool\RenderTargetPool.cpp">
+    <ClCompile Include="Source\Daydream\Graphics\Resources\BuiltInResources.cpp">
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Daydream\Graphics\Core\RenderTargetPool\RenderTargetPoolHandle.cpp">
+    <ClCompile Include="Source\Daydream\Graphics\Pools\TexturePool\Texture2DPool.cpp">
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Daydream\Graphics\Core\RenderTargetPool\RenderTargetPoolKey.cpp">
+    <ClCompile Include="Source\Daydream\Graphics\Pools\TexturePool\Texture2DPoolHandle.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Daydream\Graphics\Pools\TexturePool\Texture2DPoolKey.cpp">
       <SubType>
       </SubType>
     </ClCompile>
@@ -921,14 +932,13 @@
     <ClCompile Include="Source\Daydream\Graphics\Core\Swapchain.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Manager\MeshRegistry.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Manager\PipelineStateRegistry.cpp" />
-    <ClCompile Include="Source\Daydream\Graphics\Manager\RenderPassRegistry.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Manager\ResourceManager.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Manager\ResourceRegistry.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Manager\SamplerRegistry.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Manager\ShaderGroupRegistry.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Manager\ShaderRegistry.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Resources\Buffer.cpp" />
-    <ClCompile Include="Source\Daydream\Graphics\Resources\PipelineState\ComputePipelineState.cpp">
+    <ClCompile Include="Source\Daydream\Graphics\States\PipelineState\ComputePipelineState.cpp">
       <SubType>
       </SubType>
     </ClCompile>
@@ -941,11 +951,15 @@
     <ClCompile Include="Source\Daydream\Graphics\Resources\Material.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Resources\Mesh.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Resources\Model.cpp" />
-    <ClCompile Include="Source\Daydream\Graphics\Resources\PipelineState\GraphicsPipelineState.cpp" />
+    <ClCompile Include="Source\Daydream\Graphics\States\PipelineState\GraphicsPipelineState.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Resources\Sampler.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Resources\Shader.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Resources\ShaderGroup.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Resources\Skybox.cpp" />
+    <ClCompile Include="Source\Daydream\Graphics\Resources\Struct\TransformConstantBufferData.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Daydream\Graphics\Resources\Texture\Texture.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Resources\Texture\TextureCube.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Resources\Texture\TextureView.cpp">

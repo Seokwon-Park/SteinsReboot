@@ -254,7 +254,7 @@ namespace Daydream
 
 	Shared<TextureView> D3D12RenderDevice::CreateTextureView(Texture* _texture, const TextureViewDesc& _desc)
 	{
-		D3D12GPUTexture* texture = Cast<D3D12GPUTexture*>(_texture->GetGPUTexturePtr());
+		D3D12GPUTexture* texture = Cast<D3D12GPUTexture*>(_texture->GetGPUTexture());
 		return MakeShared<D3D12TextureView>(this, texture, _desc);
 	}
 

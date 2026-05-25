@@ -1,5 +1,7 @@
 #include "DaydreamPCH.h"
 #include "OpenGLGraphicsPipelineState.h"
+#include "OpenGLShader.h"
+
 #include "Daydream/Graphics/Utility/GraphicsUtility.h"
 
 #include "OpenGLUtility.h"
@@ -39,8 +41,9 @@ namespace Daydream
 		//static GLint uboIndex = 0;
 		for (auto shader : GetShaders())
 		{
+			OpenGLShader* glShader = Cast<OpenGLShader*>(shader);
 			GLenum type = GraphicsUtility::OpenGL::ConvertToShaderStageBit(shader->GetType());
-			GLuint shaderID = static_cast<GLuint>(reinterpret_cast<uintptr_t>(shader->GetNativeHandle()));
+			GLuint shaderID = static_cast<GLuint>(glShader->GetShaderID());
 			glUseProgramStages(pipeline, type, shaderID);
 			for (auto& info : shader->GetShaderReflectionData())
 			{
@@ -77,7 +80,7 @@ namespace Daydream
 	{
 
 	}
-	void OpenGLGraphicsPipelineState::BindPipelineState()
+	void OpenGLGraphicsPipelineState::BindPipelineState() const
 	{
 		const auto& rsDesc = desc.rasterizerState;
 		// Fill Mode (Solid vs Wireframe)

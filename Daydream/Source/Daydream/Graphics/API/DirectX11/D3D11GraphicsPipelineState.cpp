@@ -35,7 +35,7 @@ namespace Daydream
 			{
 			case ShaderType::Vertex:
 			{
-				Shared<D3D11VertexShader> vs = static_pointer_cast<D3D11VertexShader>(shaderGroup->GetShader(ShaderType::Vertex));
+				D3D11VertexShader* vs = Cast<D3D11VertexShader*>(shaderGroup->GetShader(ShaderType::Vertex));
 				DAYDREAM_CORE_ASSERT(vs, "Vertex Shader is nullptr!");
 				ID3DBlob* vsBlob = vs->GetShaderBlob();
 				DAYDREAM_CORE_ASSERT(vsBlob, "Vertex Shader Blob is nullptr!");
@@ -50,12 +50,13 @@ namespace Daydream
 				);
 				DAYDREAM_CORE_ASSERT(SUCCEEDED(hr), "Failed to create inputlayout!");
 
-				vertexShader = (ID3D11VertexShader*)vs->GetNativeHandle();
+				vertexShader = vs->GetID3D11VertexShader();
 				break;
 			}
 			case ShaderType::Pixel:
 			{
-				pixelShader = (ID3D11PixelShader*)shaderGroup->GetShader(ShaderType::Pixel)->GetNativeHandle();
+				D3D11PixelShader* ps = Cast<D3D11PixelShader*>(shaderGroup->GetShader(ShaderType::Pixel));
+				pixelShader = ps->GetID3D11PixelShader();
 				break;
 			}
 			default:

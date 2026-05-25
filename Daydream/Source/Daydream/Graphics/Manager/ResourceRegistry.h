@@ -14,14 +14,14 @@ namespace Daydream
 	class ResourceRegistry : public IResourceRegistry
 	{
 	public:
-		virtual Shared<T> Get(const String& _name)
+		virtual T* Get(const String& _name)
 		{
 			auto itr = registry.find(_name);
 			if (itr == registry.end())
 			{
 				return nullptr;
 			}
-			return itr->second;
+			return itr->second.get();
 		}
 
 		virtual void Register(const String& _name, Shared<T> _resource)
@@ -31,7 +31,7 @@ namespace Daydream
 			{
 				//DAYDREAM_CORE_INFO("Resource {0} changed {1} -> {2}", _name, itr->second, _resource.get());
 			}
-			itr->second = _resource;
+			itr->second = std::move(_resource);
 		}
 
 	protected:

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Daydream/Graphics/Resources/PipelineState/GraphicsPipelineState.h"
+#include "Daydream/Graphics/States/PipelineState/GraphicsPipelineState.h"
 #include "VulkanRenderDevice.h"
 
 namespace Daydream
@@ -14,9 +14,9 @@ namespace Daydream
 		virtual void Bind() const override;
 		//virtual Shared<Material> CreateMaterial() override;
 
-		void CreateShaderStageInfo(const Shared<Shader>& _shader);
-		Array<vk::DescriptorSetLayout> GetLayout() { return rawDescriptorSetLayouts; };
-		vk::PipelineLayout GetPipelineLayout() { return pipelineLayout.get(); }
+		//void CreateShaderStageInfo(const Shader>& _shader);
+		Array<vk::DescriptorSetLayout> GetLayout() const { return rawDescriptorSetLayouts; };
+		vk::PipelineLayout GetPipelineLayout() const { return pipelineLayout.get(); }
 		vk::Pipeline GetPipeline() const { return pipeline.get(); }
 	private:
 

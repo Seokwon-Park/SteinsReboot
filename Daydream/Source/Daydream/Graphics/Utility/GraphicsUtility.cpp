@@ -7,7 +7,7 @@
 #include "Daydream/Graphics/Resources/Buffer.h"
 #include "Daydream/Graphics/Resources/Mesh.h"
 #include "Daydream/Graphics/Resources/Framebuffer.h"
-#include "Daydream/Graphics/Resources/PipelineState/GraphicsPipelineState.h"
+#include "Daydream/Graphics/States/PipelineState/GraphicsPipelineState.h"
 
 namespace Daydream
 {
@@ -386,6 +386,20 @@ namespace Daydream
 			}
 			DAYDREAM_CORE_ERROR("Not a valid VendorID");
 			return "";
+		}
+
+		Bool IsDepthFormat(RenderFormat _format)
+		{
+			switch (_format)
+			{
+			case RenderFormat::D24_UNORM_S8_UINT:
+			case RenderFormat::D32_FLOAT:
+			case RenderFormat::D16_UNORM:
+			case RenderFormat::D32_FLOAT_S8X24_UINT:
+				return true;
+			default:
+				return false;
+			}
 		}
 
 

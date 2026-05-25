@@ -3,7 +3,7 @@
 #include "Daydream/Graphics/Resources/Mesh.h"
 #include "Daydream/Graphics/Resources/Texture/Texture2D.h"
 #include "Daydream/Graphics/Resources/Texture/TextureCube.h"
-#include "Daydream/Graphics/Resources/PipelineState/GraphicsPipelineState.h"
+#include "Daydream/Graphics/States/PipelineState/GraphicsPipelineState.h"
 #include "Daydream/Graphics/Core/RenderingInfo.h"
 
 namespace Daydream
@@ -18,7 +18,7 @@ namespace Daydream
         void GenerateDefault();
         void Update();
 
-        void GenerateHDRCubemap(Shared<Texture2D> _texture);
+        void GenerateHDRCubemap(Texture2D* _texture);
         void GenerateIrradianceCubemap();
         void GeneratePrefilterCubemap();
         void GenerateBRDF();
@@ -105,19 +105,18 @@ namespace Daydream
         //Shared<RenderPass> resizeRenderPass;
         //Shared<RenderPass> irradianceRenderPass;
 
-        Shared<GraphicsPipelineState> equirectangularPSO;
-        Shared<GraphicsPipelineState> irradiancePSO;
-        Shared<GraphicsPipelineState> prefilterPSO;
-        Shared<GraphicsPipelineState> resizePSO;
-        Shared<GraphicsPipelineState> brdfPSO;
+        GraphicsPipelineState* equirectangularPSO;
+        GraphicsPipelineState* irradiancePSO;
+        GraphicsPipelineState* prefilterPSO;
+        GraphicsPipelineState* resizePSO;
+        GraphicsPipelineState* brdfPSO;
 
-        Shared<Mesh> boxMesh;
-
-        Shared<Mesh> quadMesh;
-
-        Shared<Texture2D> equirectangularTexture; // 2D->Cube 원본 텍스쳐
-        Shared<TextureView> equirectangularSRV ; // 2D->Cube 원본 텍스쳐뷰
-        Shared<Texture2D> equirectangularDropTarget; // dummy(No Texture)
+        Mesh* boxMesh;
+        Mesh* quadMesh;
+        
+        Texture2D* equirectangularTexture; // 2D->Cube 원본 텍스쳐
+        Texture2D* equirectangularDropTarget; // dummy(No Texture)
+        Shared<TextureView> equirectangularSRV; // 2D->Cube 원본 텍스쳐뷰
 
         Array<Shared<Texture2D>> equirectangularResultTextures;
         Array<Shared<Texture2D>> irradianceResultTextures;

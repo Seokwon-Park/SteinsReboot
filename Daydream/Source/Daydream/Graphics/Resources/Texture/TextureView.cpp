@@ -14,7 +14,6 @@ namespace Daydream
 
 	TextureView::~TextureView()
 	{
-		DAYDREAM_CORE_WARN("Why?");
 		originTexture = nullptr;
 	}
 

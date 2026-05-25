@@ -1,14 +1,15 @@
 #pragma once
 
 #include "RenderGraphDrawList.h"
-#include "Daydream/Graphics/Core/RenderTargetPool/RenderTargetPool.h"
-#include "Daydream/Graphics/Resources/PipelineState/GraphicsPipelineState.h"
+#include "Daydream/Graphics/Pools/TexturePool/Texture2DPool.h"
+#include "Daydream/Graphics/States/PipelineState/GraphicsPipelineState.h"
 
 namespace Daydream
 {
 	enum class PassDrawType
 	{
-		Geometry,       // 3D 메쉬들을 그리는 패스 (예: GBuffer)
+		DrawMesh,       // 3D 메쉬들을 그리는 패스 (예: GBuffer)
+		DrawDepthStencil,      // 깊이만 그리는 패스 (예: Depth)
 		FullScreenQuad, // 화면 전체를 덮는 2D 후처리 패스 (예: Lighting, Bloom)
 		Compute         // 컴퓨트 셰이더 패스
 	};
@@ -22,8 +23,8 @@ namespace Daydream
 
 	struct RenderGraphPassDesc
 	{
-		Shared<GraphicsPipelineState> pipelineState;
-		Shared<RenderGraphDrawList> drawList;
+		const GraphicsPipelineState* pipelineState;
+		RenderGraphDrawList drawList;
 		PassDrawType drawType;
 	};
 
@@ -67,15 +68,17 @@ namespace Daydream
 			UInt32 firstPass;
 			UInt32 lastPass;
 
-			RenderTargetPoolHandle resourceHandle;
+			Texture2DPoolHandle resourceHandle;
 		};
 
 		struct PassNode
 		{
 			String name;
-			Shared<GraphicsPipelineState> pipelineState;
-			Shared<RenderGraphDrawList> drawList;
+
+			const GraphicsPipelineState* pipelineState;
+			RenderGraphDrawList drawList;
 			PassDrawType drawType;
+
 			Array<UInt32> reads;
 			Array<UInt32> writes;
 		};
@@ -85,5 +88,7 @@ namespace Daydream
 		Array<ResourceNode> resources;
 		Array<PassNode> passes;
 		Array<UInt32> executionOrder;
+
+		Shared<ConstantBuffer> transformCB;
 	};
 }

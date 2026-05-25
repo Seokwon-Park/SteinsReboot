@@ -32,7 +32,7 @@ namespace Daydream
 		virtual void EndFrame() = 0;
 
 		virtual TextureView* GetCurrentRenderTargetView() const = 0;
-		virtual Shared<RenderCommandList> GetCurrentCommandList() const = 0;
+		virtual RenderCommandList* GetCurrentCommandList() const = 0;
 
 		inline const UInt32 GetWidth() const { return desc.width; }
 		inline const UInt32 GetHeight() const { return desc.height; }
@@ -45,6 +45,5 @@ namespace Daydream
 		bool isSwapchainResized = false;
 
 		SwapchainDesc desc;
-		Array<Texture2D> swapchainBackBuffers;
 	};
 }

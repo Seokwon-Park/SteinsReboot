@@ -13,9 +13,9 @@ namespace Daydream
 
 		void Bind() const override;
 		void Unbind() const override;
-		virtual void* GetNativeHandle() override { return shaderBlob.Get(); };
-
+		
 		D3D12_SHADER_BYTECODE GetShaderBytecode() const { return shaderByteCode; }
+		IDxcBlob* GetIDxcBlob() const { return shaderBlob.Get(); }
 	private:
 		D3D12RenderDevice* device;
 		D3D12_SHADER_BYTECODE shaderByteCode;

@@ -32,6 +32,6 @@ namespace Daydream
 		Int32 mipLevel = 0;
 
 		Skybox* skybox = nullptr;
-		Shared<Texture2D> equirectangularDropTarget;
+		Texture2D* equirectangularDropTarget;
 	};
 }

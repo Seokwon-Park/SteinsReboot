@@ -5,11 +5,11 @@
 
 namespace Daydream
 {
-	struct RenderGraphDrawObject
+	struct RenderItem
 	{
-		Shared<Mesh> mesh;
-		Shared<Material> material;
-		Matrix4x4 transform;
+		Mesh* mesh;
+		Material* material;
+		Matrix4x4 worldMatrix;
 		float distanceToCamera; // 카메라로부터의 거리
 	};
 
@@ -19,10 +19,16 @@ namespace Daydream
 		RenderGraphDrawList();
 		~RenderGraphDrawList();
 
-		void AddDrawObject(Shared<Mesh> _mesh, Shared<Material> _material, const Matrix4x4& _transform, Float32 _distanceToCamera);
+		void AddDrawObject(Mesh* _mesh, Material* _material, const Matrix4x4& _transform, Float32 _distanceToCamera);
+
+		inline auto begin() { return renderItems.begin(); }
+		inline auto end() { return renderItems.end(); }
+
+		inline auto begin() const { return renderItems.begin(); }
+		inline auto end() const { return renderItems.end(); }
 	protected:
 
 	private:
-		Array<RenderGraphDrawObject> opaqueItems;
+		Array<RenderItem> renderItems;
 	};
 }

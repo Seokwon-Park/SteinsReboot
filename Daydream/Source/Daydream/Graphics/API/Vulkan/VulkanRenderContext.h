@@ -23,25 +23,25 @@ namespace Daydream
 		//virtual void BeginRenderPass(Shared<RenderPass> _renderPass, Shared<Framebuffer> _framebuffer) override;
 		//virtual void EndRenderPass(Shared<RenderPass> _renderPass) override;
 
-		virtual void BindPipelineState(Shared<GraphicsPipelineState> _pipelineState) override;
+		virtual void BindPipelineState(const GraphicsPipelineState* _pipelineState) override;
 
-		virtual void BindVertexBuffer(Shared<VertexBuffer> _vertexBuffer) override;
-		virtual void BindIndexBuffer(Shared<IndexBuffer> _indexBuffer) override;
+		virtual void BindVertexBuffer(const GPUBuffer* _vertexBuffer, UInt32 _stride) override;
+		virtual void BindIndexBuffer(const GPUBuffer* _indexBuffer) override;
 
 		/*virtual void SetTexture2D(const String& _name, Shared<Texture2D> _texture) override;
 		virtual void SetTextureCube(const String& _name, Shared<TextureCube> _textureCube) override;*/
-		virtual void BindShaderResourceView(const String& _name, Shared<TextureView> _textureView, Shared<Sampler> _sampler) override;
-		virtual void SetConstantBuffer(const String& _name, Shared<ConstantBuffer> _buffer) override;
+		virtual void BindShaderResourceView(const String& _name, const TextureView* _textureView, const Sampler* _sampler) override;
+		virtual void BindConstantBuffer(const String& _name, const ConstantBuffer* _buffer) override;
 
-		virtual void CopyBuffer(Shared<GPUBuffer> _src, Shared<GPUBuffer> _dst, UInt32 _copySize) override;
-		virtual void CopyBufferToTexture(Shared<GPUBuffer> _src, Shared<GPUTexture> _dst) override;
+		virtual void CopyBuffer(const GPUBuffer* _src, const GPUBuffer* _dst, UInt32 _copySize, UInt32 _srcOffset, UInt32 _dstOffset) override;
+		virtual void CopyBufferToTexture(const GPUBuffer* _src, const GPUTexture* _dst) override;
 
-		virtual void CopyTexture2D(Shared<Texture2D> _src, Shared<Texture2D> _dst) override;
-		virtual void CopyTextureToCubemapFace(Shared<Texture2D> _srcTexture2D, Shared<TextureCube> _dstCubemap, UInt32 _faceIndex, UInt32 _mipLevel = 0) override;
+		virtual void CopyTexture2D(const Texture2D* _src, const Texture2D* _dst) override;
+		virtual void CopyTextureToCubemapFace(const Texture2D* _srcTexture2D, const TextureCube* _dstCubemap, UInt32 _faceIndex, UInt32 _mipLevel = 0) override;
 
-		virtual void GenerateMips(Shared<Texture> _texture) override;
+		virtual void GenerateMips(GPUTexture* _texture) override;
 
-		virtual void TransitionTextureState(Shared<GPUTexture> _texture,
+		virtual void TransitionTextureState(const GPUTexture * _texture,
 			ResourceState _beforeState,
 			ResourceState _afterState, 
 			UInt32 _baseMip, 
@@ -49,13 +49,11 @@ namespace Daydream
 			UInt32 _baseLayer,	
 			UInt32 _layerCount) override;
 
-		virtual void TransitionBufferState(
-			Shared<GPUBuffer> _buffer,
+		virtual void TransitionBufferState(const GPUBuffer* _buffer,
 			ResourceState _beforeState,
-			ResourceState _afterState
-		) override;
+			ResourceState _afterState) override;
 
-		virtual void SetActiveCommandList(Shared<RenderCommandList> _commandList) override;
+		virtual void SetActiveCommandList(RenderCommandList * _commandList) override;
 
 	private:
 		vk::CommandBuffer GetActiveCommandBuffer();

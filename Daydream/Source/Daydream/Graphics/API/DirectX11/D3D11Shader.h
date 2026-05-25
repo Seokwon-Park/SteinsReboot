@@ -34,7 +34,7 @@ namespace Daydream
 		virtual void Bind() const override;
 		virtual void Unbind() const override;
 
-		virtual void* GetNativeHandle() { return pixelShader.Get(); }
+		ID3D11PixelShader* GetID3D11PixelShader() const { return pixelShader.Get(); }
 
 	private:
 		ComPtr<ID3D11PixelShader> pixelShader;

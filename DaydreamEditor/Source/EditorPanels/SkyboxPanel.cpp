@@ -77,7 +77,7 @@ namespace Daydream
 						AssetHandle handle = *pHandle;
 						auto texture = AssetManager::GetAsset<Texture2D>(handle);
 
-						skybox->UpdateSkyboxFace(i, texture);
+						//skybox->UpdateSkyboxFace(i, texture);
 					}
 					ImGui::EndDragDropTarget();
 				}

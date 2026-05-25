@@ -2,7 +2,7 @@
 #include "Material.h"
 
 #include "Daydream/Graphics/Core/Renderer.h"
-#include "Daydream/Graphics/Resources/PipelineState/GraphicsPipelineState.h"
+#include "Daydream/Graphics/States/PipelineState/GraphicsPipelineState.h"
 #include "Daydream/Graphics/Manager/ResourceManager.h"
 #include "Daydream/Asset/AssetManager.h"
 
@@ -32,16 +32,8 @@ namespace Daydream
 			return;
 		}
 		textures[_name].handle = _textureHandle;
-	}
-
-	void Material::LoadMaterialAsset(const String& _name)
-	{
-		if (textures.find(_name) == textures.end())
-		{
-			DAYDREAM_CORE_ERROR("[Material] There is no Texture Name {}", _name);
-			return;
-		}
 		textures[_name].cache = AssetManager::GetAsset<Texture2D>(textures[_name].handle);
+
 	}
 
 	//void Material::SetTextureCube(const String& _name, Shared<TextureCube> _texture)
@@ -60,7 +52,7 @@ namespace Daydream
 	//	}
 	//}
 
-	Shared<Material> Material::Create(Shared<GraphicsPipelineState> _pipeline)
+	Shared<Material> Daydream::Material::Create(const GraphicsPipelineState* _pipeline)
 	{
 		return MakeShared<Material>(_pipeline->GetShaderGroup());
 	}

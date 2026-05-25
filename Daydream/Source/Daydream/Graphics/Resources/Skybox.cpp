@@ -2,10 +2,10 @@
 #include "Skybox.h"
 
 #include "Daydream/Asset/AssetManager.h"
-#include "Daydream/Graphics/Manager/ResourceManager.h"
 #include "Daydream/Graphics/Core/Renderer.h"
+#include "Daydream/Graphics/Manager/ResourceManager.h"
 #include "Daydream/Graphics/Utility/MeshGenerator.h"
-#include "Daydream/Graphics/Manager/SamplerRegistry.h"
+#include "Daydream/Graphics/Resources/BuiltInResources.h"
 
 namespace Daydream
 {
@@ -66,17 +66,8 @@ namespace Daydream
 
 		brdfPSO = ResourceManager::GetResource<GraphicsPipelineState>("BRDFPSO");
 
-		quadMesh = ResourceManager::GetResource<Mesh>("Quad");
-
-		auto meshData = MeshGenerator::CreateCube();
-		Array<Vector3> positions;
-		for (Vertex v : meshData.vertices)
-		{
-			positions.push_back(v.position);
-		}
-		//boxVB = VertexBuffer::CreateStatic(sizeof(Vector3) * (UInt32)positions.size(), 12, positions.data());
-		//boxIB = IndexBuffer::Create(meshData.indices.data(), (UInt32)meshData.indices.size());
-		boxMesh = ResourceManager::GetResource<Mesh>("Box");
+		quadMesh = AssetManager::GetAsset<Mesh>(AssetDefaults::DefaultQuadMeshHandle);
+		boxMesh = AssetManager::GetAsset<Mesh>(AssetDefaults::DefaultBoxMeshHandle);
 
 		////////////////////////////////////////////////////////////////////////////Create Default Skybox TextureCubes;
 		skyboxMipLevels = (UInt32)std::log2f((Float32)skyboxResolution);
@@ -212,7 +203,7 @@ namespace Daydream
 		srvDesc.mipLevels = 1;
 		srvDesc.baseLayer = 0;
 		srvDesc.layerCount = 1;
-		BRDFSRV= TextureView::Create(BRDFTexture, srvDesc);
+		BRDFSRV = TextureView::Create(BRDFTexture, srvDesc);
 
 
 		//////////////////////////////////////Create Resize Texture
@@ -244,7 +235,7 @@ namespace Daydream
 
 		for (int i = 0; i < 6; i++)
 		{
-			Renderer::UpdateConstantBuffer(cubeFaceConstantBuffers[i], captureViewProjections[i]);
+			Renderer::UpdateConstantBuffer(cubeFaceConstantBuffers[i].get(), captureViewProjections[i]);
 		}
 
 		GenerateHDRCubemap(equirectangularTexture);
@@ -270,8 +261,9 @@ namespace Daydream
 		//}
 	}
 
-	void Skybox::GenerateHDRCubemap(Shared<Texture2D> _texture)
+	void Skybox::GenerateHDRCubemap(Texture2D* _texture)
 	{
+		boxMesh->GetIndexCount();
 		equirectangularTexture = _texture;
 
 		for (int i = 0; i < 6; i++)
@@ -291,7 +283,7 @@ namespace Daydream
 			Renderer::BeginRendering(renderingInfo);
 			Renderer::BindPipelineState(equirectangularPSO);
 			Renderer::BindConstantBuffer("Camera", cubeFaceConstantBuffers[i]);
-			Renderer::BindShaderResourceView("Texture", equirectangularTexture->GetDefaultSRV(), SamplerRegistry::LinearClampToEdge);
+			Renderer::BindShaderResourceView("Texture", equirectangularTexture->GetOrCreateDefaultSRV(), BuiltIn::Samplers::LinearClampToEdge());
 			Renderer::BindMesh(boxMesh);
 			Renderer::DrawIndexed(boxMesh->GetIndexCount());
 			Renderer::EndRendering(renderingInfo);
@@ -318,7 +310,7 @@ namespace Daydream
 			Renderer::BeginRendering(renderingInfo);
 			Renderer::BindPipelineState(irradiancePSO);
 			Renderer::BindConstantBuffer("Camera", cubeFaceConstantBuffers[i]);
-			Renderer::BindShaderResourceView("TextureCubemap", skyboxTextureCube->GetDefaultSRV(), SamplerRegistry::LinearClampToEdge);
+			Renderer::BindShaderResourceView("TextureCubemap", skyboxTextureCube->GetOrCreateDefaultSRV(), BuiltIn::Samplers::LinearClampToEdge());
 			Renderer::BindMesh(boxMesh);
 			Renderer::DrawIndexed(boxMesh->GetIndexCount());
 			Renderer::EndRendering(renderingInfo);
@@ -355,7 +347,7 @@ namespace Daydream
 				Renderer::BindPipelineState(prefilterPSO);
 				Renderer::BindConstantBuffer("Camera", cubeFaceConstantBuffers[face]);
 				Renderer::BindConstantBuffer("Roughness", roughnessConstantBuffers[mip]);
-				Renderer::BindShaderResourceView("TextureCubemap", skyboxTextureCube->GetDefaultSRV(), SamplerRegistry::LinearClampToEdge);
+				Renderer::BindShaderResourceView("TextureCubemap", skyboxTextureCube->GetOrCreateDefaultSRV(), BuiltIn::Samplers::LinearClampToEdge());
 				Renderer::BindMesh(boxMesh);
 				Renderer::DrawIndexed(boxMesh->GetIndexCount());
 				Renderer::EndRendering(renderingInfo);

@@ -89,7 +89,6 @@ namespace Daydream
 		AssetManager::LoadAssetMetadataFromDirectory("Resource");
 
 		AssetManager::LoadAssets(LoadPhase::Early);// 셰이더 때문에 renderer초기화 이후로 미룸
-		AssetManager::LoadAssets(LoadPhase::Normal);// 모델을 로드하기 위해서는 pipeline이 빌드된 상태여야함
 
 		ResourceManager::Init();
 

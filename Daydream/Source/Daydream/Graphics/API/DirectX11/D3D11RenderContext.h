@@ -21,26 +21,26 @@ namespace Daydream
 		virtual void BeginRendering(const RenderingInfo& _renderingInfo) override;
 		virtual void EndRendering(const RenderingInfo& _renderingInfo) override;
 
-		virtual void BindPipelineState(Shared<GraphicsPipelineState> _pipelineState)override;
+		virtual void BindPipelineState(const GraphicsPipelineState* _pipelineState)override;
 
-		virtual void BindVertexBuffer(Shared<VertexBuffer> _vertexBuffer) override;
-		virtual void BindIndexBuffer(Shared<IndexBuffer> _indexBuffer) override;
+		virtual void BindVertexBuffer(const GPUBuffer* _vertexBuffer, UInt32 _stride) override;
+		virtual void BindIndexBuffer(const GPUBuffer* _indexBuffer) override;
 
 		//virtual void SetTexture2D(const String& _name, Shared<Texture2D> _texture) override;
 		//virtual void SetTextureCube(const String& _name, Shared<TextureCube> _textureCube) override;
-		virtual void BindShaderResourceView(const String& _name, Shared<TextureView> _textureView, Shared<Sampler> _sampler) override;
-		virtual void SetConstantBuffer(const String& _name, Shared<ConstantBuffer> _buffer) override;
+		virtual void BindShaderResourceView(const String& _name, const TextureView* _textureView, const Sampler* _sampler) override;
+		virtual void BindConstantBuffer(const String& _name, const ConstantBuffer* _buffer) override;
 
-		virtual void CopyBuffer(Shared<GPUBuffer> _src, Shared<GPUBuffer> _dst, UInt32 _copySize) override;
-		virtual void CopyBufferToTexture(Shared<GPUBuffer> _src, Shared<GPUTexture> _dst) override;
+		virtual void CopyBuffer(const GPUBuffer* _src, const GPUBuffer* _dst, UInt32 _copySize, UInt32 _srcOffset, UInt32 _dstOffset) override;
+		virtual void CopyBufferToTexture(const GPUBuffer* _src, const GPUTexture* _dst) override;
 		
 
-		virtual void CopyTexture2D(Shared<Texture2D> _src, Shared<Texture2D> _dst) override;
-		virtual void CopyTextureToCubemapFace(Shared<Texture2D> _srcTexture2D, Shared<TextureCube> _dstCubemap, UInt32 _faceIndex, UInt32 _mipLevel = 0)override;
-		virtual void CopyTextureCubeToTexture2D(Shared<TextureCube> _srcCubemap, UInt32 _faceIndex, Shared<Texture2D> _dstTexture2D, UInt32 _mipLevel = 0) override;
+		virtual void CopyTexture2D(const Texture2D* _src, const Texture2D* _dst) override;
+		virtual void CopyTextureToCubemapFace(const Texture2D* _srcTexture2D, const TextureCube* _dstCubemap, UInt32 _faceIndex, UInt32 _mipLevel = 0)override;
+		virtual void CopyTextureCubeToTexture2D(const TextureCube* _srcCubemap, const Texture2D* _dstTexture2D, UInt32 _faceIndex, UInt32 _mipLevel = 0) override;
 
 
-		virtual void GenerateMips(Shared<Texture> _texture)override;
+		virtual void GenerateMips(GPUTexture* _texture)override;
 
 	private:
 		inline static Array<ID3D11ShaderResourceView*> nullSRVs = Array<ID3D11ShaderResourceView*>(128, nullptr); 

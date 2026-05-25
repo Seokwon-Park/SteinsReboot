@@ -104,34 +104,34 @@ namespace Daydream
 	void D3D12RenderContext::EndRendering(const RenderingInfo& _renderingInfo)
 	{
 	}
-	void D3D12RenderContext::BindPipelineState(Shared<GraphicsPipelineState> _pipelineState)
+	void D3D12RenderContext::BindPipelineState(const GraphicsPipelineState* _pipelineState)
 	{
 		RenderContext::BindPipelineState(_pipelineState);
-		Shared<D3D12GraphicsPipelineState> d3d12PipelineState = SharedCast<D3D12GraphicsPipelineState>(_pipelineState);
+		D3D12GraphicsPipelineState* d3d12PipelineState = Cast<D3D12GraphicsPipelineState*>(_pipelineState);
 
 		GetD3D12ActiveCommandList()->SetGraphicsRootSignature(d3d12PipelineState->GetID3D12RootSignature());
 		GetD3D12ActiveCommandList()->SetPipelineState(d3d12PipelineState->GetID3D12PipelineState());
 	}
-	void D3D12RenderContext::BindVertexBuffer(Shared<VertexBuffer> _vertexBuffer)
+	void D3D12RenderContext::BindVertexBuffer(const GPUBuffer* _vertexBuffer, UInt32 _stride)
 	{
-		D3D12GPUBuffer* vertexBuffer = Cast<D3D12GPUBuffer*>(_vertexBuffer->GetGPUBufferPtr());
+		D3D12GPUBuffer* vertexBuffer = Cast<D3D12GPUBuffer*>(_vertexBuffer);
 		ID3D12Resource* d3d12Resource = vertexBuffer->GetID3D12Resource();
 		D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
 		vertexBufferView.BufferLocation = d3d12Resource->GetGPUVirtualAddress();
 		vertexBufferView.SizeInBytes = (UInt32)vertexBuffer->GetSize();
-		vertexBufferView.StrideInBytes = _vertexBuffer->GetStride();
+		vertexBufferView.StrideInBytes = _stride;
 
 		GetD3D12ActiveCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView);
 	}
-	void D3D12RenderContext::BindIndexBuffer(Shared<IndexBuffer> _indexBuffer)
+	void D3D12RenderContext::BindIndexBuffer(const GPUBuffer* _indexBuffer)
 	{
-		D3D12GPUBuffer* indexBuffer = Cast<D3D12GPUBuffer*>(_indexBuffer->GetGPUBufferPtr());
+		D3D12GPUBuffer* indexBuffer = Cast<D3D12GPUBuffer*>(_indexBuffer);
 		ID3D12Resource* d3d12Resource = indexBuffer->GetID3D12Resource();
 
 		D3D12_INDEX_BUFFER_VIEW indexBufferView;
 		indexBufferView.BufferLocation = d3d12Resource->GetGPUVirtualAddress();
 		indexBufferView.Format = DXGI_FORMAT_R32_UINT;
-		indexBufferView.SizeInBytes = sizeof(UInt32) * _indexBuffer->GetIndexCount();
+		indexBufferView.SizeInBytes = indexBuffer->GetSize();
 
 		GetD3D12ActiveCommandList()->IASetIndexBuffer(&indexBufferView);
 	}
@@ -159,14 +159,14 @@ namespace Daydream
 	//	const ShaderReflectionData* resourceInfo = activePipelineState->GetBindingInfo(_name);
 	//	if (resourceInfo == nullptr) return;
 
-	void D3D12RenderContext::BindShaderResourceView(const String& _name, Shared<TextureView> _textureView, Shared<Sampler> _sampler)
+	void D3D12RenderContext::BindShaderResourceView(const String& _name, const TextureView* _textureView, const Sampler* _sampler)
 	{
-		D3D12GraphicsPipelineState* d3d12PipelineState = Cast<D3D12GraphicsPipelineState*>(currentGraphicsPipelineState.get());
+		D3D12GraphicsPipelineState* d3d12PipelineState = Cast<D3D12GraphicsPipelineState*>(currentGraphicsPipelineState);
 		const ShaderReflectionData* resourceInfo = currentGraphicsPipelineState->GetBindingInfo(_name);
 		if (resourceInfo == nullptr) return;
 		DAYDREAM_CORE_ASSERT(device->GetAPI() == RendererAPIType::DirectX12, "Wrong API!");
-		D3D12TextureView* d3d12Tex = Cast<D3D12TextureView*>(_textureView.get());
-		D3D12Sampler* d3d12Sampler = Cast<D3D12Sampler*>(_sampler.get());
+		D3D12TextureView* d3d12Tex = Cast<D3D12TextureView*>(_textureView);
+		D3D12Sampler* d3d12Sampler = Cast<D3D12Sampler*>(_sampler);
 
 		GetD3D12ActiveCommandList()->SetGraphicsRootDescriptorTable(d3d12PipelineState->GetDescriptorTableIndex(_name), d3d12Tex->GetGPUHandle());
 		String samplerName = _name + "Sampler";
@@ -184,40 +184,40 @@ namespace Daydream
 	//		GetD3D12ActiveCommandList()->SetGraphicsRootDescriptorTable(d3d12PipelineState->GetDescriptorTableIndex(samplerName), d3d12Tex->GetSamplerHandle());
 	//	}
 	//}
-	void D3D12RenderContext::SetConstantBuffer(const String& _name, Shared<ConstantBuffer> _buffer)
+	void D3D12RenderContext::BindConstantBuffer(const String& _name, const ConstantBuffer* _buffer)
 	{
 		if (_buffer == nullptr) return;
-		D3D12GraphicsPipelineState* d3d12PipelineState = Cast<D3D12GraphicsPipelineState*>(currentGraphicsPipelineState.get());
+		D3D12GraphicsPipelineState* d3d12PipelineState = Cast<D3D12GraphicsPipelineState*>(currentGraphicsPipelineState);
 		const ShaderReflectionData* resourceInfo = currentGraphicsPipelineState->GetBindingInfo(_name);
 		if (resourceInfo == nullptr) return;
 		DAYDREAM_CORE_ASSERT(device->GetAPI() == RendererAPIType::DirectX12, "Wrong API!");
 
-		D3D12GPUBuffer* constantBuffer = Cast<D3D12GPUBuffer*>(_buffer->GetGPUBufferPtr());
+		D3D12GPUBuffer* constantBuffer = Cast<D3D12GPUBuffer*>(_buffer->GetGPUBuffer());
 		ID3D12Resource* d3d12Resource = constantBuffer->GetID3D12Resource();
 		D3D12_GPU_VIRTUAL_ADDRESS gpuAddress = d3d12Resource->GetGPUVirtualAddress();
 
 		GetD3D12ActiveCommandList()->SetGraphicsRootConstantBufferView(d3d12PipelineState->GetDescriptorTableIndex(_name), gpuAddress);
 	}
 
-	void D3D12RenderContext::CopyBuffer(Shared<GPUBuffer> _src, Shared<GPUBuffer> _dst, UInt32 _copySize)
+	void D3D12RenderContext::CopyBuffer(const GPUBuffer* _src, const GPUBuffer* _dst, UInt32 _copySize, UInt32 _srcOffset, UInt32 _dstOffset)
 	{
-		D3D12GPUBuffer* src = Cast<D3D12GPUBuffer*>(_src.get());
-		D3D12GPUBuffer* dst = Cast<D3D12GPUBuffer*>(_dst.get());
+		D3D12GPUBuffer* src = Cast<D3D12GPUBuffer*>(_src);
+		D3D12GPUBuffer* dst = Cast<D3D12GPUBuffer*>(_dst);
 
 		GetD3D12ActiveCommandList()->CopyBufferRegion(
 			dst->GetID3D12Resource(),
-			0,
+			_dstOffset,
 			src->GetID3D12Resource(),
-			0,
+			_srcOffset,
 			_copySize
 		);
 	}
 
-	void D3D12RenderContext::CopyBufferToTexture(Shared<GPUBuffer> _src, Shared<GPUTexture> _dst)
+	void D3D12RenderContext::CopyBufferToTexture(const GPUBuffer* _src, const GPUTexture* _dst)
 	{
 		// 1. 객체 캐스팅 및 리소스 가져오기
-		D3D12GPUBuffer* srcBuffer = Cast<D3D12GPUBuffer*>(_src.get());
-		D3D12GPUTexture* dstTexture = Cast<D3D12GPUTexture*>(_dst.get());
+		D3D12GPUBuffer* srcBuffer = Cast<D3D12GPUBuffer*>(_src);
+		D3D12GPUTexture* dstTexture = Cast<D3D12GPUTexture*>(_dst);
 
 		ID3D12Resource* srcResource = srcBuffer->GetID3D12Resource();
 		ID3D12Resource* dstResource = dstTexture->GetID3D12Resource();
@@ -244,9 +244,9 @@ namespace Daydream
 		GetD3D12ActiveCommandList()->CopyTextureRegion(&dstLocation, 0, 0, 0, &srcLocation, nullptr);
 	}
 
-	void D3D12RenderContext::CopyDataToTexture2D(Shared<Texture2D> _target, Shared<Array<Byte>> _data)
+	void D3D12RenderContext::CopyDataToTexture2D(const Texture2D* _target, const void* _data)
 	{
-		D3D12GPUTexture* dstTexture = Cast<D3D12GPUTexture*>(_target->GetGPUTexture().get());
+		D3D12GPUTexture* dstTexture = Cast<D3D12GPUTexture*>(_target->GetGPUTexture());
 		TextureDesc desc = dstTexture->GetDesc();
 
 		UInt32 formatSize = GraphicsUtility::GetRenderFormatSize(desc.format);
@@ -255,14 +255,13 @@ namespace Daydream
 		UInt32 uploadSize = alignedRowPitch * desc.height;
 
 		Shared<UploadBuffer> stagingBuffer = UploadBuffer::Create(uploadSize);
-		CaptureResource(stagingBuffer->GetGPUBuffer());
-		ID3D12Resource* stagingResource = Cast<D3D12GPUBuffer*>(stagingBuffer->GetGPUBuffer().get())->GetID3D12Resource();
+		ID3D12Resource* stagingResource = Cast<D3D12GPUBuffer*>(stagingBuffer->GetGPUBuffer())->GetID3D12Resource();
 
 		void* mappedData = nullptr;
 		stagingResource->Map(0, nullptr, &mappedData);
 
 		Byte* dstBytes = static_cast<Byte*>(mappedData);
-		const Byte* srcBytes = _data->data();
+		const Byte* srcBytes = (Byte*)_data;
 
 		for (UInt32 y = 0; y < desc.height; ++y)
 		{
@@ -273,10 +272,10 @@ namespace Daydream
 		CopyBufferToTexture(stagingBuffer->GetGPUBuffer(), _target->GetGPUTexture());
 	}
 
-	void D3D12RenderContext::CopyTexture2D(Shared<Texture2D> _src, Shared<Texture2D> _dst)
+	void D3D12RenderContext::CopyTexture2D(const Texture2D* _src, const Texture2D* _dst)
 	{
-		D3D12GPUTexture* src = Cast<D3D12GPUTexture*>(_src->GetGPUTexturePtr());
-		D3D12GPUTexture* dst = Cast<D3D12GPUTexture*>(_dst->GetGPUTexturePtr());
+		D3D12GPUTexture* src = Cast<D3D12GPUTexture*>(_src->GetGPUTexture());
+		D3D12GPUTexture* dst = Cast<D3D12GPUTexture*>(_dst->GetGPUTexture());
 
 		D3D12_RESOURCE_BARRIER barriers[2] = {};
 
@@ -312,10 +311,10 @@ namespace Daydream
 		barriers[1].Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 		GetD3D12ActiveCommandList()->ResourceBarrier(2, barriers);
 	}
-	void D3D12RenderContext::CopyTextureToCubemapFace(Shared<Texture2D> _srcTexture2D, Shared<TextureCube> _dstCubemap, UInt32 _faceIndex, UInt32 _mipLevel)
+	void D3D12RenderContext::CopyTextureToCubemapFace(const Texture2D* _srcTexture2D, const TextureCube* _dstCubemap, UInt32 _faceIndex, UInt32 _mipLevel)
 	{
-		D3D12GPUTexture* dst = Cast<D3D12GPUTexture*>(_dstCubemap->GetGPUTexturePtr());
-		D3D12GPUTexture* src = Cast<D3D12GPUTexture*>(_srcTexture2D->GetGPUTexturePtr());
+		D3D12GPUTexture* dst = Cast<D3D12GPUTexture*>(_dstCubemap->GetGPUTexture());
+		D3D12GPUTexture* src = Cast<D3D12GPUTexture*>(_srcTexture2D->GetGPUTexture());
 
 		D3D12_RESOURCE_BARRIER barriers[2] = {};
 
@@ -364,9 +363,9 @@ namespace Daydream
 
 
 	//TODO : using ComputeShader Later
-	void D3D12RenderContext::GenerateMips(Shared<Texture> _texture)
+	void Daydream::D3D12RenderContext::GenerateMips(GPUTexture* _texture)
 	{
-		D3D12GPUTexture* d3d12Texture = Cast<D3D12GPUTexture*>(_texture->GetGPUTexturePtr());
+		D3D12GPUTexture* d3d12Texture = Cast<D3D12GPUTexture*>(_texture);
 
 		UInt32 mipLevels = _texture->GetMipLevels();
 		UInt32 layerCount = _texture->GetLayerCount();
@@ -434,9 +433,9 @@ namespace Daydream
 		auto quadMesh = ResourceManager::GetResource<Mesh>("Quad");
 
 		BindPipelineState(generateMipPSO);
-		D3D12GraphicsPipelineState* d3d12PipelineState = Cast<D3D12GraphicsPipelineState*>(generateMipPSO.get());
-		BindVertexBuffer(quadMesh->GetVertexBuffer());
-		BindIndexBuffer(quadMesh->GetIndexBuffer());
+		D3D12GraphicsPipelineState* d3d12PipelineState = Cast<D3D12GraphicsPipelineState*>(generateMipPSO);
+		BindVertexBuffer(quadMesh->GetVertexBuffer()->GetGPUBuffer(), quadMesh->GetVertexBuffer()->GetStride());
+		BindIndexBuffer(quadMesh->GetIndexBuffer()->GetGPUBuffer());
 		GetD3D12ActiveCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		for (UInt32 mip = 1; mip < mipLevels; mip++)
@@ -490,7 +489,7 @@ namespace Daydream
 			}
 		}
 	}
-	void D3D12RenderContext::TransitionTextureState(Shared<GPUTexture> _texture, ResourceState _beforeState, ResourceState _afterState, UInt32 _baseMip, UInt32 _mipLevels, UInt32 _baseLayer, UInt32 _layerCount)
+	void D3D12RenderContext::TransitionTextureState(const GPUTexture* _texture, ResourceState _beforeState, ResourceState _afterState, UInt32 _baseMip, UInt32 _mipLevels, UInt32 _baseLayer, UInt32 _layerCount)
 	{
 		if (_beforeState == _afterState)
 		{
@@ -498,7 +497,7 @@ namespace Daydream
 			return;
 		}
 
-		D3D12GPUTexture* d3d12Texture = Cast<D3D12GPUTexture*>(_texture.get());
+		const D3D12GPUTexture* d3d12Texture = Cast<const D3D12GPUTexture*>(_texture);
 		ID3D12Resource* resource = d3d12Texture->GetID3D12Resource();
 
 		_mipLevels = (_mipLevels == -1 ? _texture->GetMipLevels() : _mipLevels);
@@ -549,7 +548,7 @@ namespace Daydream
 			GetD3D12ActiveCommandList()->ResourceBarrier(static_cast<UINT>(barriers.size()), barriers.data());
 		}
 	}
-	void D3D12RenderContext::TransitionBufferState(Shared<GPUBuffer> _buffer, ResourceState _beforeState, ResourceState _afterState)
+	void Daydream::D3D12RenderContext::TransitionBufferState(const GPUBuffer* _buffer, ResourceState _beforeState, ResourceState _afterState)
 	{
 		if (_beforeState == _afterState)
 		{
@@ -557,7 +556,7 @@ namespace Daydream
 			return;
 		}
 
-		D3D12GPUBuffer* d3d12Buffer = Cast<D3D12GPUBuffer*>(_buffer.get());
+		D3D12GPUBuffer* d3d12Buffer = Cast<D3D12GPUBuffer*>(_buffer);
 
 		D3D12_RESOURCE_BARRIER barrier = {};
 		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
@@ -570,9 +569,9 @@ namespace Daydream
 		GetD3D12ActiveCommandList()->ResourceBarrier(1, &barrier);
 	}
 
-	void D3D12RenderContext::SetActiveCommandList(Shared<RenderCommandList> _commandList)
+	void D3D12RenderContext::SetActiveCommandList(RenderCommandList* _commandList)
 	{
 		activeCommandList = _commandList;
-		activeD3D12CommandList = SharedCast<D3D12RenderCommandList>(_commandList)->GetID3D12GraphicsCommandList();
+		activeD3D12CommandList = Cast<D3D12RenderCommandList*>(_commandList)->GetID3D12GraphicsCommandList();
 	}
 }

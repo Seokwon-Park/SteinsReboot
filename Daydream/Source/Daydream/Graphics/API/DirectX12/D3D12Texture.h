@@ -14,7 +14,7 @@ namespace Daydream
 		D3D12GPUTexture(D3D12RenderDevice* _device, const TextureDesc& _desc, ComPtr<ID3D12Resource> _d3d12BackBuffer);
 		virtual ~D3D12GPUTexture() = default;
 
-		inline ID3D12Resource* GetID3D12Resource() { return texture.Get(); }
+		inline ID3D12Resource* GetID3D12Resource() const { return texture.Get(); }
 	private:
 		D3D12RenderDevice* device;
 		ComPtr<ID3D12Resource> texture;

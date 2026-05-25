@@ -17,7 +17,6 @@ namespace Daydream
 	void EditorLayer::OnAttach()
 	{
 		//AssetManager::LoadAssetMetadataFromDirectory("Resource");
-		AssetManager::LoadAssets(LoadPhase::Early);
 
 		editorCamera = MakeShared<EditorCamera>();
 		editorCamera->SetPosition({ 0.0f,0.0f,-2.0f });
@@ -31,8 +30,6 @@ namespace Daydream
 		entityBuffer = ConstantBuffer::Create(sizeof(EntityInfo));
 		info.entityID = 0;
 		info.thickness = 3;
-
-		sampler = ResourceManager::GetResource<Sampler>("LinearRepeat");
 
 		RenderingInfo renderingInfo{};
 
@@ -52,7 +49,7 @@ namespace Daydream
 		auto entity2 = activeScene->CreateGameEntity();
 		entity2->SetName("Test2");
 
-		activeScene->SetCurrentCamera(editorCamera);
+		activeScene->SetCurrentCamera(editorCamera.get());
 		//Cubemap Mesh
 		//auto meshData = MeshGenerator::CreateCube(5.0f);
 		auto meshData = MeshGenerator::CreateSphere(100.0f, 20, 20);
@@ -67,8 +64,10 @@ namespace Daydream
 		cubeMesh = Mesh::Create(cubeVBO, cubeIBO);
 		/////////////////////////////////////////////////////////////////////////////////////
 
+		activeScene->CreateGameEntityFromModel(AssetManager::GetAssetHandleByPath("Asset/Model/cerberusgun/scene.gltf"));
+
 		ModelRendererComponent* component = entity->AddComponent<ModelRendererComponent>();
-		component->SetModel(model);
+		component->SetModel(model.get());
 
 		ModelRendererComponent* component2 = entity2->AddComponent<ModelRendererComponent>();
 		component2->SetModel(AssetManager::GetAssetByPath<Model>("Asset/Model/cerberusgun/scene.gltf"));
@@ -119,6 +118,12 @@ namespace Daydream
 
 		activeScene->Update(_deltaTime);
 
+		SceneData sceneData;
+		sceneData.camera = editorCamera.get();
+		sceneData.scene = activeScene.get();
+		sceneData.width = 1920;
+		sceneData.height = 1080;
+		sceneRenderer->RenderScene(sceneData);
 		//RenderGraph renderGraph;
 		//RenderGraphResourceDesc desc{};
 
@@ -270,7 +275,7 @@ namespace Daydream
 
 		//ImGui::Image((ImTextureID)depthFramebuffer->GetDepthAttachmentTexture()->GetImGuiHandle(), ImVec2{ viewportSize.x / 3,viewportSize.y / 3 });
 
-		ImGui::Image((ImTextureID)AssetManager::GetAssetByPath<Texture2D>("Resource/skybox.hdr")->GetDefaultSRV()->GetUIHandle(), ImVec2{ viewportSize.x / 3,viewportSize.y / 3 });
+		ImGui::Image((ImTextureID)AssetManager::GetAssetByPath<Texture2D>("Resource/skybox.hdr")->GetOrCreateDefaultSRV()->GetUIHandle(), ImVec2{ viewportSize.x / 3,viewportSize.y / 3 });
 
 		//for (int i = 0; i < 4; i++)
 		//{

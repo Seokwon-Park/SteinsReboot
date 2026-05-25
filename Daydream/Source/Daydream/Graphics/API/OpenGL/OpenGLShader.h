@@ -19,7 +19,7 @@ namespace Daydream
 		virtual void Bind() const override;
 		virtual void Unbind() const override;
 
-		virtual void* GetNativeHandle() override { return reinterpret_cast<void*>(static_cast<uintptr_t>(shaderProgramID)); }
+		UInt32 GetShaderID() const { return shaderProgramID; }
 
 		//virtual void SetMat4(const std::string& _name, const Matrix4x4& _value) override;
 	private:

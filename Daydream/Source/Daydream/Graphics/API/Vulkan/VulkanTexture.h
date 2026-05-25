@@ -13,7 +13,7 @@ namespace Daydream
 		VulkanGPUTexture(VulkanRenderDevice* _device, const TextureDesc& _desc, vk::Image _vulkanBackBuffer);
 		virtual ~VulkanGPUTexture() = default;
 
-		inline vk::Image GetVkImage() { return image; }
+		inline vk::Image GetVkImage() const { return image; }
 	private:
 		vk::Image image;
 

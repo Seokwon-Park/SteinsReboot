@@ -1,18 +1,30 @@
 #include "DaydreamPCH.h"
 #include "SamplerRegistry.h"
 
+#include "Daydream/Graphics/Resources/BuiltinResources.h"
+
 namespace Daydream
 {
+	namespace
+	{
+		const Sampler* internalLinearRepeat = nullptr;
+		const Sampler* internalLinearClampToEdge = nullptr;
+		const Sampler* internalNearestRepeat = nullptr;
+		const Sampler* internalNearestClampToEdge = nullptr;
+	}
+
+	const Sampler* BuiltIn::Samplers::LinearRepeat() { return internalLinearRepeat; }
+	const Sampler* BuiltIn::Samplers::LinearClampToEdge() { return internalLinearClampToEdge; }
+	const Sampler* BuiltIn::Samplers::NearestRepeat() { return internalNearestRepeat; }
+	const Sampler* BuiltIn::Samplers::NearestClampToEdge() { return internalNearestClampToEdge; }
+
+
 	SamplerRegistry::SamplerRegistry()
 	{
 	}
 
 	SamplerRegistry::~SamplerRegistry()
 	{
-		LinearRepeat = nullptr;
-		LinearClampToEdge = nullptr;
-		NearestRepeat = nullptr;
-		NearestClampToEdge = nullptr;
 		registry.clear();
 	}
 
@@ -25,8 +37,7 @@ namespace Daydream
 		samplerDesc.wrapU = WrapMode::Repeat;
 		samplerDesc.wrapV = WrapMode::Repeat;
 		samplerDesc.wrapW = WrapMode::Repeat;
-		LinearRepeat = Sampler::Create(samplerDesc);
-		registry["LinearRepeat"] = LinearRepeat;
+		registry["LinearRepeat"] = Sampler::Create(samplerDesc);
 
 
 		// 선형 샘플러 (클램프)
@@ -37,8 +48,7 @@ namespace Daydream
 		samplerDesc.wrapU = WrapMode::ClampToEdge;
 		samplerDesc.wrapV = WrapMode::ClampToEdge;
 		samplerDesc.wrapW = WrapMode::ClampToEdge;
-		LinearClampToEdge = Sampler::Create(samplerDesc);
-		registry["LinearClampToEdge"] = LinearClampToEdge;
+		registry["LinearClampToEdge"] = Sampler::Create(samplerDesc);
 
 		// 가장 가까운 샘플러 (반복)
 
@@ -48,8 +58,7 @@ namespace Daydream
 		samplerDesc.wrapU = WrapMode::Repeat;
 		samplerDesc.wrapV = WrapMode::Repeat;
 		samplerDesc.wrapW = WrapMode::Repeat;
-		NearestRepeat = Sampler::Create(samplerDesc);
-		registry["NearestRepeat"] = NearestRepeat;
+		registry["NearestRepeat"] = Sampler::Create(samplerDesc);
 
 		// 가장 가까운 샘플러 (클램프)
 
@@ -59,8 +68,7 @@ namespace Daydream
 		samplerDesc.wrapU = WrapMode::ClampToEdge;
 		samplerDesc.wrapV = WrapMode::ClampToEdge;
 		samplerDesc.wrapW = WrapMode::ClampToEdge;
-		NearestClampToEdge = Sampler::Create(samplerDesc);
-		registry["NearestClampToEdge"] = NearestClampToEdge;
+		registry["NearestClampToEdge"] = Sampler::Create(samplerDesc);
 
 	}
 

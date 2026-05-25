@@ -11,9 +11,9 @@ namespace Daydream
 	public:
 		MeshRegistry();
 
-		virtual void CreateBuiltinResources() override;
 	private:
 
+		void CreateBuiltinResources() override;
 
 	};
 }

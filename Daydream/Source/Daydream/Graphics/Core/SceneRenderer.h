@@ -8,8 +8,8 @@ namespace Daydream
 {
     struct SceneData
     {
-        Shared<Scene> scene;
-        Shared<Camera> camera;
+        Scene* scene;
+        Camera* camera;
         UInt32 width;
         UInt32 height;
     };
@@ -22,7 +22,7 @@ namespace Daydream
 
         virtual void RenderScene(const SceneData& _sceneData) {};
     protected:
-        Shared<RenderGraphDrawList> CreateDrawListFromScene(Scene* _scene, Camera* _camera);
+        RenderGraphDrawList CreateDrawListFromScene(Scene* _scene, Camera* _camera);
        
         Shared<RenderGraph> renderGraph;
     };

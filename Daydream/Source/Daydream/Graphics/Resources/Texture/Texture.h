@@ -62,9 +62,8 @@ namespace Daydream
 		inline UInt32 GetMipLevels() const { return gpuTexture->GetDesc().mipLevels; }
 		inline UInt32 GetLayerCount() const { return gpuTexture->GetDesc().layerCount; }
 
-		inline Shared<GPUTexture> GetGPUTexture() const { return gpuTexture; }
-		inline GPUTexture* GetGPUTexturePtr() const { return gpuTexture.get(); }
-		Shared<TextureView> GetDefaultSRV();
+		inline GPUTexture* GetGPUTexture() const { return gpuTexture.get(); }
+		TextureView* GetOrCreateDefaultSRV();
 
 		inline TextureDesc GetDesc() const { return gpuTexture->GetDesc(); }
 		inline TextureType GetType() const { return gpuTexture->GetDesc().type; }

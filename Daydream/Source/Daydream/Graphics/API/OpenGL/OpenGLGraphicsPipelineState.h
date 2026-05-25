@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Daydream/Graphics/Resources/PipelineState/GraphicsPipelineState.h"
+#include "Daydream/Graphics/States/PipelineState/GraphicsPipelineState.h"
 #include "glad/glad.h"
 
 namespace Daydream
@@ -13,7 +13,7 @@ namespace Daydream
 
 		virtual void Bind() const;
 
-		void BindPipelineState();
+		void BindPipelineState() const;
 
 		//virtual Shared<Material> CreateMaterial() override;
 	private:

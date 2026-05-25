@@ -16,7 +16,7 @@ namespace Daydream
 		virtual void Init() override;
 		virtual void Update(Float32 _deltaTime) override {};
 
-		void SetModel(Shared<Model> _model);
+		void SetModel(Model* _model);
 
 		REFLECT_START()
 			ADD_PROPERTY(FieldType::PBRValue, materialValue)

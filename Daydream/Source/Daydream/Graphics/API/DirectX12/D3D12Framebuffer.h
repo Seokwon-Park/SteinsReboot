@@ -22,7 +22,7 @@ namespace Daydream
 	//	virtual UInt32 ReadEntityHandleFromPixel(Int32 _mouseX, Int32 _mouseY) override;
 
 	//	const Array<Shared<D3D12Texture2D>>& GetColorAttachments() { return colorAttachments; }
-	//	const Shared<D3D12Texture2D>& GetDepthAttachment() { return depthAttachment; }
+	//	const D3D12Texture2D>& GetDepthAttachment() { return depthAttachment; }
 
 	//	const D3D12_CPU_DESCRIPTOR_HANDLE& GetDepthStencilView() { return depthStencilHandle; }
 	//	const Array<D3D12_CPU_DESCRIPTOR_HANDLE>& GetRenderTargetHandles() { return renderTargetHandles; }

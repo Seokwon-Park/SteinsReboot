@@ -11,7 +11,7 @@ namespace Daydream
 		OpenGLGPUTexture(const TextureDesc& _desc);
 		virtual ~OpenGLGPUTexture();
 
-		inline UInt32 GetTextureID() { return textureID; }
+		inline UInt32 GetTextureID() const { return textureID; }
 	private:
 		UInt32 textureID;
 	};

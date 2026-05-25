@@ -12,7 +12,7 @@ namespace Daydream
 	struct TextureBinding
 	{
 		AssetHandle handle = AssetHandle();
-		Shared<Texture2D> cache = nullptr;
+		Texture2D* cache = nullptr;
 	};
 
 	struct MaterialData
@@ -60,7 +60,6 @@ namespace Daydream
 		void Unbind() {};
 
 		void SetTextureBinding(const String& _name, AssetHandle _textureHandle);
-		void LoadMaterialAsset(const String& _name);
 		//void SetTextureCube(const String& _name, Shared<TextureCube> _textureCube);
 		//void SetConstantBuffer(const String& _name, Shared<ConstantBuffer> _constantBuffer);
 
@@ -68,12 +67,9 @@ namespace Daydream
 		//inline const HashMap<String, Shared<TextureCube>>& GetAllTextureCube() { return textureCubes; }
 		//inline const HashMap<String, Shared<ConstantBuffer>>& GetAllConstantBuffer() { return cbuffers; }
 
-		static Shared<Material> Create(Shared<GraphicsPipelineState> _pipeline);
+		static Shared<Material> Create(const GraphicsPipelineState* _pipeline);
 	protected:
 		HashMap<String, ShaderResourceType> textureBindingMap;
-
-		/*HashMap<String, Shared<ConstantBuffer>> cbuffers;
-		HashMap<String, Shared<TextureCube>> textureCubes;*/
 		HashMap<String, TextureBinding> textures;
 	private:
 	};

@@ -25,7 +25,7 @@ namespace Daydream
 		info.DescriptorPool = device->GetDescriptorPool();
 		info.MinImageCount = 3;
 		info.ImageCount = 3;
-
+		
 		static VkFormat colorFormat = (VkFormat)GraphicsUtility::Vulkan::ConvertToVkFormat(_window->GetSwapchain()->GetDesc().format);
 		info.UseDynamicRendering = true;
 		info.PipelineInfoMain.PipelineRenderingCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO_KHR;

@@ -7,14 +7,12 @@ namespace Daydream
 	class D3D11VertexShader : public D3D11Shader
 	{
 	public:
-		D3D11VertexShader(D3D11RenderDevice* _device, const std::string& _src, const ShaderLoadMode& _mode);
+		D3D11VertexShader(D3D11RenderDevice* _device, const String& _src, const ShaderLoadMode& _mode);
 
 		virtual void Bind() const override;
 		virtual void Unbind() const override;
 
-		virtual void* GetNativeHandle() { return vertexShader.Get(); }
-		//virtual void SetMat4(const std::string& _name, const Matrix4x4& _value) override;
-
+		ID3D11VertexShader* GetID3D11VertexShader() const { return vertexShader.Get(); }
 	private:
 		ComPtr<ID3D11VertexShader> vertexShader;
 	};

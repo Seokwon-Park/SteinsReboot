@@ -17,9 +17,9 @@ namespace Daydream
 	{
 	}
 
-	Shared<RenderGraphDrawList> SceneRenderer::CreateDrawListFromScene(Scene* _scene, Camera* _camera)
+	RenderGraphDrawList SceneRenderer::CreateDrawListFromScene(Scene* _scene, Camera* _camera)
 	{
-		Shared<RenderGraphDrawList> drawList = MakeShared<RenderGraphDrawList>();
+		RenderGraphDrawList drawList{};
 
 		Vector3 cameraPos = _camera->GetPosition();
 		for (EntityHandle entityHandle : _scene->GetAllEntities())
@@ -31,14 +31,14 @@ namespace Daydream
 
 			if (meshRenderer)
 			{
-				Shared<Mesh> mesh = AssetManager::GetAsset<Mesh>(meshRenderer->GetMeshHandle());
-				Shared<Material> material = AssetManager::GetAsset<Material>(meshRenderer->GetMaterialHandle());
+				Mesh* mesh = AssetManager::GetAsset<Mesh>(meshRenderer->GetMeshHandle());
+				Material* material = AssetManager::GetAsset<Material>(meshRenderer->GetMaterialHandle());
 
 				if (mesh && material)
 				{
 					Float32 distanceToCamera = Vector3::Distance(cameraPos, transform->GetTransform().position);
 
-					drawList->AddDrawObject(mesh, material, transform->GetWorldMatrix(), distanceToCamera);
+					drawList.AddDrawObject(mesh, material, transform->GetWorldMatrix(), distanceToCamera);
 				} 
 			}
 		}

@@ -5,26 +5,26 @@
 
 namespace Daydream
 {
-	const Array<Shared<Shader>>& ShaderGroup::GetShaders()
+	const Array<Shader*>& ShaderGroup::GetShaders() const
 	{
 		return shaders;
 	}
 
-	Shared<ShaderGroup> ShaderGroup::Create(Shared<Shader> _vertexShader)
+	Shared<ShaderGroup> ShaderGroup::Create(Shader* _vertexShader)
 	{
 		return Create(_vertexShader, nullptr);
 	}
 
-	Shared<ShaderGroup> ShaderGroup::Create(Shared<Shader> _vertexShader, Shared<Shader> _pixelShader)
+	Shared<ShaderGroup> ShaderGroup::Create(Shader* _vertexShader, Shader* _pixelShader)
 	{
 		return Create(_vertexShader, nullptr, _pixelShader);
 	}
 
-	Shared<ShaderGroup> ShaderGroup::Create(Shared<Shader> _vertexShader, Shared<Shader> _geometryShader, Shared<Shader> _pixelShader)
+	Shared<ShaderGroup> ShaderGroup::Create(Shader* _vertexShader, Shader* _geometryShader, Shader* _pixelShader)
 	{
 		return Create(_vertexShader, nullptr, nullptr, _geometryShader, _pixelShader);
 	}
-	Shared<ShaderGroup> ShaderGroup::Create(Shared<Shader> _vertexShader, Shared<Shader> _hullShader, Shared<Shader> _domainShader, Shared<Shader> _geometryShader, Shared<Shader> _pixelShader)
+	Shared<ShaderGroup> ShaderGroup::Create(Shader* _vertexShader, Shader* _hullShader, Shader* _domainShader, Shader* _geometryShader, Shader* _pixelShader)
 	{
 		Shared<ShaderGroup> shaderGroup = Shared<ShaderGroup>(new ShaderGroup(
 			_vertexShader,
@@ -54,7 +54,7 @@ namespace Daydream
 		return &itr->second;
 	}
 
-	ShaderGroup::ShaderGroup(Shared<Shader> _vertexShader, Shared<Shader> _hullShader, Shared<Shader> _domainShader, Shared<Shader> _geometryShader, Shared<Shader> _pixelShader)
+	ShaderGroup::ShaderGroup(Shader* _vertexShader, Shader* _hullShader, Shader* _domainShader, Shader* _geometryShader, Shader* _pixelShader)
 	{
 		DAYDREAM_CORE_ASSERT(_vertexShader, "VS can't be nullptr!");
 
@@ -85,7 +85,7 @@ namespace Daydream
 	void ShaderGroup::CreateShaderBindingMap()
 	{
 		int descriptorTableIndex = 0;
-		for (const Shared<Shader>& shader : shaders)
+		for (const Shader* shader : shaders)
 		{
 			for (ShaderReflectionData data : shader->GetShaderReflectionData())
 			{
@@ -110,7 +110,7 @@ namespace Daydream
 	}
 
 
-	const Shared<Shader> ShaderGroup::GetShader(ShaderType _type)
+	Shader* ShaderGroup::GetShader(ShaderType _type) const
 	{
 		switch (_type)
 		{
@@ -141,7 +141,7 @@ namespace Daydream
 			break;
 		}
 		DAYDREAM_CORE_ASSERT(false, "Unknown Shader Type!");
-		return Shared<Shader>();
+		return nullptr;
 	}
 	Shared<ShaderGroup> ShaderGroup::Create(const Path& _vertexShaderPath, const Path&
 		_pixelShaderPath)

@@ -58,8 +58,7 @@ namespace Daydream
 		virtual void ReleaseContext() const = 0;
 
 		void SetSwapchain(Shared<Swapchain> _swapchain) { swapchain = _swapchain; }
-		Shared<Swapchain> GetSwapchain() const { return swapchain; }
-		Swapchain* GetSwapchainPtr() const { return swapchain.get(); }
+		Swapchain* GetSwapchain() const { return swapchain.get(); }
 
 		static Unique<DaydreamWindow> Create(const WindowDesc& _desc = WindowDesc());
 	protected:

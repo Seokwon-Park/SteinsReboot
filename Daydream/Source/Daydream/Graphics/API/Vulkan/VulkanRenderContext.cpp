@@ -210,23 +210,24 @@ namespace Daydream
 	//{
 	//	GetActiveCommandBuffer().endRenderPass();
 	//}
-	void VulkanRenderContext::BindPipelineState(Shared<GraphicsPipelineState> _pipelineState)
+	void VulkanRenderContext::BindPipelineState(const GraphicsPipelineState* _pipelineState)
 	{
 		RenderContext::BindPipelineState(_pipelineState);
 		currentGraphicsPipelineState = _pipelineState;
-		Shared<VulkanGraphicsPipelineState> pipelineState = static_pointer_cast<VulkanGraphicsPipelineState>(_pipelineState);
+		const VulkanGraphicsPipelineState* pipelineState = Cast<const VulkanGraphicsPipelineState*>(_pipelineState);
 
 		GetActiveCommandBuffer().bindPipeline(vk::PipelineBindPoint::eGraphics, pipelineState->GetPipeline());
 	}
-	void VulkanRenderContext::BindVertexBuffer(Shared<VertexBuffer> _vertexBuffer)
+
+	void VulkanRenderContext::BindVertexBuffer(const GPUBuffer* _vertexBuffer, UInt32 _stride)
 	{
 		vk::DeviceSize offset = 0;
-		VulkanGPUBuffer* vertexBuffer = Cast<VulkanGPUBuffer*>(_vertexBuffer->GetGPUBufferPtr());
+		const VulkanGPUBuffer* vertexBuffer = Cast<const VulkanGPUBuffer*>(_vertexBuffer);
 		GetActiveCommandBuffer().bindVertexBuffers(0, { vertexBuffer->GetVkBuffer() }, { offset });
 	}
-	void VulkanRenderContext::BindIndexBuffer(Shared<IndexBuffer> _indexBuffer)
+	void Daydream::VulkanRenderContext::BindIndexBuffer(const GPUBuffer* _indexBuffer)
 	{
-		VulkanGPUBuffer* indexBuffer = Cast<VulkanGPUBuffer*>(_indexBuffer->GetGPUBufferPtr());
+		const VulkanGPUBuffer* indexBuffer = Cast<const VulkanGPUBuffer*>(_indexBuffer);
 		GetActiveCommandBuffer().bindIndexBuffer(indexBuffer->GetVkBuffer(), 0, vk::IndexType::eUint32);
 	}
 
@@ -237,8 +238,8 @@ namespace Daydream
 	//	const ShaderReflectionData* resourceInfo = activePipelineState->GetBindingInfo(_name);
 	//	if (resourceInfo == nullptr) return;
 
-	//	Shared<VulkanTexture2D> vulkanTexture = SharedCast<VulkanTexture2D>(_texture);
-	//	Shared<VulkanPipelineState> vulkanPSO = SharedCast<VulkanPipelineState>(activePipelineState);
+	//	Shared<VulkanTexture2D> vulkanTexture = Cast<VulkanTexture2D>(_texture);
+	//	Shared<VulkanPipelineState> vulkanPSO = Cast<VulkanPipelineState>(activePipelineState);
 
 	//	vk::DescriptorImageInfo imageInfo{};
 	//	imageInfo.imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
@@ -281,14 +282,14 @@ namespace Daydream
 	//	writeSet.descriptorType = vk::DescriptorType::eCombinedImageSampler;
 	//	writeSet.pImageInfo = &imageInfo;
 
-	void VulkanRenderContext::BindShaderResourceView(const String& _name, Shared<TextureView> _textureView, Shared<Sampler> _sampler)
+	void VulkanRenderContext::BindShaderResourceView(const String& _name, const TextureView* _textureView, const Sampler* _sampler)
 	{
 		const ShaderReflectionData* resourceInfo = currentGraphicsPipelineState->GetBindingInfo(_name);
 		if (resourceInfo == nullptr) return;
 
-		Shared<VulkanTextureView> vulkanTextureView = SharedCast<VulkanTextureView>(_textureView);
-		Shared<VulkanSampler> vulkanSampler = SharedCast<VulkanSampler>(_sampler);
-		Shared<VulkanGraphicsPipelineState> vulkanPSO = SharedCast<VulkanGraphicsPipelineState>(currentGraphicsPipelineState);
+		const VulkanTextureView* vulkanTextureView = Cast<const VulkanTextureView*>(_textureView);
+		const VulkanSampler* vulkanSampler = Cast<const VulkanSampler*>(_sampler);
+		VulkanGraphicsPipelineState* vulkanPSO = Cast<VulkanGraphicsPipelineState*>(currentGraphicsPipelineState);
 
 		vk::DescriptorImageInfo imageInfo{};
 		imageInfo.imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
@@ -311,14 +312,14 @@ namespace Daydream
 		);
 	}
 
-	void VulkanRenderContext::SetConstantBuffer(const String& _name, Shared<ConstantBuffer> _buffer)
+	void VulkanRenderContext::BindConstantBuffer(const String& _name, const ConstantBuffer* _buffer)
 	{
 		if (_buffer == nullptr) return;
 		const ShaderReflectionData* resourceInfo = currentGraphicsPipelineState->GetBindingInfo(_name);
 		if (resourceInfo == nullptr) return;
 
-		VulkanGPUBuffer* constantBuffer = Cast<VulkanGPUBuffer*>(_buffer->GetGPUBufferPtr());
-		Shared<VulkanGraphicsPipelineState> vulkanPSO = std::static_pointer_cast<VulkanGraphicsPipelineState>(currentGraphicsPipelineState);
+		const VulkanGPUBuffer* constantBuffer = Cast<const VulkanGPUBuffer*>(_buffer->GetGPUBuffer());
+		const VulkanGraphicsPipelineState* vulkanPSO = Cast<const VulkanGraphicsPipelineState*>(currentGraphicsPipelineState);
 
 		vk::DescriptorBufferInfo bufferInfo{};
 		bufferInfo.buffer = constantBuffer->GetVkBuffer();
@@ -341,23 +342,23 @@ namespace Daydream
 		);
 	}
 
-	void VulkanRenderContext::CopyBuffer(Shared<GPUBuffer> _src, Shared<GPUBuffer> _dst, UInt32 _copySize)
+	void VulkanRenderContext::CopyBuffer(const GPUBuffer* _src, const GPUBuffer* _dst, UInt32 _copySize, UInt32 _srcOffset, UInt32 _dstOffset)
 	{
-		VulkanGPUBuffer* src = Cast<VulkanGPUBuffer*>(_src.get());
-		VulkanGPUBuffer* dst = Cast<VulkanGPUBuffer*>(_dst.get());
+		const VulkanGPUBuffer* src = Cast<const VulkanGPUBuffer*>(_src);
+		const VulkanGPUBuffer* dst = Cast<const VulkanGPUBuffer*>(_dst);
 
 		vk::BufferCopy copyRegion{};
-		copyRegion.srcOffset = 0; // Optional
-		copyRegion.dstOffset = 0; // Optional
+		copyRegion.srcOffset = _srcOffset; // Optional
+		copyRegion.dstOffset = _dstOffset; // Optional
 		copyRegion.size = _copySize;
 
 		GetActiveCommandBuffer().copyBuffer(src->GetVkBuffer(), dst->GetVkBuffer(), 1, &copyRegion);
 	}
 
-	void VulkanRenderContext::CopyBufferToTexture(Shared<GPUBuffer> _src, Shared<GPUTexture> _dst)
+	void VulkanRenderContext::CopyBufferToTexture(const GPUBuffer* _src, const GPUTexture* _dst)
 	{
-		Shared<VulkanGPUBuffer> src = SharedCast<VulkanGPUBuffer>(_src);
-		Shared<VulkanGPUTexture> dst = SharedCast<VulkanGPUTexture>(_dst);
+		const VulkanGPUBuffer* src = Cast<const VulkanGPUBuffer*>(_src);
+		const VulkanGPUTexture* dst = Cast<const VulkanGPUTexture*>(_dst);
 
 		
 		vk::BufferImageCopy region{};
@@ -380,12 +381,12 @@ namespace Daydream
 		GetActiveCommandBuffer().copyBufferToImage(src->GetVkBuffer(), dst->GetVkImage(), vk::ImageLayout::eTransferDstOptimal, 1, &region);
 	}
 
-	void VulkanRenderContext::CopyTexture2D(Shared<Texture2D> _src, Shared<Texture2D> _dst)
+	void VulkanRenderContext::CopyTexture2D(const Texture2D* _src, const Texture2D* _dst)
 	{
 		vk::ImageMemoryBarrier barriers[2] = {};
 
-		Shared<VulkanGPUTexture> dst = SharedCast<VulkanGPUTexture>(_dst->GetGPUTexture());
-		Shared<VulkanGPUTexture> src = SharedCast<VulkanGPUTexture>(_src->GetGPUTexture());
+		const VulkanGPUTexture* dst = Cast<const VulkanGPUTexture*>(_dst->GetGPUTexture());
+		const VulkanGPUTexture* src = Cast<const VulkanGPUTexture*>(_src->GetGPUTexture());
 
 		// 원본 이미지를 TRANSFER_SRC로 변경
 		barriers[0].oldLayout = vk::ImageLayout::eShaderReadOnlyOptimal; // 또는 현재 레이아웃
@@ -478,10 +479,10 @@ namespace Daydream
 			2, barriers
 		);
 	}
-	void Daydream::VulkanRenderContext::CopyTextureToCubemapFace(Shared<Texture2D> _srcTexture2D, Shared<TextureCube> _dstCubemap, UInt32 _faceIndex, UInt32 _mipLevel)
+	void Daydream::VulkanRenderContext::CopyTextureToCubemapFace(const Texture2D* _srcTexture2D, const TextureCube* _dstCubemap, UInt32 _faceIndex, UInt32 _mipLevel)
 	{
-		VulkanGPUTexture* dst = Cast<VulkanGPUTexture*>(_dstCubemap->GetGPUTexturePtr());
-		VulkanGPUTexture* src = Cast<VulkanGPUTexture*>(_srcTexture2D->GetGPUTexturePtr());
+		VulkanGPUTexture* dst = Cast<VulkanGPUTexture*>(_dstCubemap->GetGPUTexture());
+		VulkanGPUTexture* src = Cast<VulkanGPUTexture*>(_srcTexture2D->GetGPUTexture());
 
 		vk::ImageMemoryBarrier barriers[2] = {};
 
@@ -599,7 +600,7 @@ namespace Daydream
 		);
 	}
 
-	void VulkanRenderContext::GenerateMips(Shared<Texture> _texture)
+	void Daydream::VulkanRenderContext::GenerateMips(GPUTexture* _texture)
 	{
 		//vk::CommandBuffer commandBuffer = device->BeginSingleTimeCommands(); // 이 함수는 vk::CommandBuffer를 반환한다고 가정
 
@@ -609,7 +610,7 @@ namespace Daydream
 		UInt32 mipLevels = _texture->GetMipLevels();
 		vk::Image image;
 
-		image = SharedCast<VulkanGPUTexture>(_texture->GetGPUTexture())->GetVkImage();
+		image = Cast<VulkanGPUTexture*>(_texture)->GetVkImage();
 
 		//input texture state will be RenderTarget, but vulkan need to use blitCopy to generate mips easy.
 		//then Transition layout should be eTransferDstOptimal
@@ -721,7 +722,7 @@ namespace Daydream
 		);
 	}
 
-	void VulkanRenderContext::TransitionTextureState(Shared<GPUTexture> _texture, ResourceState _beforeState, ResourceState _afterState, UInt32 _baseMip, UInt32 _mipLevels, UInt32 _baseLayer, UInt32 _layerCount)
+	void VulkanRenderContext::TransitionTextureState(const GPUTexture* _texture, ResourceState _beforeState, ResourceState _afterState, UInt32 _baseMip, UInt32 _mipLevels, UInt32 _baseLayer, UInt32 _layerCount)
 	{
 		if (_beforeState == _afterState)
 		{
@@ -729,7 +730,7 @@ namespace Daydream
 			return;
 		}
 
-		VulkanGPUTexture* vkTexture = Cast<VulkanGPUTexture*>(_texture.get());
+		const VulkanGPUTexture* vkTexture = Cast<const VulkanGPUTexture*>(_texture);
 
 		vk::PipelineStageFlags srcStage;
 		vk::AccessFlags srcAccess;
@@ -766,7 +767,7 @@ namespace Daydream
 	}
 
 
-	void VulkanRenderContext::TransitionBufferState(Shared<GPUBuffer> _buffer, ResourceState _beforeState, ResourceState _afterState)
+	void VulkanRenderContext::TransitionBufferState(const GPUBuffer* _buffer, ResourceState _beforeState, ResourceState _afterState)
 	{
 		if (_beforeState == _afterState)
 		{
@@ -774,7 +775,7 @@ namespace Daydream
 			return;
 		}
 
-		VulkanGPUBuffer* vkBuffer = Cast<VulkanGPUBuffer*>(_buffer.get());
+		const VulkanGPUBuffer* vkBuffer = Cast<const VulkanGPUBuffer*>(_buffer);
 
 		vk::PipelineStageFlags srcStage;
 		vk::AccessFlags srcAccess;
@@ -805,11 +806,12 @@ namespace Daydream
 		);
 
 	}
-	void VulkanRenderContext::SetActiveCommandList(Shared<RenderCommandList> _commandList)
+	void Daydream::VulkanRenderContext::SetActiveCommandList(RenderCommandList* _commandList)
 	{
 		activeCommandList = _commandList;
-		activeCommandBuffer = SharedCast<VulkanRenderCommandList>(_commandList)->GetVkCommandBuffer();
+		activeCommandBuffer = Cast<VulkanRenderCommandList*>(_commandList)->GetVkCommandBuffer();
 	}
+
 	vk::CommandBuffer VulkanRenderContext::GetActiveCommandBuffer()
 	{
 		return activeCommandBuffer;

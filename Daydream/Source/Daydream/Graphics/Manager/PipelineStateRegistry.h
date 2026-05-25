@@ -2,7 +2,6 @@
 
 #include "ResourceRegistry.h"
 
-
 namespace Daydream
 {
 	class GraphicsPipelineState;
@@ -15,9 +14,7 @@ namespace Daydream
 
 		virtual void CreateBuiltinResources() override;
 
-		inline static Shared<GraphicsPipelineState> DepthPSO;
-		inline static Shared<GraphicsPipelineState> GBufferPSO;
-		inline static Shared<GraphicsPipelineState> DeferredPSO;
+
 	private:
 	};
 }

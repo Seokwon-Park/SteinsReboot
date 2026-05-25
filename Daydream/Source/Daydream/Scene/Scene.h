@@ -38,15 +38,15 @@ namespace Daydream
 
 		bool IsHandleValid(EntityHandle _handle) const;
 
-		inline void SetCurrentCamera(Shared<Camera> _camera) { currentCamera = _camera; }
-		inline const Shared<Camera> GetCurrentCamera() const { return currentCamera; }
+		inline void SetCurrentCamera(Camera* _camera) { currentCamera = _camera; }
+		inline const Camera* GetCurrentCamera() const { return currentCamera; }
 
 		inline Shared<ConstantBuffer> GetLightConstantBuffer() const { return lightBuffer; }
 
 		Skybox* GetSkybox() const;
 
 		void Update(Float32 _deltaTime);
-		void RenderDepth();
+		//void RenderDepth();
 
 		const Array<EntityHandle>& GetAllEntities() const { return activeEntities; }
 		const Array<EntityHandle>& GetRootEntities() const { return rootEntities; }
@@ -58,7 +58,7 @@ namespace Daydream
 		//temp
 		LightComponent* GetLightComponent() { return firstLightComponent; }
 	private:
-		void ProcessModelNode(GameEntity* _parentEntity, const NodeData& _curNode, const Shared<Model>& _model);
+		void ProcessModelNode(GameEntity* _parentEntity, const NodeData& _curNode, const Model* _model);
 		String name;
 
 		Array<Unique<GameEntity>> entityPool;
@@ -69,7 +69,7 @@ namespace Daydream
 		Array<EntityHandle> activeEntities;
 		Array<EntityHandle> rootEntities;
 
-		Shared<Camera> currentCamera;
+		Camera* currentCamera;
 
 		Array<EntityHandle> lightEntities;
 		Array<EntityHandle> modelRendererEntities;

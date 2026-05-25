@@ -24,7 +24,7 @@ namespace Daydream
 		virtual void EndFrame() override;
 
 		virtual TextureView* GetCurrentRenderTargetView() const { return backBufferRTVs[frameIndex].get(); };
-		virtual Shared<RenderCommandList> GetCurrentCommandList() const { return commandLists[frameIndex]; };
+		virtual RenderCommandList* GetCurrentCommandList() const { return commandLists[frameIndex].get(); };
 
 		void WaitForGPU();
 		void MoveToNextFrame();

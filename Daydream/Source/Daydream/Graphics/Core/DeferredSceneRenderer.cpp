@@ -2,7 +2,7 @@
 #include "DeferredSceneRenderer.h"
 
 #include "Renderer.h"
-#include "Daydream/Graphics/Manager/PipelineStateRegistry.h"
+#include "Daydream/Graphics/Resources/BuiltInResources.h"
 
 
 namespace Daydream
@@ -20,12 +20,12 @@ namespace Daydream
 		UInt32 width = _sceneData.width;
 		UInt32 height = _sceneData.height;
 
-		Shared<Scene> scene = _sceneData.scene;
-		Shared<Camera> camera = _sceneData.camera;
+		Scene* scene = _sceneData.scene;
+		Camera* camera = _sceneData.camera;
 
 		renderGraph->Reset();
 
-		Shared<RenderGraphDrawList> opaqueDrawList = CreateDrawListFromScene(_sceneData.scene.get(), _sceneData.camera.get());
+		RenderGraphDrawList opaqueDrawList = CreateDrawListFromScene(_sceneData.scene, _sceneData.camera);
 
 		RenderGraphResourceDesc resourceDesc{};
 
@@ -34,15 +34,15 @@ namespace Daydream
 		RenderGraphResourceHandle albedo = renderGraph->AddResource("GBufferAlbedo", { RenderFormat::R8G8B8A8_UNORM, width, height });
 		RenderGraphResourceHandle mrao = renderGraph->AddResource("GBufferMRAO", { RenderFormat::R8G8B8A8_UNORM, width, height });
 
-		RenderGraphResourceHandle depth = renderGraph->AddResource("GBufferDepth", { RenderFormat::D24_UNORM_S8_UINT, width, height });
+		RenderGraphResourceHandle shadowDepth = renderGraph->AddResource("Depth", { RenderFormat::D24_UNORM_S8_UINT, width, height });
 
 		RenderGraphResourceHandle finalResource;
 
-		RenderGraphPassDesc passDesc{};
-		passDesc.pipelineState = PipelineStateRegistry::DepthPSO;
-		passDesc.drawType = PassDrawType::Geometry;
-		passDesc.drawList = opaqueDrawList;
-		RenderGraphPassHandle depthPass = renderGraph->AddPass("DepthPass", passDesc);
+		RenderGraphPassDesc depthPassDesc{};
+		depthPassDesc.pipelineState = BuiltIn::PSO::Depth();
+		depthPassDesc.drawType = PassDrawType::DrawDepthStencil;
+		depthPassDesc.drawList = opaqueDrawList;
+		RenderGraphPassHandle depthPass = renderGraph->AddPass("DepthPass", depthPassDesc);
 		//RenderGraphPassHandle depthPass = renderGraph->AddPass("DepthPass", [=]()
 		//	{
 
@@ -69,9 +69,14 @@ namespace Daydream
 		//		}
 		//		//Renderer::EndRenderPass(depthRenderPass);
 		//	});
-		renderGraph->Write(depthPass, depth);
+		renderGraph->Write(depthPass, shadowDepth);
 
-		RenderGraphPassHandle gBufferPass = renderGraph->AddPass("GBufferPass", passDesc);
+
+		RenderGraphPassDesc gBufferPassDesc{};
+		gBufferPassDesc.pipelineState = BuiltIn::PSO::GBuffer();
+		gBufferPassDesc.drawType = PassDrawType::DrawMesh;
+		gBufferPassDesc.drawList = opaqueDrawList;
+		RenderGraphPassHandle gBufferPass = renderGraph->AddPass("GBufferPass", gBufferPassDesc);
 		//	{
 		//		//Renderer::Submit(squareIB->GetCount());
 		//		//Renderer::BeginRenderPass(gBufferRenderPass, gBufferFramebuffer);
@@ -139,6 +144,9 @@ namespace Daydream
 		//renderGraph->Read(lightingPass, normal);
 		//renderGraph->Read(lightingPass, albedo);
 		//renderGraph->Write(lightingPass, finalResource);
+
+		renderGraph->Compile();
+		renderGraph->Execute();
 	}
 }
 

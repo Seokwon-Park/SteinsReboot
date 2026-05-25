@@ -143,35 +143,37 @@ namespace Daydream
 	//{
 	//	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	//}
-	void OpenGLRenderContext::BindPipelineState(Shared<GraphicsPipelineState> _pipelineState)
+	void OpenGLRenderContext::BindPipelineState(const GraphicsPipelineState* _pipelineState)
 	{
 		RenderContext::BindPipelineState(_pipelineState);
-		OpenGLGraphicsPipelineState* pso = Cast<OpenGLGraphicsPipelineState*>(currentGraphicsPipelineState.get());
+		const OpenGLGraphicsPipelineState* pso = Cast<const OpenGLGraphicsPipelineState*>(currentGraphicsPipelineState);
 		pso->BindPipelineState();
 	}
-	void OpenGLRenderContext::BindVertexBuffer(Shared<VertexBuffer> _vertexBuffer)
+
+	void OpenGLRenderContext::BindVertexBuffer(const GPUBuffer* _vertexBuffer, UInt32 _stride)
 	{
-		OpenGLGPUBuffer* vertexBuffer = Cast<OpenGLGPUBuffer*>(_vertexBuffer->GetGPUBufferPtr());
+		const OpenGLGPUBuffer* vertexBuffer = Cast<const OpenGLGPUBuffer*>(_vertexBuffer);
 
 		GLint currentVAO = 0;
 		glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &currentVAO);
-		glVertexArrayVertexBuffer(currentVAO, 0, vertexBuffer->GetBufferID(), 0, _vertexBuffer->GetStride());
+		glVertexArrayVertexBuffer(currentVAO, 0, vertexBuffer->GetBufferID(), 0, _stride);
 	}
-	void OpenGLRenderContext::BindIndexBuffer(Shared<IndexBuffer> _indexBuffer)
+
+	void OpenGLRenderContext::BindIndexBuffer(const GPUBuffer* _indexBuffer)
 	{
-		OpenGLGPUBuffer* indexBuffer = Cast<OpenGLGPUBuffer*>(_indexBuffer->GetGPUBufferPtr());
+		const OpenGLGPUBuffer* indexBuffer = Cast<const OpenGLGPUBuffer*>(_indexBuffer);
 
 		GLint currentVAO = 0; // 결과를 저장할 변수
 		glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &currentVAO);
 		glVertexArrayElementBuffer(currentVAO, indexBuffer->GetBufferID());
 	}
-	void OpenGLRenderContext::BindShaderResourceView(const String& _name, Shared<TextureView> _textureView, Shared<Sampler> _sampler)
+	void OpenGLRenderContext::BindShaderResourceView(const String& _name, const TextureView* _textureView, const Sampler* _sampler)
 	{
 		const ShaderReflectionData* bindingInfo = currentGraphicsPipelineState->GetBindingInfo(_name);
 		if (bindingInfo == nullptr) return;
 
-		OpenGLTextureView* glView = Cast<OpenGLTextureView*>(_textureView.get());
-		OpenGLSampler* glSampler = Cast<OpenGLSampler*>(_sampler.get());
+		const OpenGLTextureView* glView = Cast<const OpenGLTextureView*>(_textureView);
+		const OpenGLSampler* glSampler = Cast<const OpenGLSampler*>(_sampler);
 		glBindTextureUnit(bindingInfo->binding, glView->GetTextureViewID());
 		glBindSampler(bindingInfo->binding, glSampler->GetSamplerID());
 
@@ -181,7 +183,7 @@ namespace Daydream
 		RenderContext::SetTexture2D(_name, _texture);
 
 		const ShaderReflectionData* bindingInfo = activePipelineState->GetBindingInfo(_name);
-		if (bindingInfo == nullptr) return;
+		if (bindingInfo == nullptr) return; 
 
 		OpenGLTexture2D* glTexture = Cast<OpenGLTexture2D*>(_texture.get());
 		glBindTextureUnit(bindingInfo->binding, glTexture->GetTextureID());
@@ -196,28 +198,34 @@ namespace Daydream
 		glBindTextureUnit(bindingInfo->binding, glTexture->GetTextureID());
 		glBindSampler(bindingInfo->binding, glTexture->GetSamplerID());
 	}*/
-	void OpenGLRenderContext::SetConstantBuffer(const String& _name, Shared<ConstantBuffer> _buffer)
+	void OpenGLRenderContext::BindConstantBuffer(const String& _name, const ConstantBuffer* _buffer)
 	{
 		const ShaderReflectionData* bindingInfo = currentGraphicsPipelineState->GetBindingInfo(_name);
 		if (bindingInfo == nullptr) return;
 
-		OpenGLGPUBuffer* constantBuffer = Cast<OpenGLGPUBuffer*>(_buffer->GetGPUBufferPtr());
+		const OpenGLGPUBuffer* constantBuffer = Cast<const OpenGLGPUBuffer*>(_buffer->GetGPUBuffer());
 		glBindBufferBase(GL_UNIFORM_BUFFER, bindingInfo->binding, constantBuffer->GetBufferID());
 	}
 
-	void OpenGLRenderContext::CopyBuffer(Shared<GPUBuffer> _src, Shared<GPUBuffer> _dst, UInt32 _copySize)
+	void OpenGLRenderContext::CopyBuffer(const GPUBuffer* _src, const GPUBuffer* _dst, UInt32 _copySize, UInt32 _srcOffset, UInt32 _dstOffset)
 	{
-		OpenGLGPUBuffer* src = Cast<OpenGLGPUBuffer*>(_src.get());
-		OpenGLGPUBuffer* dst = Cast<OpenGLGPUBuffer*>(_dst.get());
+		OpenGLGPUBuffer* src = Cast<OpenGLGPUBuffer*>(_src);
+		OpenGLGPUBuffer* dst = Cast<OpenGLGPUBuffer*>(_dst);
 
 		// 소스 버퍼ID, 목적지 버퍼ID, 소스 오프셋, 목적지 오프셋, 복사할 크기
-		glCopyNamedBufferSubData(src->GetBufferID(), dst->GetBufferID(), 0, 0, _copySize);
+		glCopyNamedBufferSubData(
+			src->GetBufferID(),
+			dst->GetBufferID(),
+			_srcOffset,
+			_dstOffset,
+			_copySize
+		);
 	}
 
-	void Daydream::OpenGLRenderContext::CopyBufferToTexture(Shared<GPUBuffer> _src, Shared<GPUTexture> _dst)
+	void OpenGLRenderContext::CopyBufferToTexture(const GPUBuffer* _src, const GPUTexture* _dst)
 	{
-		Shared<OpenGLGPUBuffer> srcBuffer = SharedCast<OpenGLGPUBuffer>(_src);
-		Shared<OpenGLGPUTexture> dstTexture = SharedCast<OpenGLGPUTexture>(_dst);
+		OpenGLGPUBuffer* srcBuffer = Cast<OpenGLGPUBuffer*>(_src);
+		OpenGLGPUTexture* dstTexture = Cast<OpenGLGPUTexture*>(_dst);
 
 		GLuint bufferID = srcBuffer->GetBufferID();
 		GLuint textureID = dstTexture->GetTextureID();
@@ -242,10 +250,10 @@ namespace Daydream
 		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 	}
 
-	void OpenGLRenderContext::CopyTexture2D(Shared<Texture2D> _src, Shared<Texture2D> _dst)
+	void OpenGLRenderContext::CopyTexture2D(const Texture2D* _src, const Texture2D* _dst)
 	{
-		Shared<OpenGLGPUTexture> src = SharedCast<OpenGLGPUTexture>(_src->GetGPUTexture());
-		Shared<OpenGLGPUTexture> dst = SharedCast<OpenGLGPUTexture>(_dst->GetGPUTexture());
+		OpenGLGPUTexture* src = Cast<OpenGLGPUTexture*>(_src->GetGPUTexture());
+		OpenGLGPUTexture* dst = Cast<OpenGLGPUTexture*>(_dst->GetGPUTexture());
 		glCopyImageSubData(
 			src->GetTextureID(),          // 원본 텍스처 이름
 			GL_TEXTURE_2D,       // 원본 텍스처 타입
@@ -260,10 +268,10 @@ namespace Daydream
 			1                    // 복사할 깊이 (2D 텍스처는 1)
 		);
 	}
-	void Daydream::OpenGLRenderContext::CopyTextureToCubemapFace(Shared<Texture2D> _srcTexture2D, Shared<TextureCube> _dstCubemap, UInt32 _faceIndex, UInt32 _mipLevel)
+	void OpenGLRenderContext::CopyTextureToCubemapFace(const Texture2D* _srcTexture2D, const TextureCube* _dstCubemap, UInt32 _faceIndex, UInt32 _mipLevel)
 	{
-		OpenGLGPUTexture* src = Cast<OpenGLGPUTexture*>(_srcTexture2D->GetGPUTexturePtr());
-		OpenGLGPUTexture* dst = Cast<OpenGLGPUTexture*>(_dstCubemap->GetGPUTexturePtr());
+		OpenGLGPUTexture* src = Cast<OpenGLGPUTexture*>(_srcTexture2D->GetGPUTexture());
+		OpenGLGPUTexture* dst = Cast<OpenGLGPUTexture*>(_dstCubemap->GetGPUTexture());
 		glCopyImageSubData(
 			src->GetTextureID(),      // 원본 텍스처 핸들
 			GL_TEXTURE_2D,        // 원본 타겟 타입
@@ -277,9 +285,20 @@ namespace Daydream
 		);
 	}
 
-	void OpenGLRenderContext::GenerateMips(Shared<Texture> _texture)
+	void OpenGLRenderContext::GenerateMips(GPUTexture* _texture)
 	{
-		Shared<OpenGLTextureView> src = SharedCast<OpenGLTextureView>(_texture->GetDefaultSRV());
-		glGenerateTextureMipmap(src->GetTextureViewID());
+		const OpenGLGPUTexture* glTexture = Cast<const OpenGLGPUTexture*>(_texture);
+
+		UInt32 mipLevels = _texture->GetMipLevels();
+		UInt32 layerCount = _texture->GetLayerCount();
+
+		GLenum target = GraphicsUtility::OpenGL::ConvertToOpenGLTextureTarget(_texture->GetType());
+		GLenum internalFormat = GraphicsUtility::OpenGL::ConvertRenderFormatToGLFormat(_texture->GetFormat());
+
+		GLuint srvID;
+		glGenTextures(1, &srvID);
+		glTextureView(srvID, target, glTexture->GetTextureID(), internalFormat, 0, mipLevels, 0, layerCount);
+
+		glGenerateTextureMipmap(srvID);
 	}
 }

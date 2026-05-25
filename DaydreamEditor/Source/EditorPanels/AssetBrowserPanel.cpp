@@ -67,7 +67,7 @@ namespace Daydream
 
 					ImGui::PushID(pathString.c_str()); // 각 위젯에 고유 ID 부여
 
-					Shared<Texture2D> thumbnail;
+					Texture2D* thumbnail;
 
 					// 폴더 또는 파일 아이콘 표시
 					if (path.IsDirectory())
@@ -79,7 +79,7 @@ namespace Daydream
 					{
 						AssetType type = AssetManager::GetAssetTypeFromPath(path);
 						String typeString = AssetManager::AssetTypeToString(type);
-						Shared<Asset> asset;
+						Asset* asset;
 						thumbnail = AssetManager::GetAssetByPath<Texture2D>("Resource\\FileIcon.png");
 						switch (type)
 						{

@@ -5,6 +5,8 @@
 #include "AssetDefaults.h"
 
 #include "Daydream/Graphics/Resources/Texture/Texture2D.h"
+#include "Daydream/Graphics/Utility/MeshGenerator.h"
+
 
 #include "Daydream/Core/UUID.h"
 #include "yaml-cpp/yaml.h"
@@ -160,6 +162,7 @@ namespace Daydream
 	void AssetManager::LoadAssets(LoadPhase _phase)
 	{
 		instance->CreateBuiltinTexture2D();
+		instance->CreateBuiltinMesh();
 		for (auto [handle, metadata] : instance->assetRegistry)
 		{
 			if (instance->loadedAssetCache.find(handle) != instance->loadedAssetCache.end())
@@ -187,13 +190,14 @@ namespace Daydream
 	void AssetManager::CreateBuiltinAssets()
 	{
 		instance->CreateBuiltinTexture2D();
+
 		AssetMetadata metadata;
-		metadata.handle = AssetDefaults::DefaultMaterial;
+		metadata.handle = AssetDefaults::DefaultMaterialHandle;
 		metadata.filePath = "";
 		metadata.type = AssetType::Material;
 		metadata.name = "";
 
-		instance->assetRegistry[AssetDefaults::DefaultMaterial] = metadata;
+		instance->assetRegistry[AssetDefaults::DefaultMaterialHandle] = metadata;
 	}
 
 	const AssetMetadata& AssetManager::GetAssetMetadata(AssetHandle _handle)
@@ -201,7 +205,7 @@ namespace Daydream
 		auto itr = instance->assetRegistry.find(_handle);
 		if (itr == instance->assetRegistry.end())
 		{
-			return instance->assetRegistry[AssetDefaults::DefaultMaterial];
+			return AssetMetadata();
 		}
 		return itr->second;
 	}
@@ -367,6 +371,35 @@ namespace Daydream
 		pixelData[2] = 255;
 		assetPathMap["DefaultAO"] = AssetDefaults::DefaultAOHandle;
 		loadedAssetCache[AssetDefaults::DefaultAOHandle] = Texture2D::Create(desc, pixelData.data());
+	}
+
+	void AssetManager::CreateBuiltinMesh()
+	{
+		float vertices[] =
+		{
+			-1.0f,-1.0f, 0.0f, 0.0f, 1.0f,
+			-1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+			1.0f,  1.0f, 0.0f, 1.0f, 0.0f,
+			1.0f, -1.0f, 0.0f, 1.0f, 1.0f,
+		};
+
+		UInt32 indices[6] = { 0,1,2,2,3,0 };
+		Shared<VertexBuffer> vertexBuffer = VertexBuffer::CreateStatic(sizeof(vertices), 20, vertices);
+		Shared<IndexBuffer> indexBuffer = IndexBuffer::Create(indices, 6);
+
+		assetPathMap["DefaultQuadMesh"] = AssetDefaults::DefaultQuadMeshHandle;
+		loadedAssetCache[AssetDefaults::DefaultQuadMeshHandle] = Mesh::Create(vertexBuffer, indexBuffer);
+
+		auto meshData = MeshGenerator::CreateCube();
+		Array<Vector3> positions;
+		for (const Vertex& v : meshData.vertices)
+		{
+			positions.push_back(v.position);
+		}
+		vertexBuffer = VertexBuffer::CreateStatic(sizeof(Vector3) * (UInt32)positions.size(), 12, positions.data());
+		indexBuffer = IndexBuffer::Create(meshData.indices.data(), (UInt32)meshData.indices.size());
+		assetPathMap["DefaultBoxMesh"] = AssetDefaults::DefaultBoxMeshHandle;
+		loadedAssetCache[AssetDefaults::DefaultBoxMeshHandle] = Mesh::Create(vertexBuffer, indexBuffer);
 	}
 
 	void AssetManager::ProcessDirectory(const Path& _directoryPath, bool _isRecursive)

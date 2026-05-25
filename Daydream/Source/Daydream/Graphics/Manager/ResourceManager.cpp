@@ -2,14 +2,13 @@
 #include "ResourceManager.h"
 
 #include "Daydream/Graphics/Resources/ShaderGroup.h"
-#include "Daydream/Graphics/Resources/PipelineState/GraphicsPipelineState.h"
+#include "Daydream/Graphics/States/PipelineState/GraphicsPipelineState.h"
 #include "Daydream/Graphics/Resources/Shader.h"
 #include "Daydream/Graphics/Resources/Mesh.h"
 #include "Daydream/Graphics/Resources/Sampler.h"
 
 #include "ShaderRegistry.h"
 #include "ShaderGroupRegistry.h"
-#include "RenderPassRegistry.h"
 #include "MeshRegistry.h"
 #include "PipelineStateRegistry.h"
 #include "SamplerRegistry.h"

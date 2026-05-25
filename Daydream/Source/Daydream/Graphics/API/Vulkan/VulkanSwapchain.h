@@ -35,7 +35,7 @@ namespace Daydream
 		//virtual void EndRenderPass() override;
 
 		inline virtual TextureView* GetCurrentRenderTargetView() const { return backBufferRTVs[currentFrame].get(); };
-		inline virtual Shared<RenderCommandList> GetCurrentCommandList() const override { return commandLists[currentFrame]; }
+		inline virtual RenderCommandList* GetCurrentCommandList() const override { return commandLists[currentFrame].get(); }
 
 
 		inline vk::Format GetFormat() const { return format; }

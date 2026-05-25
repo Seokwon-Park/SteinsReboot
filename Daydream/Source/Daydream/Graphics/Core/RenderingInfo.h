@@ -34,6 +34,4 @@ namespace Daydream
 		Array<AttachmentDesc> colorAttachments;
 		AttachmentDesc depthAttachment;
 	};
-
-
 }

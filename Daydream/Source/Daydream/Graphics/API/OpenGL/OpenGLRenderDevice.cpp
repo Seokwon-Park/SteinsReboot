@@ -88,7 +88,7 @@ namespace Daydream
 
 	Shared<TextureView> OpenGLRenderDevice::CreateTextureView(Texture* _texture, const TextureViewDesc& _desc)
 	{
-		OpenGLGPUTexture* texture = Cast<OpenGLGPUTexture*>(_texture->GetGPUTexturePtr());
+		OpenGLGPUTexture* texture = Cast<OpenGLGPUTexture*>(_texture->GetGPUTexture());
 		return MakeShared<OpenGLTextureView>(texture, _desc);
 	}
 

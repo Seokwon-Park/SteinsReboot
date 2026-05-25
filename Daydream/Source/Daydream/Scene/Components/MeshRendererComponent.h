@@ -25,9 +25,9 @@ namespace Daydream
 		inline Shared<ConstantBuffer> GetWorldMatrixConstantBuffer() { return worldMatrixConstantBuffer; }
 		Shared<ConstantBuffer> GetEntityHandleConstantBuffer() { return entityHandleConstantBuffer; }
 
-		void Render();
-		void RenderMeshOnly();
-		void RenderDepth();
+		//void Render();
+		//void RenderMeshOnly();
+		//void RenderDepth();
 
 		REFLECT_START()
 			ADD_PROPERTY(FieldType::Mesh, meshHandle)
@@ -38,9 +38,6 @@ namespace Daydream
 	private:
 		AssetHandle meshHandle;
 		AssetHandle materialHandle;
-
-		Shared<Material> maskMaterial;
-		Shared<Material> lightMaterial;
 
 		Shared<ConstantBuffer> worldMatrixConstantBuffer;
 		Shared<ConstantBuffer> entityHandleConstantBuffer;

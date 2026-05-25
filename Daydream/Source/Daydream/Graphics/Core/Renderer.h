@@ -9,14 +9,14 @@
 #include "Daydream/Graphics/Camera/Camera.h"
 #include "Daydream/Graphics/Resources/Skybox.h"
 #include "Daydream/Graphics/Resources/Texture/TextureView.h"
-#include "Daydream/Graphics/Core/RenderTargetPool/RenderTargetPool.h"
+#include "Daydream/Graphics/Pools/TexturePool/Texture2DPool.h"
 
 namespace Daydream
 {
 	struct ResourceCapturedData
 	{
-		UInt64 capturedLoop;            
-		Array<Shared<GPUResource>> resources; 
+		UInt64 capturedLoop;
+		Array<Shared<GPUResource>> resources;
 	};
 
 	class Scene;
@@ -52,58 +52,63 @@ namespace Daydream
 		static void Shutdown();
 
 		static bool CreateSwapchainForWindow(DaydreamWindow& _window);
-		static void OnSwapchainResize(const Shared<Swapchain>& _swapchain, UInt32 _width, UInt32 _height);
+		static void OnSwapchainResize(Swapchain* _swapchain, UInt32 _width, UInt32 _height);
 
 		static void SetRenderThreadEnabled(bool _enabled);
 		static bool IsRenderThreadEnabled() { return useRenderThread; }
 
-		static void BeginFrame(const Shared<Swapchain>& _swapchain);
-		static void EndFrame(const Shared<Swapchain>& _swapchain);
+		static void BeginFrame(Swapchain* _swapchain);
+		static void EndFrame(Swapchain* _swapchain);
 
 		static void BeginRendering(const RenderingInfo& _renderingInfo);
 		static void EndRendering(const RenderingInfo& _renderingInfo);
-		static void BeginRendering(const Shared<Swapchain>& _swapchain, Color _clearColor);
+		static void BeginRendering(const Swapchain* _swapchain, Color _clearColor);
 		//static void EndRendering(Swapchain* _swapchain);
-		//static void BeginRenderPass(const Shared<RenderPass>& _renderPass, const Shared<Framebuffer>& _framebuffer);
-		//static void EndRenderPass(const Shared<RenderPass>& _renderPass);
+		//static void BeginRenderPass(const RenderPass>& _renderPass, const Framebuffer>& _framebuffer);
+		//static void EndRenderPass(const RenderPass>& _renderPass);
 
 		//static void BeginSwapchainRenderPass(Swapchain* _swapchain);
 		//static void EndSwapchainRenderPass(Swapchain* _swapchain);
 
-		static void BindPipelineState(const Shared<GraphicsPipelineState>& _pipelineState);
+		static void BindPipelineState(const GraphicsPipelineState* _pipelineState);
 
 		//static void SetTexture2D(const String& _name, Shared<Texture2D> _texture);
 		//static void SetTextureCube(const String& _name, Shared<TextureCube> _textureCube);
-		static void BindShaderResourceView(const String& _name, const Shared<TextureView>& _textureView, Shared<Sampler> _samplerState);
+		static void BindShaderResourceView(const String& _name, const TextureView* _textureView, const Sampler* _samplerState);
+		static void BindConstantBuffer(const String& _name, const ConstantBuffer* _buffer);
 		static void BindConstantBuffer(const String& _name, const Shared<ConstantBuffer>& _buffer);
-
-
+		
 		template <typename DataType>
-		static void UpdateConstantBuffer(const Shared<ConstantBuffer>& _buffer, const DataType& _data)
+		static void UpdateConstantBuffer(ConstantBuffer* _buffer, const DataType& _data)
 		{
 			EnqueueCommand([_buffer, _data]()
 				{
 					_buffer->UpdateData(&_data, sizeof(DataType));
 				});
 		}
+		template <typename DataType>
+		inline static void UpdateConstantBuffer(const Shared<ConstantBuffer>& _buffer, const DataType& _data)
+		{
+			UpdateConstantBuffer(_buffer.get(), _data);
+		}
 
-		static void BindMesh(const Shared<Mesh>& _mesh);
-		static void BindMaterial(const Shared<Material>& _material);
+		static void BindMesh(const Mesh* _mesh);
+		static void BindMaterial(const Material* _material);
 
 		static void DrawIndexed(UInt32 _indexCount);
 
-		//static void RequestResizeFramebuffer(const Shared<Framebuffer>& _framebuffer, UInt32 _width, UInt32 _height);
+		//static void RequestResizeFramebuffer(const Framebuffer>& _framebuffer, UInt32 _width, UInt32 _height);
 
-		static void CopyBuffer(const Shared<GPUBuffer>& _src, const Shared<GPUBuffer>& _dst, UInt32 _copySize);
-		static void CopyBufferToTexture(const Shared<GPUBuffer>& _src, const Shared<GPUTexture>& _dst);
-		static void CopyDataToTexture2D(const Shared<Texture2D>& _target, const Shared<Array<Byte>>& _data);
+		static void CopyBuffer(const GPUBuffer* _src, const GPUBuffer* _dst, UInt32 _copySize);
+		static void CopyBufferToTexture(const GPUBuffer* _src, const GPUTexture* _dst);
+		static void CopyDataToTexture2D(const Texture2D* _target, const void* _data);
 
-		static void CopyTexture2D(const Shared<Texture2D>& _src, const Shared<Texture2D>& _dst);
-		static void CopyTexture2DToTextureCube(const Shared<Texture2D>& _srcTexture2D, const Shared<TextureCube>& _dstCubemap, UInt32 _faceIndex, UInt32 _mipLevel = 0);
-		static void CopyTextureCubeToTexture2D(const Shared<TextureCube>& _srcCubemap, const Shared<Texture2D>& _dstTexture2D, UInt32 _faceIndex, UInt32 _mipLevel = 0);
+		static void CopyTexture2D(const Texture2D* _src, const Texture2D* _dst);
+		static void CopyTexture2DToTextureCube(const Texture2D* _srcTexture2D, const TextureCube* _dstCubemap, UInt32 _faceIndex, UInt32 _mipLevel = 0);
+		static void CopyTextureCubeToTexture2D(const TextureCube* _srcCubemap, const Texture2D* _dstTexture2D, UInt32 _faceIndex, UInt32 _mipLevel = 0);
 
 
-		static void TransitionTextureState(const Shared<GPUTexture>& _texture,
+		static void TransitionTextureState(const Texture* _texture,
 			ResourceState _beforeState,
 			ResourceState _afterState,
 			UInt32 _baseMip = 0,
@@ -119,36 +124,41 @@ namespace Daydream
 			UInt32 _baseLayer = 0,
 			UInt32 _layerCount = -1);
 
-
 		static void TransitionBufferState(
-			const Shared<GPUBuffer>& _buffer,
+			const GPUBuffer* _buffer,
 			ResourceState _beforeState,
 			ResourceState _afterState
 		);
 
-		static void GenerateMips(const Shared<Texture>& _texture);
+		static void TransitionBufferState(const Shared<Buffer>& _buffer, ResourceState _beforeState, ResourceState _afterState);
+
+		static void GenerateMips(Texture* _texture);
+		inline static void GenerateMips(const Shared<Texture>& _texture) { GenerateMips(_texture.get()); };
 
 		static void ExecutePreFrameCommands();
 
 		static void Submit();
 
-		inline static void CaptureResource(Array<Shared<GPUResource>> _resources)
-		{
-			capturedResourcesQueue.push({ currentLoop, std::move(_resources) });
-		}
+
+		inline static UInt32 GetCurrentLoop() { return currentLoop; }
 
 		inline static ImGuiRenderer* GetImGuiRenderer() { return imguiRenderer.get(); }
 
 		//static Renderer& Get() { return *instance; }
 		inline static RendererAPIType GetAPI() { return renderDevice->GetAPI(); }
 		inline static RenderDevice* GetRenderDevice() { return renderDevice.get(); }
-		inline static RenderContext* GetRenderContext() { return renderContext.get(); }
 		inline static Skybox* GetSkybox() { return skybox.get(); }
-		inline static RenderCommandList* GetActiveCommandList() { return renderContext->GetActiveCommandList().get(); }
-		inline static RenderTargetPool* GetRenderTargetPool() { return renderTargetPool.get(); }
+		inline static RenderCommandList* GetActiveCommandList() { return renderContext->GetActiveCommandList(); }
+		inline static Texture2DPool* GetRenderTargetPool() { return renderTargetPool.get(); }
 	private:
 		Renderer() = default;
 		static void InitRenderDevice(Daydream::RendererAPIType _API);
+
+		inline static RenderContext* GetRenderContext() { return renderContext.get(); }
+		inline static void CaptureResource(Array<Shared<GPUResource>> _resources)
+		{
+			capturedResourcesQueue.push({ currentLoop, std::move(_resources) });
+		}
 
 		inline static Unique<RenderDevice> renderDevice = nullptr;
 		inline static Unique<RenderContext> renderContext = nullptr;
@@ -156,9 +166,10 @@ namespace Daydream
 		inline static Unique<Skybox> skybox = nullptr;
 
 		inline static Queue<ResourceCapturedData> capturedResourcesQueue;
-		inline static Unique<RenderTargetPool> renderTargetPool;
-
-		/////////////////////////////////  RenderThread  ///////////////////////////////// 
+		inline static Unique<Texture2DPool> renderTargetPool;
+		////////////////////////////////////////////////////////////////// 
+		// RenderThread
+		////////////////////////////////////////////////////////////////// 
 		inline static bool useRenderThread = 0;
 
 		inline static Queue<RenderCommand> singleTimeCommandQueue;
@@ -174,6 +185,7 @@ namespace Daydream
 		//////////////////////////////////////////////////////////////////////////////////
 
 		inline static UInt32 currentLoop = 0;
+
 
 	};
 }

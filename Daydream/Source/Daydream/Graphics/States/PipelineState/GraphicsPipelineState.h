@@ -28,7 +28,7 @@ namespace Daydream
 
 	struct GraphicsPipelineStateDesc
 	{
-		Shared<ShaderGroup> shaderGroup;
+		ShaderGroup* shaderGroup;
 		//Shared<Shader> computeShader; //??
 
 		//BufferLayout inputLayout;
@@ -53,10 +53,10 @@ namespace Daydream
 
 		virtual void Bind() const = 0;
 		//virtual Shared<Material> CreateMaterial() = 0;
-
+		 
 		//ShaderGroup Functions
-		inline const Shared<ShaderGroup>& GetShaderGroup() const { return shaderGroup; }
-		inline const Array<Shared<Shader>>& GetShaders() const { return shaderGroup->GetShaders(); };
+		inline const ShaderGroup* GetShaderGroup() const { return shaderGroup; }
+		inline const Array<Shader*>& GetShaders() const { return shaderGroup->GetShaders(); };
 		inline const ShaderReflectionData* GetBindingInfo(const String& _name) const {
 			return shaderGroup->GetShaderBindingInfo(_name);
 		}
@@ -64,7 +64,7 @@ namespace Daydream
 		static Shared<GraphicsPipelineState> Create(const GraphicsPipelineStateDesc& _desc);
 	protected:
 
-		Shared<ShaderGroup> shaderGroup;
+		ShaderGroup* shaderGroup;
 
 		GraphicsPipelineStateDesc desc;
 		//rtv, dsv;

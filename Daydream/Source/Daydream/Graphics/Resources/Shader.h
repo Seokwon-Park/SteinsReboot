@@ -38,8 +38,6 @@ namespace Daydream
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
 
-		virtual void* GetNativeHandle() = 0;
-
 		ShaderType GetType() const { return shaderType; }
 		const Array<ShaderReflectionData>& GetShaderReflectionData() const { return reflectionDatas; }
 

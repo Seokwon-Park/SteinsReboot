@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Asset.h"
+#include "AssetDefaults.h"
 
 namespace Daydream
 {
@@ -52,15 +53,16 @@ namespace Daydream
 			return GetAssetTypeFromExtension(ext);
 		}
 
+
 		template<typename AssetType>
-		static Shared<AssetType> GetAsset(AssetHandle _uuid)
+		static AssetType* GetAsset(AssetHandle _uuid)
 		{
 			auto itr = instance->loadedAssetCache.find(_uuid);
 			if (itr != instance->loadedAssetCache.end())
 			{
-				return SharedCast<AssetType>(itr->second);
+				return Cast<AssetType*>(itr->second.get());
 			}
-			
+
 			Shared<Asset> newAsset = instance->LoadAssetCache(_uuid);
 
 			if (newAsset == nullptr)
@@ -69,13 +71,13 @@ namespace Daydream
 			}
 
 			newAsset->SetAssetHandle(_uuid);
-			instance->loadedAssetCache[_uuid] = newAsset;
+			instance->loadedAssetCache[_uuid] = std::move(newAsset);
 
-			return std::static_pointer_cast<AssetType>(newAsset);
+			return Cast<AssetType*>(instance->loadedAssetCache[_uuid].get());
 		}
 
 		template<typename AssetType>
-		static Shared<AssetType> GetAssetByPath(const Path& _path)
+		static AssetType* GetAssetByPath(const Path& _path)
 		{
 			if (_path.IsEmpty()) return nullptr;
 			String path = _path.ToGenericString();
@@ -111,6 +113,8 @@ namespace Daydream
 		AssetManager();
 
 		void CreateBuiltinTexture2D();
+		void CreateBuiltinMesh();
+
 
 		void ProcessDirectory(const Path& _directoryPath, bool _isRecursive = true);
 		void ProcessFile(const Path& _filePath, AssetType _assetType);

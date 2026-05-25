@@ -10,15 +10,15 @@ namespace Daydream
 	RenderGraphDrawList::~RenderGraphDrawList()
 	{
 	}
-	void RenderGraphDrawList::AddDrawObject(Shared<Mesh> _mesh, Shared<Material> _material, const Matrix4x4& _transform, Float32 _distanceToCamera)
+	void RenderGraphDrawList::AddDrawObject(Mesh* _mesh, Material* _material, const Matrix4x4& _transform, Float32 _distanceToCamera)
 	{
-		RenderGraphDrawObject item{};
+		RenderItem item{};
 		item.mesh = _mesh;
 		item.material = _material;
-		item.transform = _transform;
+		item.worldMatrix = _transform;
 		item.distanceToCamera = _distanceToCamera;
 
-		opaqueItems.push_back(item);
+		renderItems.push_back(item);
 	}
 }
 

@@ -83,7 +83,6 @@ namespace Daydream
 		}
 	}
 
-
 	void D3D11VertexShader::Bind() const
 	{
 		device->GetContext()->VSSetShader(vertexShader.Get(), nullptr, 0);

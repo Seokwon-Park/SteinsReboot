@@ -9,6 +9,7 @@
 
 #include "Daydream/Graphics/Resources/Mesh.h"
 #include "Daydream/Graphics/Resources/Skybox.h"
+#include "Daydream/Graphics/Resources/BuiltInResources.h"
 
 
 namespace Daydream
@@ -23,7 +24,7 @@ namespace Daydream
 
 		imguiRenderer = renderDevice->CreateImGuiRenderer();
 
-		renderTargetPool = MakeUnique<RenderTargetPool>();
+		renderTargetPool = MakeUnique<Texture2DPool>();
 
 		commandQueues.resize(MaxCommandListsInFlight);
 		for (auto& commandList : commandQueues)
@@ -102,7 +103,7 @@ namespace Daydream
 		return true;
 	}
 
-	void Renderer::OnSwapchainResize(const Shared<Swapchain>& _swapchain, UInt32 _width, UInt32 _height)
+	void Renderer::OnSwapchainResize(Swapchain* _swapchain, UInt32 _width, UInt32 _height)
 	{
 		//renderContext->SetViewport(0, 0, _width, _height);
 		_swapchain->ResizeSwapchain(_width, _height);
@@ -126,7 +127,7 @@ namespace Daydream
 		}
 	}
 
-	void Renderer::BeginFrame(const Shared<Swapchain>& _swapchain)
+	void Renderer::BeginFrame(Swapchain* _swapchain)
 	{
 		EnqueueCommand([_swapchain]()
 			{
@@ -138,7 +139,7 @@ namespace Daydream
 			});
 	}
 
-	void Renderer::EndFrame(const Shared<Swapchain>& _swapchain)
+	void Renderer::EndFrame(Swapchain* _swapchain)
 	{
 		EnqueueCommand([_swapchain]()
 			{
@@ -163,7 +164,7 @@ namespace Daydream
 			});
 	}
 
-	void Renderer::BeginRendering(const Shared<Swapchain>& _swapchain, Color _clearColor)
+	void Renderer::BeginRendering(const Swapchain* _swapchain, Color _clearColor)
 	{
 		EnqueueCommand([_swapchain, _clearColor]()
 			{
@@ -180,14 +181,14 @@ namespace Daydream
 			});
 	}
 
-	//void Renderer::BeginRenderPass(const Shared<RenderPass>& _renderPass, const Shared<Framebuffer>& _framebuffer)
+	//void Renderer::BeginRenderPass(const RenderPass>& _renderPass, const Framebuffer>& _framebuffer)
 	//{
 	//	EnqueueCommand([_renderPass, _framebuffer]()
 	//		{
 	//			renderContext->BeginRenderPass(_renderPass, _framebuffer);
 	//		});
 	//}
-	//void Renderer::EndRenderPass(const Shared<RenderPass>& _renderPass)
+	//void Renderer::EndRenderPass(const RenderPass>& _renderPass)
 	//{
 	//	EnqueueCommand([_renderPass]()
 	//		{
@@ -211,7 +212,7 @@ namespace Daydream
 	//		});
 	//}
 
-	void Renderer::BindPipelineState(const Shared<GraphicsPipelineState>& _pipelineState)
+	void Renderer::BindPipelineState(const GraphicsPipelineState* _pipelineState)
 	{
 		EnqueueCommand([_pipelineState]()
 			{
@@ -221,21 +222,21 @@ namespace Daydream
 
 
 
-	//void Renderer::SetTexture2D(const String& _name, const Shared<Texture2D> _texture)
+	//void Renderer::SetTexture2D(const String& _name, const Texture2D> _texture)
 	//{
 	//	EnqueueCommand([_name, _texture]()
 	//		{
 	//			renderContext->SetTexture2D(_name, _texture);
 	//		});
 	//}
-	//void Renderer::SetTextureCube(const String& _name, const Shared<TextureCube> _textureCube)
+	//void Renderer::SetTextureCube(const String& _name, const TextureCube> _textureCube)
 	//{
 	//	EnqueueCommand([_name, _textureCube]()
 	//		{
 	//			renderContext->SetTextureCube(_name, _textureCube);
 	//		});
 	//}
-	void Renderer::BindShaderResourceView(const String& _name, const Shared<TextureView>& _textureView, const Shared<Sampler> _samplerState)
+	void Renderer::BindShaderResourceView(const String& _name, const TextureView* _textureView, const Sampler* _samplerState)
 	{
 		EnqueueCommand([_name, _textureView, _samplerState]()
 			{
@@ -243,35 +244,36 @@ namespace Daydream
 			});
 	}
 
-	void Renderer::BindConstantBuffer(const String& _name, const Shared<ConstantBuffer>& _buffer)
+	void Renderer::BindConstantBuffer(const String& _name, const ConstantBuffer* _buffer)
 	{
 		EnqueueCommand([_name, _buffer]()
 			{
-				renderContext->SetConstantBuffer(_name, _buffer);
+				renderContext->BindConstantBuffer(_name, _buffer);
 			});
 	}
 
-	void Renderer::BindMesh(const Shared<Mesh>& _mesh)
+	void Renderer::BindConstantBuffer(const String& _name, const Shared<ConstantBuffer>& _buffer)
+	{
+		BindConstantBuffer(_name, _buffer.get());
+	}
+
+	void Renderer::BindMesh(const Mesh* _mesh)
 	{
 		EnqueueCommand([_mesh]()
 			{
-				renderContext->BindVertexBuffer(_mesh->GetVertexBuffer());
-				renderContext->BindIndexBuffer(_mesh->GetIndexBuffer());
+				renderContext->BindVertexBuffer(_mesh->GetVertexBuffer()->GetGPUBuffer(), _mesh->GetVertexBuffer()->GetStride());
+				renderContext->BindIndexBuffer(_mesh->GetIndexBuffer()->GetGPUBuffer());
 			});
 	}
 
-	void Renderer::BindMaterial(const Shared<Material>& _material)
+	void Renderer::BindMaterial(const Material* _material)
 	{
 		EnqueueCommand([_material]()
 			{
 				const auto& textureInfo = _material->GetTextureBindings();
 				for (const auto& [name, texture] : textureInfo)
 				{
-					if (texture.cache == nullptr)
-					{
-						_material->LoadMaterialAsset(name);
-					}
-					//renderContext->SetTexture2D(name, texture.cache);
+					renderContext->BindShaderResourceView(name, texture.cache->GetOrCreateDefaultSRV(), BuiltIn::Samplers::LinearRepeat());
 				}
 			});
 	}
@@ -284,7 +286,7 @@ namespace Daydream
 			});
 	}
 
-	//void Renderer::RequestResizeFramebuffer(const const Shared<Framebuffer>& _framebuffer, UInt32 _width, UInt32 _height)
+	//void Renderer::RequestResizeFramebuffer(const const Framebuffer>& _framebuffer, UInt32 _width, UInt32 _height)
 	//{
 	//	EnqueuePreFrameCommand([_framebuffer, _width, _height]()
 	//		{
@@ -297,40 +299,35 @@ namespace Daydream
 	//		});
 	//}
 
-	void Renderer::CopyBuffer(const Shared<GPUBuffer>& _src, const Shared<GPUBuffer>& _dst, UInt32 _copySize)
+	void Renderer::CopyBuffer(const GPUBuffer* _src, const GPUBuffer* _dst, UInt32 _copySize)
 	{
 
 		EnqueueCommand([_src, _dst, _copySize]()
 			{
-				renderContext->CaptureResource(_src);
-				renderContext->CaptureResource(_dst);
-				renderContext->CopyBuffer(_src, _dst, _copySize);
+				renderContext->CopyBuffer(_src, _dst, _copySize, _placeholder_, _placeholder_);
 			});
 	}
 
 
-	void Renderer::CopyBufferToTexture(const Shared<GPUBuffer>& _src, const Shared<GPUTexture>& _dst)
+	void Renderer::CopyBufferToTexture(const GPUBuffer* _src, const GPUTexture* _dst)
 	{
 
 		EnqueueCommand([_src, _dst]()
 			{
-				renderContext->CaptureResource(_src);
-				renderContext->CaptureResource(_dst);
 				renderContext->CopyBufferToTexture(_src, _dst);
 			});
 	}
 
-	void Renderer::CopyDataToTexture2D(const Shared<Texture2D>& _target, const Shared<Array<Byte>>& _data)
+	void Renderer::CopyDataToTexture2D(const Texture2D* _target, const void* _data)
 	{
 		EnqueueCommand([_target, _data]()
 			{
-				renderContext->CaptureResource(_target->GetGPUTexture());
 				renderContext->CopyDataToTexture2D(_target, _data);
 			});
 	}
 
 
-	void Renderer::CopyTexture2D(const Shared<Texture2D>& _src, const Shared<Texture2D>& _dst)
+	void Renderer::CopyTexture2D(const Texture2D* _src, const Texture2D* _dst)
 	{
 		EnqueueCommand([_src, _dst]()
 			{
@@ -338,7 +335,7 @@ namespace Daydream
 			});
 	}
 
-	void Renderer::CopyTexture2DToTextureCube(const Shared<Texture2D>& _srcTexture2D, const Shared<TextureCube>& _dstCubemap, UInt32 _faceIndex, UInt32 _mipLevel)
+	void Renderer::CopyTexture2DToTextureCube(const Texture2D* _srcTexture2D, const TextureCube* _dstCubemap, UInt32 _faceIndex, UInt32 _mipLevel)
 	{
 		EnqueueCommand([_dstCubemap, _faceIndex, _srcTexture2D, _mipLevel]()
 			{
@@ -347,53 +344,55 @@ namespace Daydream
 
 	}
 
-	void Renderer::CopyTextureCubeToTexture2D(const Shared<TextureCube>& _srcCubemap, const Shared<Texture2D>& _dstTexture2D, UInt32 _faceIndex, UInt32 _mipLevel)
+	void Renderer::CopyTextureCubeToTexture2D(const TextureCube* _srcCubemap, const Texture2D* _dstTexture2D, UInt32 _faceIndex, UInt32 _mipLevel)
 	{
 		EnqueueCommand([_srcCubemap, _faceIndex, _dstTexture2D, _mipLevel]()
 			{
-				renderContext->CopyTextureCubeToTexture2D(_srcCubemap, _faceIndex, _dstTexture2D, _mipLevel);
+				renderContext->CopyTextureCubeToTexture2D(_srcCubemap, _dstTexture2D, _faceIndex, _mipLevel);
 			});
 	}
 
-	void Renderer::TransitionTextureState(const Shared<GPUTexture>& _texture, ResourceState _beforeState, ResourceState _afterState, UInt32 _baseMip, UInt32 _mipLevels, UInt32 _baseLayer, UInt32 _layerCount)
+	void Renderer::TransitionTextureState(const Texture* _texture, ResourceState _beforeState, ResourceState _afterState, UInt32 _baseMip, UInt32 _mipLevels, UInt32 _baseLayer, UInt32 _layerCount)
 	{
 		EnqueueCommand([_texture, _beforeState, _afterState, _baseMip, _mipLevels, _baseLayer, _layerCount]()
 			{
-				renderContext->CaptureResource(_texture);
-				renderContext->TransitionTextureState(_texture, _beforeState, _afterState, _baseMip, _mipLevels, _baseLayer, _layerCount);
+				renderContext->TransitionTextureState(_texture->GetGPUTexture(), _beforeState, _afterState, _baseMip, _mipLevels, _baseLayer, _layerCount);
 			});
 	}
 
-	void Renderer::TransitionTextureState(const Shared<Texture>& _texture, ResourceState _beforeState, ResourceState _afterState,
-		UInt32 _baseMip,
-		UInt32 _mipLevels,
-		UInt32 _baseLayer,
-		UInt32 _layerCount)
+	void Renderer::TransitionTextureState(const Shared<Texture>& _texture, ResourceState _beforeState, ResourceState _afterState, UInt32 _baseMip, UInt32 _mipLevels, UInt32 _baseLayer, UInt32 _layerCount)
 	{
-		TransitionTextureState(_texture->GetGPUTexture(), _beforeState, _afterState, _baseMip, _mipLevels, _baseLayer, _layerCount);
+		TransitionTextureState(_texture.get(), _beforeState, _afterState, _baseMip, _mipLevels, _baseLayer, _layerCount);
 	}
 
-	void Renderer::TransitionBufferState(const Shared<GPUBuffer>& _buffer, ResourceState _beforeState, ResourceState _afterState)
+
+	void Renderer::TransitionBufferState(const GPUBuffer* _buffer, ResourceState _beforeState, ResourceState _afterState)
 	{
 		EnqueueCommand([_buffer, _beforeState, _afterState]()
 			{
-				renderContext->CaptureResource(_buffer);
 				renderContext->TransitionBufferState(_buffer, _beforeState, _afterState);
 			});
 	}
 
-	void Renderer::GenerateMips(const Shared<Texture>& _texture)
+	void Renderer::TransitionBufferState(const Shared<Buffer>& _buffer, ResourceState _beforeState, ResourceState _afterState)
+	{
+		EnqueueCommand([_buffer, _beforeState, _afterState]()
+			{
+				renderContext->TransitionBufferState(_buffer->GetGPUBuffer(), _beforeState, _afterState);
+			});
+	}
+
+
+	void Renderer::GenerateMips(Texture* _texture)
 	{
 		EnqueueCommand([_texture]()
 			{
-				renderContext->GenerateMips(_texture);
+				renderContext->GenerateMips(_texture->GetGPUTexture());
 			});
 	}
 
 	void Renderer::ExecutePreFrameCommands()
 	{
-		//Queue<FunctionPtr<void()>> queuedCommands;
-		//std::swap(queuedCommands, singleTimeCommandQueue);
 		while (!singleTimeCommandQueue.empty())
 		{
 			singleTimeCommandQueue.front()();

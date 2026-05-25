@@ -4,7 +4,7 @@
 #include "Daydream/Graphics/Utility/ImageLoader.h"
 #include "Daydream/Graphics/Utility/ModelLoader.h"
 #include "Daydream/Graphics/Manager/ResourceManager.h"
-#include "Daydream/Graphics/Resources/PipelineState/GraphicsPipelineState.h"
+#include "Daydream/Graphics/States/PipelineState/GraphicsPipelineState.h"
 #include "Daydream/Graphics/Resources/Texture/Texture2D.h"
 #include "yaml-cpp/yaml.h"
 
@@ -160,7 +160,7 @@ namespace Daydream
 			AssetHandle materialHandle;
 			if (materialPath.IsExist())
 			{
-				Shared<Material> existingMaterial = AssetManager::GetAssetByPath<Material>(materialPathString);
+				Material* existingMaterial = AssetManager::GetAssetByPath<Material>(materialPathString);
 				if (existingMaterial)
 				{
 					materialHandle = existingMaterial->GetAssetHandle();

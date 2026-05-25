@@ -15,7 +15,7 @@ namespace Daydream
 		}
 
 		template<typename ResourceType>
-		static Shared<ResourceType> GetResource(const String& _name)
+		static ResourceType* GetResource(const String& _name)
 		{
 			auto itr = instance->registryList.find(typeid(ResourceType));
 			if (itr == instance->registryList.end())

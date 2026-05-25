@@ -37,9 +37,9 @@ namespace Daydream
 
 			Renderer::EnqueuePreFrameCommand([=]()
 				{
-					Renderer::TransitionTextureState(gpuTexture, ResourceState::Undefined, ResourceState::CopyDest, 0, 1);
+					Renderer::TransitionTextureState(texture2D, ResourceState::Undefined, ResourceState::CopyDest, 0, 1);
 					Renderer::CopyDataToTexture2D(texture2D, dataArray);
-					Renderer::TransitionTextureState(gpuTexture, ResourceState::CopyDest, ResourceState::ShaderResource, 0, 1);
+					Renderer::TransitionTextureState(texture2D, ResourceState::CopyDest, ResourceState::ShaderResource, 0, 1);
 				});
 		}
 

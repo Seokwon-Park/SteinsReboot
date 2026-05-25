@@ -159,12 +159,12 @@ namespace Daydream
 		
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC pipelineStateDesc{};
 		pipelineStateDesc.pRootSignature = rootSignature.Get();
-		pipelineStateDesc.VS = static_cast<D3D12Shader*>(shaderGroup->GetShader(ShaderType::Vertex).get())->GetShaderBytecode();
-		auto pixelShader = shaderGroup->GetShader(ShaderType::Pixel);
+		pipelineStateDesc.VS = Cast<D3D12Shader*>(shaderGroup->GetShader(ShaderType::Vertex))->GetShaderBytecode();
+		Shader* pixelShader = shaderGroup->GetShader(ShaderType::Pixel);
 		if (pixelShader)
 		{
 			// PS가 있으면 바이트코드 설정
-			pipelineStateDesc.PS = static_cast<D3D12Shader*>(pixelShader.get())->GetShaderBytecode();
+			pipelineStateDesc.PS = Cast<D3D12Shader*>(pixelShader)->GetShaderBytecode();
 		}
 		else
 		{

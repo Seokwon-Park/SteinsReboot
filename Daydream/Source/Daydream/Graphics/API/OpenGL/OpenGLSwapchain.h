@@ -22,7 +22,7 @@ namespace Daydream
 		virtual void EndFrame() override;
 
 		virtual TextureView* GetCurrentRenderTargetView() const { return backBufferRTV.get(); };
-		virtual Shared<RenderCommandList> GetCurrentCommandList() const { return nullptr; };
+		virtual RenderCommandList* GetCurrentCommandList() const { return nullptr; };
 
 	private:
 		void CreateBackBufferView();

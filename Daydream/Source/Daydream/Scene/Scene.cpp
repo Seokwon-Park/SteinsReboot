@@ -62,8 +62,8 @@ namespace Daydream
 
 	GameEntity* Scene::CreateGameEntityFromModel(AssetHandle _modelHandle)
 	{
-		Shared<Model> model = AssetManager::GetAsset<Model>(_modelHandle);
-		Shared<ModelData> data = model->GetModelData();
+		Model* model = AssetManager::GetAsset<Model>(_modelHandle);
+		const ModelData* data = model->GetModelData();
 		GameEntity* root = CreateGameEntity(data->rootNode.name);
 		ProcessModelNode(root, data->rootNode, model);
 
@@ -221,21 +221,21 @@ namespace Daydream
 		//skybox->Update();
 	}
 
-	void Scene::RenderDepth()
-	{
-		for (EntityHandle handle : activeEntities) // 이벤트 기반으로 관리된 목록 사용
-		{
-			GameEntity* entity = GetEntity(handle);
-			if (!entity) continue; // 검사
+	//void Scene::RenderDepth()
+	//{
+	//	for (EntityHandle handle : activeEntities) // 이벤트 기반으로 관리된 목록 사용
+	//	{
+	//		GameEntity* entity = GetEntity(handle);
+	//		if (!entity) continue; // 검사
 
-			//ModelRendererComponent* renderComponent = entity->GetComponent<ModelRendererComponent>();
-			MeshRendererComponent* renderComponent = entity->GetComponent<MeshRendererComponent>();
-			if (renderComponent != nullptr)
-			{
-				renderComponent->RenderDepth();
-			}
-		}
-	}
+	//		//ModelRendererComponent* renderComponent = entity->GetComponent<ModelRendererComponent>();
+	//		MeshRendererComponent* renderComponent = entity->GetComponent<MeshRendererComponent>();
+	//		if (renderComponent != nullptr)
+	//		{
+	//			renderComponent->RenderDepth();
+	//		}
+	//	}
+	//}
 
 	void Scene::AddRootEntity(EntityHandle _rootEntity)
 	{
@@ -291,7 +291,7 @@ namespace Daydream
 
 		rootEntities.insert(rootEntities.begin() + _newIndex, movedHandle);
 	}
-	void Scene::ProcessModelNode(GameEntity* _parentEntity, const NodeData& _curNode, const Shared<Model>& _model)
+	void Scene::ProcessModelNode(GameEntity* _parentEntity, const NodeData& _curNode, const Model* _model)
 	{
 		String entityName = _curNode.name;
 		if (entityName.empty()) entityName = "Node";

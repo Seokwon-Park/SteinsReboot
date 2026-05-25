@@ -34,4 +34,6 @@ namespace Daydream::GraphicsUtility
 	//ShaderType, ShaderStage
 
 	String GetVendor(UInt32 _vendorCode);
+
+	Bool IsDepthFormat(RenderFormat _format);
 }
