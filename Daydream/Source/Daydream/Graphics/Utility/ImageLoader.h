@@ -19,13 +19,6 @@ namespace Daydream
 		}
 	};
 
-	struct HDRIImageData
-	{
-		Int32 width;
-		Int32 height;
-		Array<Float32> data;
-	};
-
 	class ImageLoader
 	{
 	public:

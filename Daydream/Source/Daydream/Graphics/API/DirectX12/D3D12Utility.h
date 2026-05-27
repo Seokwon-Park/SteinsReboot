@@ -7,11 +7,18 @@
 #include "Daydream/Graphics/Resources/Buffer.h"
 #include "Daydream/Graphics/Resources/Sampler.h"
 #include "Daydream/Graphics/States/RasterizerState.h"
+#include "D3D12MemAlloc.h"
 
 namespace Daydream::GraphicsUtility::DirectX12
 {
+	inline UInt32 CalcSubresource(UInt32 MipSlice, UInt32 ArraySlice, UInt32 PlaneSlice, UInt32 MipLevels, UInt32 ArraySize)
+	{
+		return MipSlice + (ArraySlice * MipLevels) + (PlaneSlice * MipLevels * ArraySize);
+	}
+
 	D3D12_RESOURCE_STATES ConvertToD3D12ResourceStates(const ResourceState& _state);
 
+	D3D12MA::ALLOCATION_DESC  ConvertToD3D12MemoryAllocationDesc(const BufferDesc& _desc);
 	D3D12_HEAP_PROPERTIES ConvertToD3D12HeapProperties(const BufferDesc& _desc);
 	D3D12_RESOURCE_DESC ConvertToD3D12ResourceDesc(const BufferDesc& _desc);
 	D3D12_RESOURCE_FLAGS ConvertToD3D12ResourceFlags(BufferUsage _bufferUsage);

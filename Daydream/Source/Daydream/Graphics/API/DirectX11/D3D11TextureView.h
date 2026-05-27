@@ -15,24 +15,24 @@ namespace Daydream
 
 		virtual void* GetUIHandle() const override { return view.Get(); }
 
-		inline ID3D11ShaderResourceView* GetSRV()
+		inline ID3D11ShaderResourceView* GetSRV() const
 		{
 			DAYDREAM_CORE_ASSERT(desc.type == TextureViewType::ShaderResource, "View is not SRV!");
 			return static_cast<ID3D11ShaderResourceView*>(view.Get());
 		}
 
-		inline ID3D11DepthStencilView* GetDSV()
+		inline ID3D11DepthStencilView* GetDSV() const
 		{
 			DAYDREAM_CORE_ASSERT(desc.type == TextureViewType::DepthStencil, "View is not DSV!");
 			return static_cast<ID3D11DepthStencilView*>(view.Get());
 		}
-		inline ID3D11RenderTargetView* GetRTV()
+		inline ID3D11RenderTargetView* GetRTV() const
 		{
 			DAYDREAM_CORE_ASSERT(desc.type == TextureViewType::RenderTarget, "View is not RTV!");
 			return static_cast<ID3D11RenderTargetView*>(view.Get());
 		}
 
-		inline ID3D11UnorderedAccessView* GetUAV()
+		inline ID3D11UnorderedAccessView* GetUAV() const
 		{
 			DAYDREAM_CORE_ASSERT(desc.type == TextureViewType::UnorderedAccess, "View is not UAV!");
 			return static_cast<ID3D11UnorderedAccessView*>(view.Get());

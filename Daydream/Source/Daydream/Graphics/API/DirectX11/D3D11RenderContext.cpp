@@ -78,7 +78,7 @@ namespace Daydream
 	void D3D11RenderContext::BindPipelineState(const GraphicsPipelineState* _pipelineState)
 	{
 		RenderContext::BindPipelineState(_pipelineState);
-		D3D11GraphicsPipelineState* pso = Cast<D3D11GraphicsPipelineState*>(currentGraphicsPipelineState);
+		const D3D11GraphicsPipelineState* pso = Cast<const D3D11GraphicsPipelineState*>(currentGraphicsPipelineState);
 		pso->BindPipelineState();
 	}
 
@@ -87,7 +87,7 @@ namespace Daydream
 		UInt32 offset = 0;
 		UInt32 stride = _stride;
 
-		D3D11GPUBuffer* vertexBuffer = Cast<D3D11GPUBuffer*>(_vertexBuffer);
+		const D3D11GPUBuffer* vertexBuffer = Cast<const D3D11GPUBuffer*>(_vertexBuffer);
 		DAYDREAM_CORE_ASSERT(vertexBuffer, "vertexBuffer is nullptr!");
 		ID3D11Buffer* d3d11Buffer = vertexBuffer->GetID3D11Buffer();
 		device->GetContext()->IASetVertexBuffers(0, 1, &d3d11Buffer, &stride, &offset);
@@ -95,7 +95,7 @@ namespace Daydream
 	void D3D11RenderContext::BindIndexBuffer(const GPUBuffer* _indexBuffer)
 	{
 		UInt32 offset = 0;
-		D3D11GPUBuffer* indexBuffer = Cast<D3D11GPUBuffer*>(_indexBuffer);
+		const D3D11GPUBuffer* indexBuffer = Cast<const D3D11GPUBuffer*>(_indexBuffer);
 		DAYDREAM_CORE_ASSERT(indexBuffer, "indexBuffer is nullptr!");
 		device->GetContext()->IASetIndexBuffer(indexBuffer->GetID3D11Buffer(), DXGI_FORMAT_R32_UINT, offset);
 	}
@@ -184,9 +184,9 @@ namespace Daydream
 		const ShaderReflectionData* bindingInfo = currentGraphicsPipelineState->GetBindingInfo(_name);
 		if (bindingInfo == nullptr) return;
 		//DAYDREAM_CORE_ASSERT(device->GetAPI() == RendererAPIType::DirectX11, "Wrong API!");
-		D3D11TextureView* view = Cast<D3D11TextureView*>(_textureView);
+		const D3D11TextureView* view = Cast<const D3D11TextureView*>(_textureView);
 		ID3D11ShaderResourceView* srv = view->GetSRV();
-		D3D11Sampler* d3d11Sampler = Cast<D3D11Sampler*>(_sampler);
+		const D3D11Sampler* d3d11Sampler = Cast<const D3D11Sampler*>(_sampler);
 		ID3D11SamplerState* samplerState = d3d11Sampler->GetID3D11SamplerState();
 		switch (bindingInfo->shaderType)
 		{
@@ -218,12 +218,12 @@ namespace Daydream
 		}
 	}
 
-	void D3D11RenderContext::BindConstantBuffer(const String& _name, const ConstantBuffer* _buffer)
+	void Daydream::D3D11RenderContext::BindConstantBuffer(const String& _name, const GPUBuffer* _buffer)
 	{
 		const ShaderReflectionData* resourceInfo = currentGraphicsPipelineState->GetBindingInfo(_name);
 		if (resourceInfo == nullptr) return;
 		DAYDREAM_CORE_ASSERT(device->GetAPI() == RendererAPIType::DirectX11, "Wrong API!");
-		D3D11GPUBuffer* constantBuffer = Cast<D3D11GPUBuffer*>(_buffer->GetGPUBuffer());
+		const D3D11GPUBuffer* constantBuffer = Cast<const D3D11GPUBuffer*>(_buffer);
 		DAYDREAM_CORE_ASSERT(constantBuffer, "vertexBuffer is nullptr!");
 		ID3D11Buffer* d3d11Buffer = constantBuffer->GetID3D11Buffer();
 		switch (resourceInfo->shaderType)
@@ -249,62 +249,12 @@ namespace Daydream
 		}
 	}
 
-	void D3D11RenderContext::CopyTexture2D(const Texture2D* _src, const Texture2D* _dst)
-	{
-		D3D11GPUTexture* dst = Cast<D3D11GPUTexture*>(_dst->GetGPUTexture());
-		D3D11GPUTexture* src = Cast<D3D11GPUTexture*>(_src->GetGPUTexture());
 
-		device->GetContext()->CopyResource(dst->GetID3D11Resource(), src->GetID3D11Resource());
-	}
-	void D3D11RenderContext::CopyTextureToCubemapFace(const Texture2D* _srcTexture2D, const TextureCube* _dstCubemap, UInt32 _faceIndex, UInt32 _mipLevel)
-	{
-		D3D11GPUTexture* src = Cast<D3D11GPUTexture*>(_srcTexture2D->GetGPUTexture());
-		D3D11GPUTexture* dst = Cast<D3D11GPUTexture*>(_dstCubemap->GetGPUTexture());
-
-		UInt32 dstSubresourceIndex = D3D11CalcSubresource(
-			_mipLevel,
-			_faceIndex,
-			dst->GetDesc().mipLevels
-		);
-
-		UInt32 srcSubresourceIndex = 0;
-
-		device->GetContext()->CopySubresourceRegion(
-			dst->GetID3D11Resource(),           // 대상 리소스
-			dstSubresourceIndex,  // 대상 Subresource
-			0, 0, 0,              // 대상 좌표 (x, y, z)
-			src->GetID3D11Resource(),         // 원본 리소스
-			srcSubresourceIndex,  // 원본 Subresource
-			nullptr               // 원본 영역 (nullptr은 전체를 의미)
-		);
-	}
-	void D3D11RenderContext::CopyTextureCubeToTexture2D(const TextureCube* _srcCubemap, const Texture2D* _dstTexture2D, UInt32 _faceIndex, UInt32 _mipLevel)
-	{
-		D3D11GPUTexture* src = Cast<D3D11GPUTexture*>(_srcCubemap->GetGPUTexture());
-		D3D11GPUTexture* dst = Cast<D3D11GPUTexture*>(_dstTexture2D->GetGPUTexture());
-
-		UInt32 srcSubresourceIndex = D3D11CalcSubresource(
-			_mipLevel,
-			_faceIndex,
-			src->GetDesc().mipLevels
-		);
-
-		UInt32 dstSubresourceIndex = 0;
-
-		device->GetContext()->CopySubresourceRegion(
-			dst->GetID3D11Resource(),           // 대상 리소스
-			dstSubresourceIndex,  // 대상 Subresource
-			0, 0, 0,              // 대상 좌표 (x, y, z)
-			src->GetID3D11Resource(),         // 원본 리소스
-			srcSubresourceIndex,  // 원본 Subresource
-			nullptr               // 원본 영역 (nullptr은 전체를 의미)
-		);
-	}
 
 	void D3D11RenderContext::CopyBuffer(const GPUBuffer* _src, const GPUBuffer* _dst, UInt32 _copySize, UInt32 _srcOffset, UInt32 _dstOffset)
 	{
 		const D3D11GPUBuffer* src = Cast<const D3D11GPUBuffer*>(_src);
-		D3D11GPUBuffer* dst = Cast<D3D11GPUBuffer*>(_dst);
+		const D3D11GPUBuffer* dst = Cast<const D3D11GPUBuffer*>(_dst);
 
 		D3D11_BOX srcBox;
 		srcBox.left = _srcOffset;
@@ -323,8 +273,8 @@ namespace Daydream
 	{
 		D3D11_MAPPED_SUBRESOURCE mappedData;
 
-		D3D11GPUBuffer* src = Cast<D3D11GPUBuffer*>(_src);
-		D3D11GPUTexture* dst = Cast<D3D11GPUTexture*>(_dst);
+		const D3D11GPUBuffer* src = Cast<const D3D11GPUBuffer*>(_src);
+		const D3D11GPUTexture* dst = Cast<const D3D11GPUTexture*>(_dst);
 
 		HRESULT hr = device->GetContext()->Map(src->GetID3D11Buffer(), 0, D3D11_MAP_READ, 0, &mappedData);
 		DAYDREAM_CORE_ASSERT(SUCCEEDED(hr), "Failed to map source buffer for reading in DX11!");
@@ -338,9 +288,35 @@ namespace Daydream
 		device->GetContext()->Unmap(src->GetID3D11Buffer(), 0);
 	}
 
-	void Daydream::D3D11RenderContext::GenerateMips(GPUTexture* _texture)
+	void D3D11RenderContext::CopyTexture(const GPUTexture* _src, const GPUTexture* _dst, const TextureCopyRegion& _region)
 	{
-		D3D11GPUTexture* texture = Cast<D3D11GPUTexture*>(_texture);
+		const D3D11GPUTexture* src = Cast<const D3D11GPUTexture*>(_src);
+		const D3D11GPUTexture* dst = Cast<const D3D11GPUTexture*>(_dst);
+
+		for (UInt32 i = 0; i < _region.srcSubresource.layerCount; ++i)
+		{
+			UINT srcSub = D3D11CalcSubresource(_region.srcSubresource.mipLevel, _region.srcSubresource.baseLayer + i, src->GetMipLevels());
+			UINT dstSub = D3D11CalcSubresource(_region.dstSubresource.mipLevel, _region.dstSubresource.baseLayer + i, dst->GetMipLevels());
+
+			D3D11_BOX srcBox;
+			srcBox.left = _region.srcOffset[0];
+			srcBox.top = _region.srcOffset[1];
+			srcBox.front = _region.srcOffset[2];
+			srcBox.right = srcBox.left + _region.extent[0];
+			srcBox.bottom = srcBox.top + _region.extent[1];
+			srcBox.back = srcBox.front + _region.extent[2];
+
+			device->GetContext()->CopySubresourceRegion(
+				dst->GetID3D11Resource(), dstSub,
+				_region.dstOffset[0], _region.dstOffset[1], _region.dstOffset[2],
+				src->GetID3D11Resource(), srcSub, &srcBox
+			);
+		}
+	}
+
+	void D3D11RenderContext::GenerateMips(GPUTexture* _texture)
+	{
+		const D3D11GPUTexture* texture = Cast<const D3D11GPUTexture*>(_texture);
 		ComPtr<ID3D11ShaderResourceView> srv = nullptr;
 
 		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc{};

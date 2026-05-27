@@ -8,7 +8,7 @@
 
 namespace Daydream
 {
-	Material::Material(Shared<ShaderGroup> _shaderGroup)
+	Material::Material(const ShaderGroup* _shaderGroup)
 	{
 		textureBindingMap = _shaderGroup->GetMaterialMap();
 	}

@@ -12,6 +12,9 @@ namespace Daydream
 
 		DXGI_FORMAT format = GraphicsUtility::DirectX::ConvertToDXGIFormat(desc.format);
 
+		D3D12MA::ALLOCATION_DESC allocationDesc{};
+		allocationDesc.HeapType = D3D12_HEAP_TYPE_DEFAULT;
+
 		D3D12_RESOURCE_DESC textureDesc = {};
 		textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 		textureDesc.Width = desc.width;
@@ -30,36 +33,13 @@ namespace Daydream
 		textureDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN; 
 		textureDesc.Flags = GraphicsUtility::DirectX12::ConvertToD3D12BindFlags(desc.textureUsage);
 
-		//D3D12_CLEAR_VALUE clearValue{};
-		//bool isUseClearValue = textureDesc.Flags & D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET || textureDesc.Flags & D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
-		//if (isUseClearValue)
-		//{
-		//	clearValue.Format = textureDesc.Format;
-		//	if (textureDesc.Format == DXGI_FORMAT_D24_UNORM_S8_UINT)
-		//	{
-		//		clearValue.DepthStencil.Depth = 1.0f;
-		//		clearValue.DepthStencil.Stencil = 0;
-		//	}
-		//	else
-		//	{
-		//		clearValue.Color[0] = 0.0f;
-		//		clearValue.Color[1] = 0.0f;
-		//		clearValue.Color[2] = 1.0f;
-		//		clearValue.Color[3] = 1.0f;
-		//	}
-		//}
-
-		D3D12_HEAP_PROPERTIES heapProperties = {};
-		heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
-
-		device->GetDevice()->CreateCommittedResource(
-			&heapProperties,
-			D3D12_HEAP_FLAG_NONE,
+		HRESULT hr = device->GetMemoryAllocator()->CreateResource(
+			&allocationDesc,
 			&textureDesc,
 			D3D12_RESOURCE_STATE_COMMON,
 			nullptr,
-			IID_PPV_ARGS(texture.GetAddressOf())
-		);
+			allocation.GetAddressOf(),
+			IID_PPV_ARGS(texture.GetAddressOf()));
 
 		if (_desc.type == TextureType::TextureCube)
 			texture->SetName(L"TextureCube");

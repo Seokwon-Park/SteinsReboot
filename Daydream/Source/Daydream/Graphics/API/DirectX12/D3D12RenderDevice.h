@@ -1,5 +1,6 @@
 #pragma once
 
+#include "D3D12MemAlloc.h"
 #include "Daydream/Graphics/Core/RenderDevice.h"
 #include "D3D12HeapAllocator.h"
 
@@ -19,33 +20,21 @@ namespace Daydream
 		virtual Shared<GPUBuffer> CreateGPUBuffer(const BufferDesc& _desc) override;
 		virtual Shared<GPUTexture> CreateGPUTexture(const TextureDesc& _desc) override;
 		virtual Shared<TextureView> CreateTextureView(Texture* _texture, const TextureViewDesc& _desc) override;
-		//virtual Shared<VertexBuffer> CreateDynamicVertexBuffer(UInt32 _size, UInt32 _stride, UInt32 _initialDataSize = 0, const void* _initialData = nullptr) override;
-		//virtual Shared<VertexBuffer> CreateStaticVertexBuffer(UInt32 _size, UInt32 _stride, const void* _initialData) override;
-		//virtual Shared<IndexBuffer> CreateIndexBuffer(const UInt32 * _indices, UInt32 _count) override;
-		//virtual Shared<ConstantBuffer> CreateConstantBuffer(UInt32 _size) override;
-		//virtual Shared<RenderPass> CreateRenderPass(const RenderPassDesc& _desc) override;
-		//virtual Shared<Framebuffer> CreateFramebuffer(Shared<RenderPass> _renderPass, const FramebufferDesc& _desc) override;
 		virtual Shared<GraphicsPipelineState> CreatePipelineState(const GraphicsPipelineStateDesc& _desc)override;
 		virtual Shared<Shader> CreateShader(const std::string& _src, const ShaderType& _type, ShaderLoadMode _mode) override;
 		virtual Shared<Swapchain> CreateSwapchain(const DaydreamWindow& _window, const SwapchainDesc& _desc)override;
-		//virtual Shared<Texture2D> CreateTexture2D(const void* _imageData, const TextureDesc& _desc)override;
-		//virtual Shared<Texture2D> CreateEmptyTexture2D(const TextureDesc& _desc)override;
-		//virtual Shared<TextureCube> CreateTextureCube(Array<const void*>& _imagePixels, const TextureDesc& _desc)override;
-		//virtual Shared<TextureCube> CreateEmptyTextureCube(const TextureDesc& _desc) override;
 		virtual Shared<Sampler> CreateSampler(const SamplerDesc& _desc) override;
 		virtual Unique<ImGuiRenderer> CreateImGuiRenderer() override;
 
-
 		ID3D12Device* GetDevice() const { return device.Get(); }
 		ID3D12CommandQueue* GetCommandQueue() const { return commandQueue.Get(); }
-		void SetCommandList(ComPtr<ID3D12GraphicsCommandList> _commandList) { commandList = _commandList; }
-		ID3D12GraphicsCommandList* GetCommandList() const { return commandList.Get(); }
+
+		D3D12MA::Allocator* GetMemoryAllocator() const { return memoryAllocator.Get(); }
+		
 		ID3D12DescriptorHeap* GetRTVHeap() const { return rtvHeap.Get(); }
 		ID3D12DescriptorHeap* GetDSVHeap() const { return dsvHeap.Get(); }
 		ID3D12DescriptorHeap* GetSamplerHeap() const { return samplerHeap.Get(); }
 		ID3D12DescriptorHeap* GetCBVSRVUAVHeap() const { return cbvSrvUavHeap.Get(); }
-		ID3D12DescriptorHeap* GetDynamicSamplerHeap() const { return dynamicSamplerHeap.Get(); }
-		ID3D12DescriptorHeap* GetDynamicCBVSRVUAVHeap() const { return dynamicCbvSrvUavHeap.Get(); }
 
 		DescriptorHeapAllocator& GetRTVHeapAlloc() { return rtvHeapAlloc; }
 		DescriptorHeapAllocator& GetDSVHeapAlloc() { return dsvHeapAlloc; }
@@ -80,9 +69,9 @@ namespace Daydream
 		//void WaitForGPU(IDXGISwapChain3* _swapChain);
 
 	private:
+
 		ComPtr<ID3D12Device> device;
 		ComPtr<ID3D12CommandQueue> commandQueue;
-		ComPtr<ID3D12CommandAllocator> allocator;
 
 		ComPtr<ID3D12RootSignature> rootSignature;
 		ComPtr<ID3D12DescriptorHeap> rtvHeap;
@@ -107,6 +96,8 @@ namespace Daydream
 		ComPtr<IDXGIFactory7> dxgiFactory;
 		ComPtr<IDXGIAdapter4> dxgiAdapter;
 		ComPtr<ID3D12Debug> debugLayer;
+
+		ComPtr<D3D12MA::Allocator> memoryAllocator;
 
 		ComPtr<ID3D12CommandAllocator> uploadCommandAllocator;
 		ComPtr<ID3D12GraphicsCommandList> uploadCommandList;

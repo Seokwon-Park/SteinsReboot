@@ -10,15 +10,16 @@ namespace Daydream
 	{
 		device = _device;
 
-		D3D12_HEAP_PROPERTIES heapProperties = GraphicsUtility::DirectX12::ConvertToD3D12HeapProperties(_desc);
+		//D3D12_HEAP_PROPERTIES heapProperties = GraphicsUtility::DirectX12::ConvertToD3D12HeapProperties(_desc);
+		D3D12MA::ALLOCATION_DESC allocationDesc = GraphicsUtility::DirectX12::ConvertToD3D12MemoryAllocationDesc(_desc);
 		D3D12_RESOURCE_DESC resourceDesc= GraphicsUtility::DirectX12::ConvertToD3D12ResourceDesc(_desc);
 
-		HRESULT hr = device->GetDevice()->CreateCommittedResource(
-			&heapProperties,
-			D3D12_HEAP_FLAG_NONE,
+		HRESULT hr = device->GetMemoryAllocator()->CreateResource(
+			&allocationDesc,
 			&resourceDesc,
 			GraphicsUtility::DirectX12::ConvertToD3D12InitialState(_desc.memoryUsage),
-			nullptr, 
+			nullptr,
+			allocation.GetAddressOf(),
 			IID_PPV_ARGS(buffer.GetAddressOf()));
 
 		if (_desc.memoryUsage == MemoryUsage::Dynamic || _desc.memoryUsage == MemoryUsage::Upload)

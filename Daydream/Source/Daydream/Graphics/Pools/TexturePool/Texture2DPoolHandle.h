@@ -22,7 +22,7 @@ namespace Daydream
 		Texture2DPoolHandle(Texture2DPoolHandle&&) noexcept = default;
 		Texture2DPoolHandle& operator=(Texture2DPoolHandle&&) noexcept = default;
 	private:
-		UInt32 lastUsedLoop = 0;
+		UInt64 lastUsedLoop = 0;
 		Shared<Texture2D> texture;
 		Shared<TextureView> renderTargetView;
 		Shared<TextureView> depthStencilView;

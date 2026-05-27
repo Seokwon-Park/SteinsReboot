@@ -16,7 +16,7 @@ namespace Daydream
 		return std::make_pair<T1, T2>(std::forward<T1>(_first), std::forward<T2>(_second));
 	}
 
-	using Byte = unsigned char;
+	using Byte = std::byte;
 	using String = std::string;
 	using StringView = std::string_view;
 	using WideString = std::wstring;

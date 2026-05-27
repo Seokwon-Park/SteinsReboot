@@ -31,13 +31,12 @@ namespace Daydream
 		/*virtual void SetTexture2D(const String& _name, Shared<Texture2D> _texture) override;
 		virtual void SetTextureCube(const String& _name, Shared<TextureCube> _textureCube) override;*/
 		virtual void BindShaderResourceView(const String& _name, const TextureView* _textureView, const Sampler* _sampler) override;
-		virtual void BindConstantBuffer(const String& _name, const ConstantBuffer* _buffer) override;
+		virtual void BindConstantBuffer(const String& _name, const GPUBuffer* _buffer) override;
 
 		virtual void CopyBuffer(const GPUBuffer* _src, const GPUBuffer* _dst, UInt32 _copySize, UInt32 _srcOffset, UInt32 _dstOffset) override;
 		virtual void CopyBufferToTexture(const GPUBuffer* _src, const GPUTexture* _dst) override;
 
-		virtual void CopyTexture2D(const Texture2D* _src, const Texture2D* _dst) override;
-		virtual void CopyTextureToCubemapFace(const Texture2D* _srcTexture2D, const TextureCube* _dstCubemap, UInt32 _faceIndex, UInt32 _mipLevel = 0) override;
+		virtual void CopyTexture(const GPUTexture* _src, const GPUTexture* _dst, const TextureCopyRegion& _region) override;
 
 		virtual void GenerateMips(GPUTexture* _texture) override;
 

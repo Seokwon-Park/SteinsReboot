@@ -18,6 +18,7 @@ workspace "Daydream"
 	IncludeDir["stb"] = "Daydream/Vendor/stb"
 	IncludeDir["dxcompiler"] = "Daydream/Vendor/dxcompiler/include"
 	IncludeDir["VulkanMemoryAllocator"] = "Daydream/Vendor/VulkanMemoryAllocator"
+	IncludeDir["D3D12MemoryAllocator"] = "Daydream/Vendor/D3D12MemoryAllocator"
 	IncludeDir["ImGuizmo"] = "Daydream/Vendor/ImGuizmo"
 	IncludeDir["stduuid"] = "Daydream/Vendor/stduuid/include"
 	IncludeDir["yaml"] = "Daydream/Vendor/yaml-cpp/include"
@@ -52,6 +53,7 @@ project "Daydream"
  		"%{prj.name}/Vendor/glm/glm/**.inl",
  		"%{prj.name}/Vendor/DaydreamMath/DaydreamMath/**.h",
  		"%{prj.name}/Vendor/VulkanMemoryAllocator/**.cpp",
+ 		"%{prj.name}/Vendor/D3D12MemoryAllocator/**.cpp",
  		"%{prj.name}/Vendor/ImGuizmo/ImGuizmo.h",
  		"%{prj.name}/Vendor/ImGuizmo/ImGuizmo.cpp",
 	}
@@ -68,6 +70,7 @@ project "Daydream"
 		"%{IncludeDir.assimp}",
 		"%{IncludeDir.dxcompiler}",
 		"%{IncludeDir.VulkanMemoryAllocator}",
+		"%{IncludeDir.D3D12MemoryAllocator}",
 		"%{IncludeDir.ImGuizmo}",
 		"%{IncludeDir.stduuid}",
 		"%{IncludeDir.yaml}",

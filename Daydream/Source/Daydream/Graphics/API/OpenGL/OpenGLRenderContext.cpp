@@ -198,19 +198,19 @@ namespace Daydream
 		glBindTextureUnit(bindingInfo->binding, glTexture->GetTextureID());
 		glBindSampler(bindingInfo->binding, glTexture->GetSamplerID());
 	}*/
-	void OpenGLRenderContext::BindConstantBuffer(const String& _name, const ConstantBuffer* _buffer)
+	void Daydream::OpenGLRenderContext::BindConstantBuffer(const String& _name, const GPUBuffer* _buffer)
 	{
 		const ShaderReflectionData* bindingInfo = currentGraphicsPipelineState->GetBindingInfo(_name);
 		if (bindingInfo == nullptr) return;
 
-		const OpenGLGPUBuffer* constantBuffer = Cast<const OpenGLGPUBuffer*>(_buffer->GetGPUBuffer());
+		const OpenGLGPUBuffer* constantBuffer = Cast<const OpenGLGPUBuffer*>(_buffer);
 		glBindBufferBase(GL_UNIFORM_BUFFER, bindingInfo->binding, constantBuffer->GetBufferID());
 	}
 
 	void OpenGLRenderContext::CopyBuffer(const GPUBuffer* _src, const GPUBuffer* _dst, UInt32 _copySize, UInt32 _srcOffset, UInt32 _dstOffset)
 	{
-		OpenGLGPUBuffer* src = Cast<OpenGLGPUBuffer*>(_src);
-		OpenGLGPUBuffer* dst = Cast<OpenGLGPUBuffer*>(_dst);
+		const OpenGLGPUBuffer* src = Cast<const OpenGLGPUBuffer*>(_src);
+		const OpenGLGPUBuffer* dst = Cast<const OpenGLGPUBuffer*>(_dst);
 
 		// 소스 버퍼ID, 목적지 버퍼ID, 소스 오프셋, 목적지 오프셋, 복사할 크기
 		glCopyNamedBufferSubData(
@@ -224,8 +224,8 @@ namespace Daydream
 
 	void OpenGLRenderContext::CopyBufferToTexture(const GPUBuffer* _src, const GPUTexture* _dst)
 	{
-		OpenGLGPUBuffer* srcBuffer = Cast<OpenGLGPUBuffer*>(_src);
-		OpenGLGPUTexture* dstTexture = Cast<OpenGLGPUTexture*>(_dst);
+		const OpenGLGPUBuffer* srcBuffer = Cast<const OpenGLGPUBuffer*>(_src);
+		const OpenGLGPUTexture* dstTexture = Cast<const OpenGLGPUTexture*>(_dst);
 
 		GLuint bufferID = srcBuffer->GetBufferID();
 		GLuint textureID = dstTexture->GetTextureID();
@@ -250,38 +250,28 @@ namespace Daydream
 		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 	}
 
-	void OpenGLRenderContext::CopyTexture2D(const Texture2D* _src, const Texture2D* _dst)
+	void OpenGLRenderContext::CopyTexture(const GPUTexture* _src, const GPUTexture* _dst, const TextureCopyRegion& _region)
 	{
-		OpenGLGPUTexture* src = Cast<OpenGLGPUTexture*>(_src->GetGPUTexture());
-		OpenGLGPUTexture* dst = Cast<OpenGLGPUTexture*>(_dst->GetGPUTexture());
+		const OpenGLGPUTexture* src = Cast<const OpenGLGPUTexture*>(_src);
+		const OpenGLGPUTexture* dst = Cast<const OpenGLGPUTexture*>(_dst);
+
+		UInt32 srcZ = _region.srcOffset[2] + _region.srcSubresource.baseLayer;
+		UInt32 dstZ = _region.dstOffset[2] + _region.dstSubresource.baseLayer;
+
+		UInt32 depthExtent = std::max(_region.extent[2], _region.srcSubresource.layerCount);
+
 		glCopyImageSubData(
-			src->GetTextureID(),          // 원본 텍스처 이름
-			GL_TEXTURE_2D,       // 원본 텍스처 타입
-			0,                   // 원본 밉맵 레벨
-			0, 0, 0,             // 원본 오프셋 (x, y, z)
-			dst->GetTextureID(),          // 대상 텍스처 이름
-			GL_TEXTURE_2D,       // 대상 텍스처 타입
-			0,                   // 대상 밉맵 레벨
-			0, 0, 0,             // 대상 오프셋 (x, y, z)
-			_src->GetWidth(),               // 복사할 너비
-			_src->GetHeight(),              // 복사할 높이
-			1                    // 복사할 깊이 (2D 텍스처는 1)
-		);
-	}
-	void OpenGLRenderContext::CopyTextureToCubemapFace(const Texture2D* _srcTexture2D, const TextureCube* _dstCubemap, UInt32 _faceIndex, UInt32 _mipLevel)
-	{
-		OpenGLGPUTexture* src = Cast<OpenGLGPUTexture*>(_srcTexture2D->GetGPUTexture());
-		OpenGLGPUTexture* dst = Cast<OpenGLGPUTexture*>(_dstCubemap->GetGPUTexture());
-		glCopyImageSubData(
-			src->GetTextureID(),      // 원본 텍스처 핸들
-			GL_TEXTURE_2D,        // 원본 타겟 타입
-			0,                    // 원본 밉 레벨
-			0, 0, 0,              // 원본 좌표 (x, y, z)
-			dst->GetTextureID(),         // 대상 텍스처 핸들
-			GL_TEXTURE_CUBE_MAP,  // 대상 타겟 타입
-			_mipLevel,             // 대상 밉 레벨
-			0, 0, _faceIndex,      // 대상 좌표 (x, y, layer) - faceIndex가 레이어를 지정!
-			src->GetWidth(), src->GetHeight(), 1      // 복사할 크기
+			src->GetTextureID(),								// 원본 텍스처 이름
+			GL_TEXTURE_2D,										// 원본 텍스처 타입
+			_region.srcSubresource.mipLevel,					// 원본 밉맵 레벨
+			_region.srcOffset[0], _region.srcOffset[1], srcZ,	// 원본 오프셋 (x, y, z)
+			dst->GetTextureID(),						        // 대상 텍스처 이름
+			GL_TEXTURE_2D,										// 대상 텍스처 타입
+			_region.dstSubresource.mipLevel,					// 대상 밉맵 레벨
+			_region.dstOffset[0], _region.dstOffset[1], dstZ,	// 대상 오프셋 (x, y, z)
+			_region.extent[0],									// 복사할 너비
+			_region.extent[1],									// 복사할 높이
+			depthExtent											// 복사할 깊이 (2D 텍스처는 1)
 		);
 	}
 

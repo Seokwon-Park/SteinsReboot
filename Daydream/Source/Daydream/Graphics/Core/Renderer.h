@@ -10,6 +10,7 @@
 #include "Daydream/Graphics/Resources/Skybox.h"
 #include "Daydream/Graphics/Resources/Texture/TextureView.h"
 #include "Daydream/Graphics/Pools/TexturePool/Texture2DPool.h"
+#include "Daydream/Graphics/Pools/BufferPool/UploadBufferPool.h"
 
 namespace Daydream
 {
@@ -41,6 +42,7 @@ namespace Daydream
 			}
 		}
 
+		// This Commands are executed before starting layerloop
 		template<typename RenderFunction>
 		static void EnqueuePreFrameCommand(RenderFunction&& _command)
 		{
@@ -62,7 +64,7 @@ namespace Daydream
 
 		static void BeginRendering(const RenderingInfo& _renderingInfo);
 		static void EndRendering(const RenderingInfo& _renderingInfo);
-		static void BeginRendering(const Swapchain* _swapchain, Color _clearColor);
+		static void BeginRendering(Swapchain* _swapchain, Color _clearColor);
 		//static void EndRendering(Swapchain* _swapchain);
 		//static void BeginRenderPass(const RenderPass>& _renderPass, const Framebuffer>& _framebuffer);
 		//static void EndRenderPass(const RenderPass>& _renderPass);
@@ -97,10 +99,7 @@ namespace Daydream
 
 		static void DrawIndexed(UInt32 _indexCount);
 
-		//static void RequestResizeFramebuffer(const Framebuffer>& _framebuffer, UInt32 _width, UInt32 _height);
-
-		static void CopyBuffer(const GPUBuffer* _src, const GPUBuffer* _dst, UInt32 _copySize);
-		static void CopyBufferToTexture(const GPUBuffer* _src, const GPUTexture* _dst);
+		static void CopyBuffer(const Buffer* _src, const Buffer* _dst, UInt32 _copySize, UInt32 _srcOffset, UInt32 _dstOffset);
 		static void CopyDataToTexture2D(const Texture2D* _target, const void* _data);
 
 		static void CopyTexture2D(const Texture2D* _src, const Texture2D* _dst);
@@ -149,24 +148,22 @@ namespace Daydream
 		inline static RenderDevice* GetRenderDevice() { return renderDevice.get(); }
 		inline static Skybox* GetSkybox() { return skybox.get(); }
 		inline static RenderCommandList* GetActiveCommandList() { return renderContext->GetActiveCommandList(); }
-		inline static Texture2DPool* GetRenderTargetPool() { return renderTargetPool.get(); }
+		inline static Texture2DPool* GetRenderTargetPool() { return texturePool.get(); }
 	private:
 		Renderer() = default;
 		static void InitRenderDevice(Daydream::RendererAPIType _API);
 
 		inline static RenderContext* GetRenderContext() { return renderContext.get(); }
-		inline static void CaptureResource(Array<Shared<GPUResource>> _resources)
-		{
-			capturedResourcesQueue.push({ currentLoop, std::move(_resources) });
-		}
 
 		inline static Unique<RenderDevice> renderDevice = nullptr;
 		inline static Unique<RenderContext> renderContext = nullptr;
 		inline static Unique<ImGuiRenderer> imguiRenderer = nullptr;
 		inline static Unique<Skybox> skybox = nullptr;
 
-		inline static Queue<ResourceCapturedData> capturedResourcesQueue;
-		inline static Unique<Texture2DPool> renderTargetPool;
+		inline static Unique<Texture2DPool> texturePool;
+		inline static Unique<UploadBufferPool> uploadBufferPool;
+
+		inline static Array<IResourcePool> pools;
 		////////////////////////////////////////////////////////////////// 
 		// RenderThread
 		////////////////////////////////////////////////////////////////// 

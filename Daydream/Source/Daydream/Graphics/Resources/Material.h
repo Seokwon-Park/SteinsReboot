@@ -54,7 +54,7 @@ namespace Daydream
 	public:
 		ASSET_CLASS_TYPE(Material)
 		Material() = default;
-		Material(Shared<ShaderGroup> _shaderGroup);
+		Material(const ShaderGroup* _shaderGroup);
 		~Material();
 		void Bind() {};
 		void Unbind() {};

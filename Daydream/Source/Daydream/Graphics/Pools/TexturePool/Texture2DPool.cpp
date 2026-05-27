@@ -21,10 +21,10 @@ namespace Daydream
 
 		Texture2DPoolHandle handle{};
 		//렌더타겟 풀에서 key에 해당하는 렌더타겟 큐에 할당할 렌더타겟이 있으면 할당, 없으면 생성해서 리턴
-		if (!pool[key].empty())
+		if (!freeQueue[key].empty())
 		{
-			handle = std::move(pool[key].front());
-			pool[key].pop();
+			handle = std::move(freeQueue[key].front());
+			freeQueue[key].pop();
 		}
 		else
 		{
@@ -82,19 +82,30 @@ namespace Daydream
 	void Texture2DPool::ReturnTexture2DHandle(Texture2DPoolHandle&& _handle, UInt32 _lastUsedLoop)
 	{
 		_handle.lastUsedLoop = _lastUsedLoop;
-		Texture2DPoolKey key;
-		key.width = _handle.texture->GetWidth();
-		key.height = _handle.texture->GetHeight();
-		key.format = _handle.texture->GetFormat();
 
-		pool[key].push(std::move(_handle));
+		pendingQueue.push(std::move(_handle));
 	}
 
-	void Texture2DPool::CleanUp(UInt64 _thresholdLoop)
+	void Texture2DPool::FlushInFlight(UInt32 _currentLoop, UInt32 _maxFramesInFlight)
 	{
-		for (auto& [key, handles] : pool)
+		while (!pendingQueue.empty() && pendingQueue.front().lastUsedLoop + _maxFramesInFlight <= _currentLoop)
 		{
-			while(!handles.empty() && handles.front().lastUsedLoop <= _thresholdLoop)
+			pendingQueue.front().lastUsedLoop = _currentLoop;
+
+			Texture2DPoolKey key;
+			key.width = pendingQueue.front().texture->GetWidth();
+			key.height = pendingQueue.front().texture->GetHeight();
+			key.format = pendingQueue.front().texture->GetFormat();
+		
+			freeQueue[key].push(std::move(pendingQueue.front()));
+			pendingQueue.pop();
+		}
+	}
+	void Daydream::Texture2DPool::CleanUp(UInt32 _currentLoop, UInt32 _removeLimit)
+	{
+		for (auto& [key, handles] : freeQueue)
+		{
+			while (!handles.empty() && handles.front().lastUsedLoop + _removeLimit <= _currentLoop)
 			{
 				handles.pop();
 			}

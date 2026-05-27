@@ -15,9 +15,7 @@ namespace Daydream
 
 		virtual void* GetUIHandle() const { return imageView.get(); }
 
-		void SetImageView(vk::UniqueImageView _imageView) { imageView = std::move(_imageView); }
 		vk::ImageView GetVkImageView() const { return imageView.get(); }
-
 	private:
 		VulkanRenderDevice* device;
 		TextureViewDesc desc;

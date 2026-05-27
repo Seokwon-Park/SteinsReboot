@@ -17,8 +17,8 @@ namespace Daydream
 		ID3D12Resource* GetID3D12Resource() const { return buffer.Get(); }
 	protected:
 		D3D12RenderDevice* device;
+		ComPtr<D3D12MA::Allocation> allocation;
 		ComPtr<ID3D12Resource> buffer;
-
 	};
 
 	//class D3D12VertexBuffer : public VertexBuffer

@@ -29,7 +29,7 @@ namespace Daydream
 	struct TextureSubresourceLayers
 	{
 		UInt32 mipLevel = 0;
-		UInt32 baseArrayLayer = 0;
+		UInt32 baseLayer = 0;
 		UInt32 layerCount = 1; // 2D면 1, 큐브맵 전체면 6
 	};
 
@@ -67,19 +67,15 @@ namespace Daydream
 		//virtual void SetTexture2D(const String& _name, Shared<Texture2D> _texture) ;
 		//virtual void SetTextureCube(const String& _name, Shared<TextureCube> _textureCube) {};
 		virtual void BindShaderResourceView(const String& _name, const TextureView* _textureView, const Sampler* _sampler) {};
-		virtual void BindConstantBuffer(const String& _name, const ConstantBuffer* _buffer) {};
-		virtual void PushConstants(const String& _name, const void* _data, UInt32 _size) {};
+		virtual void BindConstantBuffer(const String& _name, const GPUBuffer* _buffer) {};
 
 		virtual void CopyBuffer(const GPUBuffer* _src, const GPUBuffer* _dst, UInt32 _copySize, UInt32 _srcOffset = 0, UInt32 _dstOffset = 0) {};
 		virtual void CopyBufferToTexture(const GPUBuffer* _src, const GPUTexture* _dst) {};
 
 		// Uploads raw pixel data to the texture. 
 		// Backends may override this to handle API-specific memory alignment requirements.
-		virtual void CopyDataToTexture2D(const Texture2D* _target, const void*_data);
-		virtual void CopyTexture2D(const Texture2D* _src, const Texture2D* _dst) {};
-		virtual void CopyTextureToCubemapFace(const Texture2D* _srcTexture2D, const TextureCube* _dstCubemap, UInt32 _dstFaceIndex, UInt32 _mipLevel = 0) {};
-		virtual void CopyTextureCubeToTexture2D(const TextureCube* _srcCubemap, const Texture2D* _dstTexture2D, UInt32 _srcFaceIndex, UInt32 _mipLevel = 0) {};
-		//virtual void CopyTextureToBuffer(Shared<Texture2D> _srcTexture, Shared<Buffer> _dstBuffer, UInt32 _offsetX, UInt32 _offsetY, UInt32 _width, UInt 32 _height) = 0;
+		virtual void CopyDataToTexture(const GPUTexture* _dst, const void* _data);
+		virtual void CopyTexture(const GPUTexture* _src, const GPUTexture* _dst, const TextureCopyRegion& _region) {};
 
 		virtual void GenerateMips(GPUTexture* _texture) {};
 

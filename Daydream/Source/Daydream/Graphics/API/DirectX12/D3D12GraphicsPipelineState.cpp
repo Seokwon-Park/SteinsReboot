@@ -235,12 +235,7 @@ namespace Daydream
 	D3D12GraphicsPipelineState::~D3D12GraphicsPipelineState()
 	{
 	}
-	void D3D12GraphicsPipelineState::Bind() const
-	{
-		device->GetCommandList()->SetGraphicsRootSignature(rootSignature.Get());
-		device->GetCommandList()->SetPipelineState(pipeline.Get());
-	}
-	UInt32 D3D12GraphicsPipelineState::GetDescriptorTableIndex(String _resourceName)
+	UInt32 D3D12GraphicsPipelineState::GetDescriptorTableIndex(String _resourceName) const
 	{
 		auto itr = descriptorTable.find(_resourceName);
 		if (itr == descriptorTable.end())

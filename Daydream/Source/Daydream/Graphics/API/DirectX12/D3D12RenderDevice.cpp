@@ -21,7 +21,6 @@ namespace Daydream
 
 	D3D12RenderDevice::~D3D12RenderDevice()
 	{
-
 	}
 
 	void D3D12RenderDevice::Init()
@@ -76,6 +75,15 @@ namespace Daydream
 
 		hr = D3D12CreateDevice(dxgiAdapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(device.GetAddressOf()));
 		DAYDREAM_CORE_ASSERT(SUCCEEDED(hr), "Failed to Create Device!");
+
+		D3D12MA::ALLOCATOR_DESC allocatorDesc = {};
+		allocatorDesc.pDevice = device.Get();
+		allocatorDesc.pAdapter = dxgiAdapter.Get();
+		allocatorDesc.Flags = Cast<D3D12MA::ALLOCATOR_FLAGS>(D3D12MA_RECOMMENDED_ALLOCATOR_FLAGS);
+
+		hr = D3D12MA::CreateAllocator(&allocatorDesc, memoryAllocator.GetAddressOf());
+		DAYDREAM_CORE_ASSERT(SUCCEEDED(hr), "Failed to Create Memory Allocator!");
+
 
 #if defined(DEBUG) || defined(_DEBUG)
 		Microsoft::WRL::ComPtr<ID3D12InfoQueue> infoQueue;

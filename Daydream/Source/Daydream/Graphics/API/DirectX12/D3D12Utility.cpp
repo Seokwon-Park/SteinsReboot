@@ -46,6 +46,21 @@ namespace Daydream::GraphicsUtility::DirectX12
 			return D3D12_RESOURCE_STATE_COMMON;
 		}
 	}
+	D3D12MA::ALLOCATION_DESC ConvertToD3D12MemoryAllocationDesc(const BufferDesc& _desc)
+	{
+		D3D12MA::ALLOCATION_DESC allocationDesc{};
+
+		switch (_desc.memoryUsage)
+		{
+		case MemoryUsage::Static:	allocationDesc.HeapType = D3D12_HEAP_TYPE_DEFAULT; break;
+		case MemoryUsage::Dynamic:	allocationDesc.HeapType = D3D12_HEAP_TYPE_UPLOAD;  break;
+		case MemoryUsage::Readback:	allocationDesc.HeapType = D3D12_HEAP_TYPE_READBACK; break;
+		case MemoryUsage::Upload:	allocationDesc.HeapType = D3D12_HEAP_TYPE_UPLOAD; break;
+		default:					allocationDesc.HeapType = D3D12_HEAP_TYPE_DEFAULT; break;
+		}
+
+		return allocationDesc;
+	}
 	D3D12_HEAP_PROPERTIES ConvertToD3D12HeapProperties(const BufferDesc& _desc)
 	{
 		D3D12_HEAP_PROPERTIES heapProperties{};
@@ -69,7 +84,7 @@ namespace Daydream::GraphicsUtility::DirectX12
 		D3D12_RESOURCE_DESC resourceDesc{};
 		resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
 		resourceDesc.Alignment = 0;
-		resourceDesc.Width = _desc.bufferUsage == BufferUsage::Constant ? ((_desc.size + 255) & ~255) : _desc.size;
+		resourceDesc.Width = (Bool)(_desc.bufferUsage & BufferUsage::Constant) ? ((_desc.size + 255) & ~255) : _desc.size;
 		resourceDesc.Height = 1;
 		resourceDesc.DepthOrArraySize = 1;
 		resourceDesc.MipLevels = 1;

@@ -31,14 +31,11 @@ namespace Daydream
 		if (_initialData)
 		{
 			UInt32 imageSize = desc.width * desc.height * GraphicsUtility::GetRenderFormatSize(desc.format);
-			Shared<Array<Byte>> dataArray = MakeShared<Array<Byte>>(imageSize);
-
-			memcpy(dataArray->data(), _initialData, imageSize);
 
 			Renderer::EnqueuePreFrameCommand([=]()
 				{
 					Renderer::TransitionTextureState(texture2D, ResourceState::Undefined, ResourceState::CopyDest, 0, 1);
-					Renderer::CopyDataToTexture2D(texture2D, dataArray);
+					Renderer::CopyDataToTexture2D(texture2D.get(), _initialData);
 					Renderer::TransitionTextureState(texture2D, ResourceState::CopyDest, ResourceState::ShaderResource, 0, 1);
 				});
 		}

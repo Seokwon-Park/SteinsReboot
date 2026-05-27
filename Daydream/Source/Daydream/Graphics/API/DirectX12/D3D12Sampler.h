@@ -11,7 +11,7 @@ namespace Daydream
 		D3D12Sampler(D3D12RenderDevice* _device, const SamplerDesc& _desc);
 		virtual ~D3D12Sampler();
 
-		inline D3D12_GPU_DESCRIPTOR_HANDLE GetSamplerHandle() { return samplerGpuHandle; }
+		inline D3D12_GPU_DESCRIPTOR_HANDLE GetSamplerHandle() const { return samplerGpuHandle; }
 	protected:
 
 	private:

@@ -83,7 +83,7 @@ namespace Daydream
 	{
 
 	}
-	void D3D11GraphicsPipelineState::BindPipelineState()
+	void D3D11GraphicsPipelineState::BindPipelineState() const 
 	{
 		device->GetContext()->VSSetShader(vertexShader, nullptr, 0);
 		device->GetContext()->PSSetShader(pixelShader, nullptr, 0);

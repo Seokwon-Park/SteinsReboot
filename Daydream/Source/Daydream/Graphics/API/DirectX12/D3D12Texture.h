@@ -18,6 +18,7 @@ namespace Daydream
 	private:
 		D3D12RenderDevice* device;
 		ComPtr<ID3D12Resource> texture;
+		ComPtr<D3D12MA::Allocation> allocation;
 	};
 
 	//class D3D12Texture2D : public Texture2D

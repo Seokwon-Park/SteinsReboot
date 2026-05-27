@@ -24,7 +24,7 @@ namespace Daydream
 
 		imguiRenderer = renderDevice->CreateImGuiRenderer();
 
-		renderTargetPool = MakeUnique<Texture2DPool>();
+		texturePool = MakeUnique<Texture2DPool>();
 
 		commandQueues.resize(MaxCommandListsInFlight);
 		for (auto& commandList : commandQueues)
@@ -164,7 +164,7 @@ namespace Daydream
 			});
 	}
 
-	void Renderer::BeginRendering(const Swapchain* _swapchain, Color _clearColor)
+	void Daydream::Renderer::BeginRendering(Swapchain* _swapchain, Color _clearColor)
 	{
 		EnqueueCommand([_swapchain, _clearColor]()
 			{
@@ -248,7 +248,7 @@ namespace Daydream
 	{
 		EnqueueCommand([_name, _buffer]()
 			{
-				renderContext->BindConstantBuffer(_name, _buffer);
+				renderContext->BindConstantBuffer(_name, _buffer->GetGPUBuffer());
 			});
 	}
 
@@ -299,30 +299,20 @@ namespace Daydream
 	//		});
 	//}
 
-	void Renderer::CopyBuffer(const GPUBuffer* _src, const GPUBuffer* _dst, UInt32 _copySize)
+	void Renderer::CopyBuffer(const Buffer* _src, const Buffer* _dst, UInt32 _copySize, UInt32 _srcOffset, UInt32 _dstOffset)
 	{
 
-		EnqueueCommand([_src, _dst, _copySize]()
+		EnqueueCommand([_src, _dst, _copySize, _srcOffset, _dstOffset]()
 			{
-				renderContext->CopyBuffer(_src, _dst, _copySize, _placeholder_, _placeholder_);
+				renderContext->CopyBuffer(_src->GetGPUBuffer(), _dst->GetGPUBuffer(), _copySize, _srcOffset, _dstOffset);
 			});
 	}
 
-
-	void Renderer::CopyBufferToTexture(const GPUBuffer* _src, const GPUTexture* _dst)
+	void Renderer::CopyDataToTexture2D(const Texture2D* _dst, const void* _data)
 	{
-
-		EnqueueCommand([_src, _dst]()
+		EnqueueCommand([_dst, _data]()
 			{
-				renderContext->CopyBufferToTexture(_src, _dst);
-			});
-	}
-
-	void Renderer::CopyDataToTexture2D(const Texture2D* _target, const void* _data)
-	{
-		EnqueueCommand([_target, _data]()
-			{
-				renderContext->CopyDataToTexture2D(_target, _data);
+				renderContext->CopyDataToTexture(_dst->GetGPUTexture(), _data);
 			});
 	}
 
@@ -331,7 +321,13 @@ namespace Daydream
 	{
 		EnqueueCommand([_src, _dst]()
 			{
-				renderContext->CopyTexture2D(_src, _dst);
+				TextureCopyRegion region = {};
+				region.extent[0] = _src->GetWidth();
+				region.extent[1] = _src->GetHeight();
+				region.extent[2] = 1; // 2D니까 깊이는 1
+
+				region.srcSubresource.layerCount = 1; // 2D니까 레이어도 1
+				renderContext->CopyTexture(_src->GetGPUTexture(), _dst->GetGPUTexture(), region);
 			});
 	}
 
@@ -339,16 +335,41 @@ namespace Daydream
 	{
 		EnqueueCommand([_dstCubemap, _faceIndex, _srcTexture2D, _mipLevel]()
 			{
-				renderContext->CopyTextureToCubemapFace(_srcTexture2D, _dstCubemap, _faceIndex, _mipLevel);
-			});
+				TextureCopyRegion region = {};
+				region.extent[0] = _srcTexture2D->GetWidth();
+				region.extent[1] = _srcTexture2D->GetHeight();
+				region.extent[2] = 1;
 
+				region.srcSubresource.mipLevel = 0;
+				region.srcSubresource.baseLayer = 0;
+				region.srcSubresource.layerCount = 1;
+
+				region.dstSubresource.mipLevel = _mipLevel;   
+				region.dstSubresource.baseLayer = _faceIndex;
+				region.dstSubresource.layerCount = 1;
+
+				renderContext->CopyTexture(_srcTexture2D->GetGPUTexture(), _dstCubemap->GetGPUTexture(), region);
+			});
 	}
 
 	void Renderer::CopyTextureCubeToTexture2D(const TextureCube* _srcCubemap, const Texture2D* _dstTexture2D, UInt32 _faceIndex, UInt32 _mipLevel)
 	{
 		EnqueueCommand([_srcCubemap, _faceIndex, _dstTexture2D, _mipLevel]()
 			{
-				renderContext->CopyTextureCubeToTexture2D(_srcCubemap, _dstTexture2D, _faceIndex, _mipLevel);
+				TextureCopyRegion region = {};
+				region.extent[0] = _srcCubemap->GetWidth();
+				region.extent[1] = _srcCubemap->GetHeight();
+				region.extent[2] = 1;
+
+				region.srcSubresource.mipLevel = _mipLevel;
+				region.srcSubresource.baseLayer = _faceIndex;
+				region.srcSubresource.layerCount = 1;
+
+				region.dstSubresource.mipLevel = 0;
+				region.dstSubresource.baseLayer = 0;
+				region.dstSubresource.layerCount = 1;
+
+				renderContext->CopyTexture(_srcCubemap->GetGPUTexture(), _dstTexture2D->GetGPUTexture(), region);
 			});
 	}
 
@@ -438,16 +459,6 @@ namespace Daydream
 			submittedQueue->Execute();
 		}
 
-		auto capturedResources = renderContext->GetCapturedResources();
-		if (!capturedResources.empty())
-		{
-			capturedResourcesQueue.push({ currentLoop, std::move(capturedResources) });
-			capturedResources.clear();
-		}
 		currentLoop += 1;
-		while (!capturedResourcesQueue.empty() && capturedResourcesQueue.front().capturedLoop + MaxFramesInFlight <= currentLoop)
-		{
-			capturedResourcesQueue.pop();
-		}
 	}
 }

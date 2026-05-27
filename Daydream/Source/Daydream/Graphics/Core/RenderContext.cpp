@@ -20,7 +20,7 @@ namespace Daydream
     //    //}
     //}
 
-    void RenderContext::CopyDataToTexture2D(const Texture2D* _target, const void*_data)
+    void Daydream::RenderContext::CopyDataToTexture(const GPUTexture* _dst, const void* _data)
     {
         //Shared<UploadBuffer> uploadBuffer = UploadBuffer::Create(_data->size());
         //uploadBuffer->UpdateData(_data->data(), _data->size());

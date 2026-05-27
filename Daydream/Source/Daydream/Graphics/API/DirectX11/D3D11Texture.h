@@ -16,7 +16,7 @@ namespace Daydream
 
 		//For Swapchain 
 		void SetID3D11Resource(ComPtr<ID3D11Resource> _backBuffer) {};
-		inline ID3D11Resource* GetID3D11Resource() { return texture.Get(); }
+		inline ID3D11Resource* GetID3D11Resource() const { return texture.Get(); }
 	private:
 		ComPtr<ID3D11Resource> texture;
 	};
