@@ -22,6 +22,7 @@
 
 #include "Daydream/Scene/Scene.h"
 #include "Daydream/Scene/Components/Component.h"
+#include "Daydream/Scene/Components/CameraComponent.h"
 #include "Daydream/Scene/Components/TransformComponent.h"
 
 
@@ -35,7 +36,6 @@
 #include "Daydream/Graphics/States/PipelineState/GraphicsPipelineState.h"
 
 #include "Daydream/Graphics/Camera/Camera.h"
-#include "Daydream/Graphics/Camera/EditorCamera.h"
 
 #include "Daydream/Graphics/States/BlendState.h"
 #include "Daydream/Graphics/States/RasterizerState.h"
@@ -46,14 +46,15 @@
 #include "Daydream/Graphics/Resources/ShaderGroup.h"
 #include "Daydream/Graphics/Resources/Framebuffer.h"
 #include "Daydream/Graphics/Resources/Sampler.h"
-#include "Daydream/Graphics/Resources/Texture/Texture2D.h"
-#include "Daydream/Graphics/Resources/Texture/TextureCube.h"
-#include "Daydream/Graphics/Resources/Texture/TextureView.h"
 #include "Daydream/Graphics/Resources/Material.h"
 #include "Daydream/Graphics/Resources/Mesh.h"
 #include "Daydream/Graphics/Resources/Model.h"
 #include "Daydream/Graphics/Resources/Light.h"
 #include "Daydream/Graphics/Resources/Skybox.h"
+#include "Daydream/Graphics/Resources/Texture/Texture2D.h"
+#include "Daydream/Graphics/Resources/Texture/TextureCube.h"
+#include "Daydream/Graphics/Resources/Texture/TextureView.h"
+#include "Daydream/Graphics/Resources/Struct/RenderDataTypes.h"
 
 #include "Daydream/Graphics/Manager/ResourceManager.h"
 

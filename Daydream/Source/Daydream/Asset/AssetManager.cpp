@@ -142,6 +142,11 @@ namespace Daydream
 		{
 			DAYDREAM_CORE_WARN("[AssetManager] AssetManager is already initialized!");
 		}
+
+		if (instance)
+		{
+			instance->CreateBuiltinAssets();
+		}
 	}
 
 	void AssetManager::Shutdown()
@@ -161,8 +166,7 @@ namespace Daydream
 
 	void AssetManager::LoadAssets(LoadPhase _phase)
 	{
-		instance->CreateBuiltinTexture2D();
-		instance->CreateBuiltinMesh();
+
 		for (auto [handle, metadata] : instance->assetRegistry)
 		{
 			if (instance->loadedAssetCache.find(handle) != instance->loadedAssetCache.end())
@@ -190,6 +194,7 @@ namespace Daydream
 	void AssetManager::CreateBuiltinAssets()
 	{
 		instance->CreateBuiltinTexture2D();
+		instance->CreateBuiltinMesh();
 
 		AssetMetadata metadata;
 		metadata.handle = AssetDefaults::DefaultMaterialHandle;
@@ -290,6 +295,9 @@ namespace Daydream
 
 		const AssetMetadata& metadata = itr->second;
 
+		DAYDREAM_CORE_INFO(metadata.filePath.ToString());
+		DAYDREAM_CORE_INFO(metadata.handle.ToString());
+
 		// 2. 메타데이터의 'Type'에 따라 적절한 임포터 호출
 		Shared<Asset> loadedAsset = nullptr;
 		switch (metadata.type)
@@ -301,7 +309,6 @@ namespace Daydream
 			//loadedAsset = AssetImporter::LoadTextureCube(metadata.FilePath);
 			break;
 		case AssetType::Model:
-			DAYDREAM_CORE_INFO(metadata.handle.ToString());
 			loadedAsset = AssetImporter::LoadModel(metadata);
 			break;
 			// ... 기타 애셋 타입
@@ -486,7 +493,6 @@ namespace Daydream
 		out << YAML::Key << "Type" << YAML::Value << AssetTypeToString(_metadata.type);
 		out << YAML::Key << "Name" << YAML::Value << _metadata.name;
 		out << YAML::EndMap;
-
 		
 		std::ofstream fout(metaFilePath.ToString());
 		fout << out.c_str();

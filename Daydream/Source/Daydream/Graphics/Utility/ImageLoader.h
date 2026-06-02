@@ -10,11 +10,19 @@ namespace Daydream
 		Int32 height = 0;
 		std::variant<Array<UInt8>, Array<Float32>> data;
 
-		const void* GetRawDataPtr()
+		const void* GetRawDataPtr() const
 		{
 			return std::visit([](const auto& array) -> const void*
 				{
 					return array.data();
+				}, data);
+		}
+
+		UInt64 GetTotalByte() const
+		{
+			return std::visit([](const auto& array) -> UInt64
+				{
+					return array.size() * sizeof(array[0]);
 				}, data);
 		}
 	};

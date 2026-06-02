@@ -29,46 +29,46 @@ namespace Daydream
         inline void SetSpecularResolution(UInt32 _value) { specularResolution = _value; }
         inline UInt32 GetPrefilterMipLevel() const { return (UInt32)std::log2(specularResolution); }
 
-        inline Shared<TextureView> GetSkyboxFaceSRV(UInt32 _faceIndex)
+        inline TextureView* GetSkyboxFaceSRV(UInt32 _faceIndex)
         {
             DAYDREAM_ASSERT(_faceIndex < 6, "{} < 6", _faceIndex);
-            return skyboxFaceSRVs[_faceIndex];
+            return skyboxFaceSRVs[_faceIndex].get();
         }
 
-        inline Shared<TextureView> GetIrradianceFaceSRV(UInt32 _faceIndex)
+        inline TextureView* GetIrradianceFaceSRV(UInt32 _faceIndex)
         {
             DAYDREAM_ASSERT(_faceIndex < 6, "{} < 6", _faceIndex);
-            return irradianceSRVs[_faceIndex];
+            return irradianceSRVs[_faceIndex].get();
         }
 
-        inline Shared<TextureView> GetPrefilterFaceSRV(UInt32 _faceIndex, UInt32 _mipLevel)
+        inline TextureView* GetPrefilterFaceSRV(UInt32 _faceIndex, UInt32 _mipLevel)
         {
             UInt32 index = prefilterMipLevels * _faceIndex + _mipLevel;
             DAYDREAM_ASSERT(index < prefilterMipLevels * 6, "{} < {}", index, prefilterMipLevels * 6);
 
-            return prefilterSRVs[index];
+            return prefilterSRVs[index].get();
         }
 
-        inline Shared<TextureView> GetBRDFSRV()
+        inline TextureView* GetBRDFSRV()
         {
-            return BRDFSRV;
+            return BRDFSRV.get();
         }
 
-        inline Shared<Texture2D> GetBRDFTexture() 
+        inline Texture2D* GetBRDFTexture() 
         {
-            return BRDFTexture; 
+            return BRDFTexture.get(); 
         }
-        inline Shared<TextureCube> GetSkyboxTexture()
+        inline TextureCube* GetSkyboxTexture()
         {
-            return skyboxTextureCube; 
+            return skyboxTextureCube.get(); 
         }
-        inline Shared<TextureCube> GetIrradianceTexture()
+        inline TextureCube* GetIrradianceTexture()
         {
-            return irradianceTextureCube; 
+            return irradianceTextureCube.get(); 
         }
-        inline Shared<TextureCube> GetPrefilterTexture()
+        inline TextureCube* GetPrefilterTexture()
         { 
-            return prefilterTextureCube; 
+            return prefilterTextureCube.get(); 
         }
     private:
 

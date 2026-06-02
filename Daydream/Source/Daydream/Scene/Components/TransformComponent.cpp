@@ -20,34 +20,53 @@ namespace Daydream
 
 	}
 
-	Matrix4x4 TransformComponent::GetWorldMatrix()
+	const Matrix4x4& TransformComponent::GetWorldMatrix() const
 	{
-		Matrix4x4 localMat = transform.GetLocalMatrix();
-
-		GameEntity* owner = GetOwner();
-		if (owner)
+		if (isDirty)
 		{
-			GameEntity* parent = owner->GetParent();
+			Matrix4x4 localMat = transform.GetLocalMatrix();
+
 			if (parent)
 			{
-				auto parentTransform = parent->GetComponent<TransformComponent>();
-
-				return localMat * parentTransform->GetWorldMatrix();
+				worldMatrix = localMat * parent->GetWorldMatrix();
 			}
+			else
+			{
+				// 최상위 루트 오브젝트인 경우
+				worldMatrix = localMat;
+			}
+
+			// 2. 갱신을 완료했으니 플래그를 끕니다.
+			isDirty = false;
 		}
-		return localMat;
+		return worldMatrix;
 	}
 
-	void TransformComponent::SetTransform(Transform _transform)
+	void TransformComponent::SetParent(TransformComponent* _newParent)
 	{
-		transform = _transform;
+		if (parent)
+		{
+			parent->childs.erase(std::remove(parent->childs.begin(), parent->childs.end(), this), parent->childs.end());
+		}
+
+		parent = _newParent;
+
+		if (parent)
+		{
+			parent->childs.push_back(this);
+		}
+
+		SetDirty();
 	}
 
-	void TransformComponent::SetTransform(Vector3 _position, Vector3 _rotation, Vector3 _scale)
+	void TransformComponent::SetDirty()
 	{
-		transform.position = _position;
-		transform.rotation = _rotation;
-		transform.scale = _scale;
-	}
+		isDirty = true;
 
+		for (auto child : childs)
+		{
+			child->SetDirty();
+		}
+
+	}
 }

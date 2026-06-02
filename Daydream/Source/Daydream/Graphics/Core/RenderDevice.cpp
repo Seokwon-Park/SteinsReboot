@@ -12,8 +12,14 @@
 
 #include "Daydream/Graphics/Resources/Buffer.h"
 
+#include "Daydream/Graphics/Utility/GraphicsUtility.h"
+
 namespace Daydream
 {
+	UInt32 RenderDevice::GetAlignedRowPitch(UInt32 _width, RenderFormat _format) const
+	{
+		return _width * GraphicsUtility::GetRenderFormatSize(_format);
+	}
 	Unique<RenderDevice> RenderDevice::Create(RendererAPIType _API)
 	{
 		switch (_API)

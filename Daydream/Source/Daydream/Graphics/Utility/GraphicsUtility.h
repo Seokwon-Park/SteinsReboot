@@ -36,4 +36,5 @@ namespace Daydream::GraphicsUtility
 	String GetVendor(UInt32 _vendorCode);
 
 	Bool IsDepthFormat(RenderFormat _format);
+	Bool IsStencilFormat(RenderFormat _format);
 }

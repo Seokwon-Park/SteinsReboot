@@ -3,10 +3,10 @@
 
 #include "Daydream/Graphics/Core/Renderer.h"
 
+
 namespace Daydream
 {
 	Camera::Camera()
-		:viewMatrix(Matrix4x4()), projectionMatrix(Matrix4x4())
 	{
 		fovy = 60.0f;
 		aspectRatio = 1.6f / 0.9f;
@@ -27,74 +27,6 @@ namespace Daydream
 
 	}
 
-	const Matrix4x4& Camera::GetViewMatrix() const
-	{
-		return viewMatrix;
-	}
-	const Matrix4x4& Camera::GetProjectionMatrix() const
-	{
-		return projectionMatrix;
-	}
-	const Matrix4x4& Camera::GetViewProjectionMatrix()
-	{
-		return viewProjectionMatrix;
-	}
 
-	Vector3 Camera::GetForward()
-	{
-		return transform.GetForward();
-	}
-	Vector3 Camera::GetUp()
-	{
-		return transform.GetUp();
-	}
-	Vector3 Camera::GetRight()
-	{
-		return Vector3::Cross(GetUp(), GetForward());
-	}
 
-	void Camera::SetPosition(Vector3 _position)
-	{
-		transform.position = _position;
-		UpdateViewMatrix();
-	}
-	void Camera::UpdateAspectRatio(UInt32 _width, UInt32 _height)
-	{
-		aspectRatio = static_cast<Float32>(_width) / _height;
-		UpdateProjectionMatrix();
-	}
-	void Camera::UpdateViewProjectionMatrix()
-	{
-		viewProjectionMatrix = viewMatrix * projectionMatrix;
-		viewProjectionMatrix.Transpose();
-
-		CameraConstantBufferData data;
-		data.view = viewMatrix;
-		data.projection = projectionMatrix;
-		data.viewProjection = viewProjectionMatrix;
-
-		Renderer::UpdateConstantBuffer(viewProjectionBuffer, data);
-	}
-	void Camera::UpdateViewMatrix()
-	{
-		viewMatrix = Matrix4x4::CreateLookToLH(transform.position, transform.GetForward(), transform.GetUp());
-		UpdateViewProjectionMatrix();
-	}
-	void Camera::UpdateProjectionMatrix()
-	{
-		switch (projectionType)
-		{
-		case ProjectionType::Perspective:
-			projectionMatrix = Matrix4x4::CreatePerspectiveLH(Math::DegreeToRadian(fovy), aspectRatio, nearPlane, farPlane);
-			break;
-		case ProjectionType::Orthographic:
-		{
-			projectionMatrix = Matrix4x4::CreateOrthographicLH(-orthoSize * aspectRatio, orthoSize * aspectRatio, -orthoSize, orthoSize, nearPlane, farPlane);
-			break;
-		}
-		default:
-			break;
-		}
-		UpdateViewProjectionMatrix();
-	}
 }

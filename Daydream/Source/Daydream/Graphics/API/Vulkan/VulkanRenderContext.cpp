@@ -551,7 +551,7 @@ namespace Daydream
 		barrier.image = vkTexture->GetVkImage();
 		barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 		barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-		barrier.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
+		barrier.subresourceRange.aspectMask = GraphicsUtility::Vulkan::GetImageAspectFlags(vkTexture->GetFormat());
 		barrier.subresourceRange.baseArrayLayer = _baseLayer;
 		barrier.subresourceRange.layerCount = _layerCount;
 		barrier.subresourceRange.baseMipLevel = _baseMip;

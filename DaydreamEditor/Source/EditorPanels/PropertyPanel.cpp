@@ -79,7 +79,7 @@ namespace Daydream
 
                         if (draggedItemIndex != i)
                         {
-                            components[draggedItemIndex].swap(components[i]);
+                            selectedEntity->SwapComponentOrder(draggedItemIndex ,i);
                         }
                     }
                     ImGui::EndDragDropTarget();

@@ -11,15 +11,10 @@
 #include "Daydream/Graphics/Resources/Texture/TextureView.h"
 #include "Daydream/Graphics/Pools/TexturePool/Texture2DPool.h"
 #include "Daydream/Graphics/Pools/BufferPool/UploadBufferPool.h"
+#include "Daydream/Graphics/Pools/BufferPool/ConstantBufferPool.h"
 
 namespace Daydream
 {
-	struct ResourceCapturedData
-	{
-		UInt64 capturedLoop;
-		Array<Shared<GPUResource>> resources;
-	};
-
 	class Scene;
 	class Renderer
 	{
@@ -65,12 +60,6 @@ namespace Daydream
 		static void BeginRendering(const RenderingInfo& _renderingInfo);
 		static void EndRendering(const RenderingInfo& _renderingInfo);
 		static void BeginRendering(Swapchain* _swapchain, Color _clearColor);
-		//static void EndRendering(Swapchain* _swapchain);
-		//static void BeginRenderPass(const RenderPass>& _renderPass, const Framebuffer>& _framebuffer);
-		//static void EndRenderPass(const RenderPass>& _renderPass);
-
-		//static void BeginSwapchainRenderPass(Swapchain* _swapchain);
-		//static void EndSwapchainRenderPass(Swapchain* _swapchain);
 
 		static void BindPipelineState(const GraphicsPipelineState* _pipelineState);
 
@@ -100,12 +89,11 @@ namespace Daydream
 		static void DrawIndexed(UInt32 _indexCount);
 
 		static void CopyBuffer(const Buffer* _src, const Buffer* _dst, UInt32 _copySize, UInt32 _srcOffset, UInt32 _dstOffset);
-		static void CopyDataToTexture2D(const Texture2D* _target, const void* _data);
+		static void CopyBufferToTexture2D(const Buffer* _src, const Texture2D* _dst);
 
 		static void CopyTexture2D(const Texture2D* _src, const Texture2D* _dst);
 		static void CopyTexture2DToTextureCube(const Texture2D* _srcTexture2D, const TextureCube* _dstCubemap, UInt32 _faceIndex, UInt32 _mipLevel = 0);
 		static void CopyTextureCubeToTexture2D(const TextureCube* _srcCubemap, const Texture2D* _dstTexture2D, UInt32 _faceIndex, UInt32 _mipLevel = 0);
-
 
 		static void TransitionTextureState(const Texture* _texture,
 			ResourceState _beforeState,
@@ -148,7 +136,9 @@ namespace Daydream
 		inline static RenderDevice* GetRenderDevice() { return renderDevice.get(); }
 		inline static Skybox* GetSkybox() { return skybox.get(); }
 		inline static RenderCommandList* GetActiveCommandList() { return renderContext->GetActiveCommandList(); }
-		inline static Texture2DPool* GetRenderTargetPool() { return texturePool.get(); }
+		inline static Texture2DPool* GetTexturePool() { return texturePool.get(); }
+		inline static UploadBufferPool* GetUploadBufferPool() { return uploadBufferPool.get(); }
+		inline static ConstantBufferPool* GetConstantBufferPool() { return constantBufferPool.get(); }
 	private:
 		Renderer() = default;
 		static void InitRenderDevice(Daydream::RendererAPIType _API);
@@ -162,8 +152,9 @@ namespace Daydream
 
 		inline static Unique<Texture2DPool> texturePool;
 		inline static Unique<UploadBufferPool> uploadBufferPool;
+		inline static Unique<ConstantBufferPool> constantBufferPool;
 
-		inline static Array<IResourcePool> pools;
+		inline static Array<IResourcePool*> pools;
 		////////////////////////////////////////////////////////////////// 
 		// RenderThread
 		////////////////////////////////////////////////////////////////// 

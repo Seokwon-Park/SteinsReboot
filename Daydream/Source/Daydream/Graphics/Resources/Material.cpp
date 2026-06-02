@@ -33,7 +33,6 @@ namespace Daydream
 		}
 		textures[_name].handle = _textureHandle;
 		textures[_name].cache = AssetManager::GetAsset<Texture2D>(textures[_name].handle);
-
 	}
 
 	//void Material::SetTextureCube(const String& _name, Shared<TextureCube> _texture)

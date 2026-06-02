@@ -16,7 +16,7 @@ namespace Daydream
 
 	void GameEntity::Init()
 	{
-		AddComponent<TransformComponent>();
+	
 	}
 
 	void GameEntity::Update(Float32 _deltaTime)
@@ -27,12 +27,12 @@ namespace Daydream
 			component->Update(_deltaTime);
 		}
 	}
-	GameEntity* GameEntity::GetParent()
-	{
-		if (!scene) return nullptr;
+	//GameEntity* GameEntity::GetParent()
+	//{
+	//	if (!scene) return nullptr;
 
-		return scene->GetEntity(parentHandle);
-	}
+	//	return scene->GetEntity(parentHandle);
+	//}
 
 	bool GameEntity::IsDescendant(GameEntity* _target)
 	{
@@ -90,7 +90,7 @@ namespace Daydream
 				return; // 실패하면 아무것도 변경하지 않음
 			}
 
-			// 순환 참조 체크 (this의 새 부모 엔티티의 부모라인을 쭉 따라갔을 때 this를 부모로 두고 있으면 절대 안된다)
+			// 순환 참조 체크 (this의 새 부모 엔티티의 부모라인을 쭉 따라갔을 때 this를 부모로 두고 있으면 막음)
 			GameEntity* checkParent = newParent;
 			if (IsDescendant(checkParent))
 			{
@@ -98,7 +98,10 @@ namespace Daydream
 			}
 		}
 
-		if (parentHandle.IsValid())
+		//유효하지 않은 경우 newParent는 nullptr -> 다시말하면 부모 노드를 삭제하고싶다(RemoveParent)
+
+		//만약 기존 부모노드가 있는경우 부모노드로부터 자신을 제거해줘야한다.
+		if (HasParent())
 		{
 			GameEntity* oldParent = scene->GetEntity(parentHandle);
 			if (oldParent)
@@ -109,55 +112,57 @@ namespace Daydream
 		else
 		{
 			// 기존 부모가 없었다면, 씬의 루트 엔티티였음
-			scene->RemoveRootEntity(handle); // 씬의 루트 목록에서 'this' 제거
+			scene->RemoveFromRootEntity(handle); // 씬의 루트 목록에서 'this' 제거
 		}
 
-		// 5. 'this'의 부모 핸들을 새 핸들로 갱신
+		// this의 부모 핸들을 새 핸들로 갱신
 		parentHandle = _parentHandle;
 
-		// 6. 새 부모에 'this'를 자식으로 추가
-		if (newParent) // _parentHandle이 유효한 경우
+		auto transformComponent = GetComponent<TransformComponent>();
+		// 새 부모에 this를 자식으로 추가
+		if (newParent) // 새로운 부모가 있는경우
 		{
 			newParent->AddChildInternal(handle); // newParent의 자식 목록에 'this' 추가
+
+			if (transformComponent)
+			{
+				if (newParent->HasComponent<TransformComponent>())
+				{
+					transformComponent->SetParent(newParent->GetComponent<TransformComponent>());
+				}
+				else
+				{
+					// 논리적 부모는 생겼지만 공간적(Transform) 부모가 없는 경우, 
+					// 기존 트랜스폼 부모와의 연결은 끊음
+					transformComponent->SetParent(nullptr);
+				}
+			}
 		}
-		else
+		else //없는경우
 		{
 			// _parentHandle이 유효하지 않은 경우(nullptr), 'this'는 루트 엔티티가 됨
 			scene->AddRootEntity(handle); // 씬의 루트 목록에 'this' 추가
+			if (transformComponent)
+			{
+				transformComponent->SetParent(nullptr);
+			}
 		}
 	}
 
 	void GameEntity::RemoveParent()
 	{
-		if (!scene)
-		{
-			DAYDREAM_CORE_ERROR("Entity has no scene!");
-			return;
-		}
+		SetParent(EntityHandle());
+	}
 
-		// 이미 루트 엔티티인 경우
-		if (!parentHandle.IsValid())
-		{
-			DAYDREAM_CORE_WARN("Entity already has no parent.");
-			return;
-		}
-
-		// 기존 부모에서 제거
-		GameEntity* oldParent = scene->GetEntity(parentHandle);
-		if (oldParent)
-		{
-			oldParent->DetachChildInternal(handle);
-		}
-		else
-		{
-			DAYDREAM_CORE_WARN("Parent entity not found.");
-		}
-
-		// 부모 핸들 무효화
+	void GameEntity::ResetSelf()
+	{
+		components.clear();
+		componentMap.clear();
+		scene = nullptr;
 		parentHandle = EntityHandle();
-
-		// 루트 엔티티로 등록
-		scene->AddRootEntity(handle);
+		childrenHandles.clear();
+		name = "";
+		handle = EntityHandle();
 	}
 
 	void GameEntity::AddChildInternal(EntityHandle _childHandle)

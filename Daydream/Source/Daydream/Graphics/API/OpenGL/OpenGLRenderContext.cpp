@@ -70,7 +70,7 @@ namespace Daydream
 
 			if (attachmentDesc.loadOp == AttachmentLoadOp::Clear)
 			{
-				glClearNamedFramebufferfv(framebufferID, GL_COLOR, i, rtvClearValue.colorClearValue.color);
+				glClearNamedFramebufferfv(framebufferID, GL_COLOR, (GLint)i, rtvClearValue.colorClearValue.color);
 			}
 		}
 
@@ -102,7 +102,7 @@ namespace Daydream
 		for (UInt64 i = 0; i < _renderingInfo.colorAttachments.size(); i++)
 		{
 			glNamedFramebufferTexture(framebufferID,
-				GL_COLOR_ATTACHMENT0 + i,
+				GL_COLOR_ATTACHMENT0 + (GLenum)i,
 				0,
 				0);
 		}

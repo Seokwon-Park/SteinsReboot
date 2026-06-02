@@ -26,6 +26,8 @@ namespace Daydream
 		virtual Shared<Sampler> CreateSampler(const SamplerDesc& _desc) override;
 		virtual Unique<ImGuiRenderer> CreateImGuiRenderer() override;
 
+		virtual UInt32 GetAlignedRowPitch(UInt32 _width, RenderFormat _format) const override; 
+
 		ID3D12Device* GetDevice() const { return device.Get(); }
 		ID3D12CommandQueue* GetCommandQueue() const { return commandQueue.Get(); }
 
@@ -43,27 +45,6 @@ namespace Daydream
 		DynamicDescriptorHeapAllocator& GetDynamicSamplerHeapAlloc() { return dynamicSamplerHeapAlloc; }
 		DynamicDescriptorHeapAllocator& GetDynamicCBVSRVUAVHeapAlloc() { return dynamicCbvSrvUavHeapAlloc; }
 		IDXGIFactory7* GetFactory() const { return dxgiFactory.Get(); }
-
-		void ExecuteSingleTimeCommands(std::function<void(ID3D12GraphicsCommandList*)> commands);
-		ComPtr<ID3D12Resource> CreateBuffer(UINT64 _size,
-			D3D12_HEAP_TYPE _heapType,
-			D3D12_RESOURCE_STATES _initialState,
-			D3D12_RESOURCE_FLAGS _flags = D3D12_RESOURCE_FLAG_NONE);
-		void CopyBuffer(ID3D12Resource* _src, ID3D12Resource* _dst, UInt32 _dataSize);
-
-		ComPtr<ID3D12Resource> CreateTexture(
-			const D3D12_RESOURCE_DESC& _desc,
-			D3D12_RESOURCE_STATES _initialState
-		);
-
-		void CopyBufferToImage(ID3D12Resource* _src, ID3D12Resource* _dst, Array<D3D12_PLACED_SUBRESOURCE_FOOTPRINT> _subresourceFootprint);
-
-		void TransitionResourceState(
-			ID3D12GraphicsCommandList* _commandList,
-			ID3D12Resource* _resource,
-			D3D12_RESOURCE_STATES _stateBefore,
-			D3D12_RESOURCE_STATES _stateAfter);
-		void TransitionResourceStateImmediate(D3D12_RESOURCE_BARRIER _barrier);
 
 
 		//void WaitForGPU(IDXGISwapChain3* _swapChain);

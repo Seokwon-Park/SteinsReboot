@@ -10,24 +10,31 @@
 
 namespace Daydream
 {
+	namespace
+	{
+		bool IsSRGBTexture(const String& _path)
+		{
+			if (_path.find("_n.") != std::string::npos ||
+				_path.find("_N.") != std::string::npos ||
+				_path.find("_normal.") != std::string::npos ||
+				_path.find("_Normal.") != std::string::npos ||
+				_path.find("metal") != std::string::npos ||    // metallic, metalness µî
+				_path.find("rough") != std::string::npos ||    // roughness
+				_path.find("ao.") != std::string::npos ||      // ambient occlusion
+				_path.find("height.") != std::string::npos)    // height map
+			{
+				return false;
+			}
+			return true;
+		}
+	}
 	Shared<Texture2D> AssetImporter::LoadTexture2D(const AssetMetadata& _metaData)
 	{
 		Path texturePath = _metaData.filePath;
 		String pathString = texturePath.ToGenericString();
 		String extension = texturePath.GetExtensionString();
 
-		bool isSRGB = true;
-		if (pathString.find("_n.") != std::string::npos ||
-			pathString.find("_N.") != std::string::npos ||
-			pathString.find("_normal.") != std::string::npos ||
-			pathString.find("_Normal.") != std::string::npos ||
-			pathString.find("metal") != std::string::npos ||    // metallic, metalness µî
-			pathString.find("rough") != std::string::npos ||    // roughness
-			pathString.find("ao.") != std::string::npos ||      // ambient occlusion
-			pathString.find("height.") != std::string::npos)    // height map
-		{
-			isSRGB = false;
-		}
+		bool isSRGB = IsSRGBTexture(pathString);
 
 		ImageData data = ImageLoader::LoadImageFile(pathString);
 		Texture2DDesc desc{};
@@ -284,6 +291,7 @@ namespace Daydream
 		{
 			shaderType = ShaderType::Domain;
 		}
+
 		if (pathString.find("GS.") != std::string::npos)
 		{
 			shaderType = ShaderType::Geometry;

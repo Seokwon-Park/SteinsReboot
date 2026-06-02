@@ -61,20 +61,21 @@ namespace Daydream
 		{
 			if (ImGui::MenuItem("Create Empty Entity"))
 			{
-				GameEntity* newEntity = scene->CreateGameEntity();
-				if (newEntity)
+				EntityHandle newHandle = scene->CreateGameEntity();
+				if (GameEntity* entity = scene->GetEntity(newHandle))
 				{
-					newEntity->SetName("Empty Entity");
-					selectedEntity = newEntity;
+					entity->SetName("Empty Entity");
+					selectedEntity = entity;
 				}
 			}
 			if (ImGui::MenuItem("Create Camera"))
 			{
-				GameEntity* newEntity = scene->CreateGameEntity();
-				if (newEntity)
+				EntityHandle newHandle = scene->CreateGameEntity();
+				if (GameEntity* entity = scene->GetEntity(newHandle))
 				{
-					newEntity->SetName("Camera");
-					selectedEntity = newEntity;
+					entity->SetName("Camera");
+					entity->AddComponent<CameraComponent>();
+					selectedEntity = entity;
 				}
 			}
 			ImGui::EndPopup();
@@ -158,12 +159,12 @@ namespace Daydream
 		{
 			if (ImGui::MenuItem("Create Child Entity"))
 			{
-				GameEntity* newChild = scene->CreateGameEntity();
-				if (newChild)
+				EntityHandle newChild = scene->CreateGameEntity();
+				if (GameEntity* entity = scene->GetEntity(newChild))
 				{
-					newChild->SetName("Child Entity");
-					newChild->SetParent(_entity->GetHandle());
-					selectedEntity = newChild;
+					entity->SetName("Child Entity");
+					entity->SetParent(_entity->GetHandle());
+					selectedEntity = entity;
 				}
 			}
 			ImGui::Separator();

@@ -6,13 +6,13 @@
 
 namespace Daydream
 {
-	class UploadBufferPool : public ResourcePoolBase<UInt32, Shared<UploadBuffer>>
+	class ConstantBufferPool : public ResourcePoolBase<UInt32, Shared<ConstantBuffer>>
 	{
 	public:
-		UploadBufferPool();
-		virtual ~UploadBufferPool();
+		ConstantBufferPool();
+		virtual ~ConstantBufferPool();
 
-		Shared<UploadBuffer> RequestBuffer(UInt32 _size);
+		Shared<ConstantBuffer> RequestBuffer(UInt32 _size);
 	protected:
 
 	private:

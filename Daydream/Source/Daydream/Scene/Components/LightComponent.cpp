@@ -18,7 +18,5 @@ namespace Daydream
 	void LightComponent::Update(Float32 _deltaTime)
 	{
 		Transform transform = GetOwner()->GetComponent<TransformComponent>()->GetTransform();
-
-		light.UpdateViewMatrix(transform);
 	}
 }

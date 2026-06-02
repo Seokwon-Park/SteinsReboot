@@ -27,11 +27,17 @@ namespace Daydream
 		}
 
 		vk::ImageAspectFlags aspectMask = vk::ImageAspectFlagBits::eColor;
-		if (_desc.type == TextureViewType::DepthStencil)
+		if (GraphicsUtility::IsDepthFormat(_desc.format))
 		{
-			aspectMask = vk::ImageAspectFlagBits::eDepth | vk::ImageAspectFlagBits::eStencil;
+			if (_desc.type == TextureViewType::DepthStencil)
+			{
+				aspectMask = vk::ImageAspectFlagBits::eDepth | vk::ImageAspectFlagBits::eStencil;
+			}
+			else if (_desc.type == TextureViewType::ShaderResource)
+			{
+				aspectMask = vk::ImageAspectFlagBits::eDepth;
+			}
 		}
-				
 		vk::ImageViewCreateInfo viewInfo{};
 		viewInfo.image = _texture->GetVkImage();
 		viewInfo.viewType = viewType;

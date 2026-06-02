@@ -1,6 +1,7 @@
 #pragma once
 
 #include "SceneRenderer.h"
+#include "Daydream/Graphics/Resources/Struct/ViewProjectionData.h"
 
 namespace Daydream
 {
@@ -14,6 +15,8 @@ namespace Daydream
 	protected:
 
 	private:
+		ViewProjectionData lightViewProjData;
 
+		Shared<ConstantBuffer> lightViewProjectionBuffer;
 	};
 }

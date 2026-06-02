@@ -2,27 +2,14 @@
 
 #include "GameEntity/GameEntity.h"
 
-#include "Daydream/Graphics/Camera/Camera.h"
 #include "Daydream/Graphics/Resources/Light.h"
 
 namespace Daydream
 {
-
 	class ModelRendererComponent;
+	class CameraComponent;
 	class LightComponent;
 	class Skybox;
-
-	struct LightData
-	{
-		DirectionalLight dirLights[2] = {};
-		PointLight pointLights[4] = {};
-		SpotLight spotLights[4] = {}; // 최대 32개 라이트
-		Vector3 eyePos;
-		UInt32 dirLightCount = 0;
-		Vector2 padding1;
-		UInt32 pointLightCount = 0;
-		UInt32 spotLightCount = 0;
-	};
 
 	class Scene
 	{
@@ -30,18 +17,17 @@ namespace Daydream
 		Scene(const String& _name);
 		~Scene();
 
-		GameEntity* CreateGameEntity(const String& _name = "Entity");
-		GameEntity* CreateGameEntityFromModel(AssetHandle _modelHandle);
+		EntityHandle CreateGameEntity(const String& _name = "Entity");
+		EntityHandle CreateGameEntityFromModel(AssetHandle _modelHandle);
 		void DestroyEntity(EntityHandle _handle);
+
 		GameEntity* GetEntity(EntityHandle _handle);
 		const GameEntity* GetEntity(EntityHandle _handle) const;
 
 		bool IsHandleValid(EntityHandle _handle) const;
 
-		inline void SetCurrentCamera(Camera* _camera) { currentCamera = _camera; }
-		inline const Camera* GetCurrentCamera() const { return currentCamera; }
-
-		inline Shared<ConstantBuffer> GetLightConstantBuffer() const { return lightBuffer; }
+		inline void SetCurrentCameraComponent(EntityHandle _camera) { cameraEntity = _camera; }
+		inline const EntityHandle GetCurrentCamera() const { return cameraEntity; }
 
 		Skybox* GetSkybox() const;
 
@@ -52,13 +38,13 @@ namespace Daydream
 		const Array<EntityHandle>& GetRootEntities() const { return rootEntities; }
 
 		void AddRootEntity(EntityHandle _rootEntity);
-		void RemoveRootEntity(EntityHandle _rootEntity);
-		void ReorderRootEntity(EntityHandle _entityHandle, UInt64 _newIndex);
+		void RemoveFromRootEntity(EntityHandle _rootEntity);
 
-		//temp
-		LightComponent* GetLightComponent() { return firstLightComponent; }
+		//For Editor
+		void ReorderRootEntity(EntityHandle _entityHandle, UInt64 _newIndex);
+			
 	private:
-		void ProcessModelNode(GameEntity* _parentEntity, const NodeData& _curNode, const Model* _model);
+		void ProcessModelNode(EntityHandle _parentEntity, const NodeData& _curNode, const Model* _model);
 		String name;
 
 		Array<Unique<GameEntity>> entityPool;
@@ -69,17 +55,9 @@ namespace Daydream
 		Array<EntityHandle> activeEntities;
 		Array<EntityHandle> rootEntities;
 
-		Camera* currentCamera;
-
-		Array<EntityHandle> lightEntities;
-		Array<EntityHandle> modelRendererEntities;
-
-		LightData lightData;
-		Shared<ConstantBuffer> lightBuffer; 
-		//Array<SpriteRendererComponent*> spriteRenderers;
+		EntityHandle cameraEntity;
+		
 		Skybox* skybox;
 
-		//temp
-		LightComponent* firstLightComponent = nullptr;
 	};
 }

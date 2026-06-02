@@ -3,15 +3,34 @@
 #include "RenderGraph/RenderGraph.h"
 #include "Daydream/Scene/Scene.h"
 #include "Daydream/Graphics/Camera/Camera.h"
+#include "Daydream/Graphics/Resources//Struct/RenderDataTypes.h"
 
 namespace Daydream
 {
+    struct CameraData
+    {
+        Transform transform;
+        ViewProjectionData viewProj;
+    };
+
     struct SceneData
     {
         Scene* scene;
-        Camera* camera;
+        CameraData cameraData;
         UInt32 width;
         UInt32 height;
+    };
+
+    struct SceneLightingData
+    {
+        DirectionalLight dirLights[2] = {};
+        PointLight pointLights[4] = {};
+        SpotLight spotLights[4] = {}; // 최대 32개 라이트
+        Vector3 eyePos; 
+        UInt32 dirLightCount = 0;
+        Vector2 padding1;
+        UInt32 pointLightCount = 0;
+        UInt32 spotLightCount = 0;
     };
 
     class SceneRenderer
@@ -21,9 +40,22 @@ namespace Daydream
         virtual ~SceneRenderer();
 
         virtual void RenderScene(const SceneData& _sceneData) {};
+
+        Texture2D* GetResult() const { return result.get(); };
     protected:
-        RenderGraphDrawList CreateDrawListFromScene(Scene* _scene, Camera* _camera);
-       
+        RenderGraphDrawList CreateDrawListFromScene(Scene* _scene, const CameraData& _cameraData);
+        void PrepareLighting(Scene* _scene, const CameraData& _cameraData);
+
+        LightComponent* GetLightComponent() const { return mainLightComponent; }
+
+        LightComponent* mainLightComponent = nullptr;
+
+		Shared<Texture2D> result;
+		Shared<TextureView> resultRTV;
+
+        SceneLightingData lightData;
+        ViewProjectionData lightViewProj;
+        ViewProjectionData cameraViewProj;
         Shared<RenderGraph> renderGraph;
     };
 }

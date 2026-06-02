@@ -215,9 +215,11 @@ namespace Daydream
 		}
 		renderingInfo.colorAttachmentCount = colorAttachmentCount;
 		renderingInfo.pColorAttachmentFormats = colorFormats.data();
-		renderingInfo.depthAttachmentFormat = desc.depthStencilFormat == RenderFormat::UNKNOWN ?
-			vk::Format::eUndefined : 
-			GraphicsUtility::Vulkan::ConvertToVkFormat(desc.depthStencilFormat); // 깊이 버퍼 사용 시
+		renderingInfo.depthAttachmentFormat = GraphicsUtility::IsDepthFormat(desc.depthStencilFormat) ?
+			GraphicsUtility::Vulkan::ConvertToVkFormat(desc.depthStencilFormat) : vk::Format::eUndefined;
+			
+		renderingInfo.stencilAttachmentFormat = GraphicsUtility::IsStencilFormat(desc.depthStencilFormat) ?
+			GraphicsUtility::Vulkan::ConvertToVkFormat(desc.depthStencilFormat) : vk::Format::eUndefined;
 
 		vk::GraphicsPipelineCreateInfo pipelineInfo{};
 		pipelineInfo.stageCount = (UInt32)shaderStages.size();

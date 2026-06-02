@@ -14,7 +14,6 @@ struct PSOutput
 //================================================================================
 struct DirectionalLight
 {
-    matrix viewProjection;
     float3 direction;
     float intensity;
     float3 color;
@@ -53,15 +52,20 @@ cbuffer Lights : register(b2)
     uint spotLightCount;
 };
 
-cbuffer EditorData : register(b3) // 기존 Material이 b3였다면 b4로 밀거나 통합하세요
+cbuffer EditorData : register(b3) 
 {
     uint2 padding;
     uint selectedID; // 현재 선택된 Entity ID (0 = 아무것도 선택 안됨)
     int outlineThickness;
-    //float screenWidth; // 화면 너비 (ID 텍스처 Load()에 사용)
-    //float screenHeight; // 화면 높이 (ID 텍스처 Load()에 사용)
-    //float outlineThickness; // 외곽선 두께 (예: 1, 2, 3 픽셀)
 };
+
+cbuffer LightViewProjection : register(b4) 
+{
+    matrix lightView;
+    matrix lightProjection;
+    matrix lightViewProjection;
+};
+
 
 // (cbuffer Material : register(b3) ... )
 
@@ -73,54 +77,54 @@ cbuffer EditorData : register(b3) // 기존 Material이 b3였다면 b4로 밀거나 통합하
 //// G-Buffer 샘플링을 위한 샘플러 (Point Sampler 권장)
 //SamplerState g_PointSampler : register(s8);
 
-[[vk::combinedImageSampler]][[vk::binding(4, 0)]]
+[[vk::combinedImageSampler]][[vk::binding(5, 0)]]
 Texture2D PositionTexture : register(t0);
-[[vk::combinedImageSampler]][[vk::binding(4, 0)]]
+[[vk::combinedImageSampler]][[vk::binding(5, 0)]]
 SamplerState PositionTextureSampler : register(s0);
 
-[[vk::combinedImageSampler]][[vk::binding(5, 0)]]
+[[vk::combinedImageSampler]][[vk::binding(6, 0)]]
 Texture2D AlbedoTexture : register(t1);
-[[vk::combinedImageSampler]][[vk::binding(5, 0)]]
+[[vk::combinedImageSampler]][[vk::binding(6, 0)]]
 SamplerState AlbedoTextureSampler : register(s1);
 
-[[vk::combinedImageSampler]][[vk::binding(6, 0)]]
+[[vk::combinedImageSampler]][[vk::binding(7, 0)]]
 Texture2D NormalTexture : register(t2);
-[[vk::combinedImageSampler]][[vk::binding(6, 0)]]
+[[vk::combinedImageSampler]][[vk::binding(7, 0)]]
 SamplerState NormalTextureSampler : register(s2);
 
-[[vk::combinedImageSampler]][[vk::binding(7, 0)]]
+[[vk::combinedImageSampler]][[vk::binding(8, 0)]]
 Texture2D RMAOTexture : register(t3);
-[[vk::combinedImageSampler]][[vk::binding(7, 0)]]
+[[vk::combinedImageSampler]][[vk::binding(8, 0)]]
 SamplerState RMAOTextureSampler : register(s3);
 
-[[vk::combinedImageSampler]][[vk::binding(8, 0)]]
+[[vk::combinedImageSampler]][[vk::binding(9, 0)]]
 TextureCube IrradianceTexture : register(t4);
-[[vk::combinedImageSampler]][[vk::binding(8, 0)]]
+[[vk::combinedImageSampler]][[vk::binding(9, 0)]]
 SamplerState IrradianceTextureSampler : register(s4);
 
-[[vk::combinedImageSampler]][[vk::binding(9, 0)]]
+[[vk::combinedImageSampler]][[vk::binding(10, 0)]]
 TextureCube Prefilter : register(t5);
-[[vk::combinedImageSampler]][[vk::binding(9, 0)]]
+[[vk::combinedImageSampler]][[vk::binding(10, 0)]]
 SamplerState PrefilterSampler : register(s5);
 
-[[vk::combinedImageSampler]][[vk::binding(10, 0)]]
+[[vk::combinedImageSampler]][[vk::binding(11, 0)]]
 Texture2D BRDFLUT : register(t6);
-[[vk::combinedImageSampler]][[vk::binding(10, 0)]]
+[[vk::combinedImageSampler]][[vk::binding(11, 0)]]
 SamplerState BRDFLUTSampler : register(s6);
 
-[[vk::combinedImageSampler]][[vk::binding(11, 0)]]
+[[vk::combinedImageSampler]][[vk::binding(12, 0)]]
 Texture2D<uint> EntityIDTexture : register(t7);
-[[vk::combinedImageSampler]][[vk::binding(11, 0)]]
+[[vk::combinedImageSampler]][[vk::binding(12, 0)]]
 SamplerState EntityIDTextureSampler : register(s7);
 
-[[vk::combinedImageSampler]][[vk::binding(12, 0)]]
+[[vk::combinedImageSampler]][[vk::binding(13, 0)]]
 Texture2D<uint> OutlineTexture : register(t8);
-[[vk::combinedImageSampler]][[vk::binding(12, 0)]]
+[[vk::combinedImageSampler]][[vk::binding(13, 0)]]
 SamplerState OutlineTextureSampler : register(s8);
 
-[[vk::combinedImageSampler]][[vk::binding(13, 0)]]
+[[vk::combinedImageSampler]][[vk::binding(14, 0)]]
 Texture2D DepthTexture : register(t9);
-[[vk::combinedImageSampler]][[vk::binding(13, 0)]]
+[[vk::combinedImageSampler]][[vk::binding(14, 0)]]
 SamplerState DepthTextureSampler : register(s9);
 
 //================================================================================
@@ -314,7 +318,7 @@ PSOutput PSMain(PSInput input)
         if (i == 0)
         {
             DirectionalLight dirLight = dirLights[i];
-            float4 lightScreen = mul(float4(worldPosition, 1.0f), dirLight.viewProjection);
+            float4 lightScreen = mul(float4(worldPosition, 1.0f), lightViewProjection);
             lightScreen.xyz /= lightScreen.w;
         
         // 2. 카메라(광원)에서 볼 때의 텍스춰 좌표 계산

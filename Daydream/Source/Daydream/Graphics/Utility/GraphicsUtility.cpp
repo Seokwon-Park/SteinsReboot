@@ -388,7 +388,7 @@ namespace Daydream
 			return "";
 		}
 
-		Bool IsDepthFormat(RenderFormat _format)
+		bool IsDepthFormat(RenderFormat _format)
 		{
 			switch (_format)
 			{
@@ -396,6 +396,30 @@ namespace Daydream
 			case RenderFormat::D32_FLOAT:
 			case RenderFormat::D16_UNORM:
 			case RenderFormat::D32_FLOAT_S8X24_UINT:
+
+			case RenderFormat::R24G8_TYPELESS:
+			case RenderFormat::R32_TYPELESS:
+			case RenderFormat::R16_TYPELESS:
+			case RenderFormat::R32G8X24_TYPELESS:
+			case RenderFormat::R24_UNORM_X8_TYPELESS:
+			case RenderFormat::R32_FLOAT_X8X24_TYPELESS:
+				return true;
+			default:
+				return false;
+			}
+		}
+
+		bool IsStencilFormat(RenderFormat _format)
+		{
+			switch (_format)
+			{
+			case RenderFormat::D24_UNORM_S8_UINT:
+			case RenderFormat::D32_FLOAT_S8X24_UINT:
+
+			case RenderFormat::R24G8_TYPELESS:
+			case RenderFormat::R32G8X24_TYPELESS:
+			case RenderFormat::X24_TYPELESS_G8_UINT:
+			case RenderFormat::X32_TYPELESS_G8X24_UINT:
 				return true;
 			default:
 				return false;

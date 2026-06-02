@@ -78,10 +78,9 @@ namespace Daydream
 		virtual Shared<Sampler> CreateSampler(const SamplerDesc& _desc) = 0;
 		virtual Unique<ImGuiRenderer> CreateImGuiRenderer() = 0;
 
-		virtual void CopyTexture2D(Shared<Texture2D> _src, Shared<Texture2D> _dst) {};
-		virtual void CopyTextureToCubemapFace(TextureCube* _dstCubemap, UInt32 _faceIndex, Texture2D* _srcTexture2D, UInt32 _mipLevel = 0) {};
+		virtual UInt32 GetAlignedRowPitch(UInt32 _width, RenderFormat _format) const;
 
-		const RendererAPIInfo& GetAPIInfo() { return info; }
+		inline const RendererAPIInfo& GetAPIInfo() { return info; }
 
 		inline RendererAPIType GetAPI() const { return API; }
 

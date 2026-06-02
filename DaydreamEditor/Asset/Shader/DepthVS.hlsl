@@ -18,7 +18,7 @@ cbuffer World : register(b0)
     matrix invTranspose;
 };
 
-cbuffer LightSpace : register(b1)
+cbuffer LightViewProjection : register(b1)
 {
     matrix viewProjection;
 };

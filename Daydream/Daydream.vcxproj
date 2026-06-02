@@ -211,8 +211,6 @@
     <ClInclude Include="Source\Daydream\Graphics\API\Vulkan\VulkanTextureView.h" />
     <ClInclude Include="Source\Daydream\Graphics\API\Vulkan\VulkanUtility.h" />
     <ClInclude Include="Source\Daydream\Graphics\Camera\Camera.h" />
-    <ClInclude Include="Source\Daydream\Graphics\Camera\CameraController.h" />
-    <ClInclude Include="Source\Daydream\Graphics\Camera\EditorCamera.h" />
     <ClInclude Include="Source\Daydream\Graphics\Core\DeferredSceneRenderer.h" />
     <ClInclude Include="Source\Daydream\Graphics\Core\RenderCommandList.h" />
     <ClInclude Include="Source\Daydream\Graphics\Core\RenderCommandQueue.h" />
@@ -233,17 +231,15 @@
     <ClInclude Include="Source\Daydream\Graphics\Manager\SamplerRegistry.h" />
     <ClInclude Include="Source\Daydream\Graphics\Manager\ShaderGroupRegistry.h" />
     <ClInclude Include="Source\Daydream\Graphics\Manager\ShaderRegistry.h" />
-    <ClInclude Include="Source\Daydream\Graphics\Pools\BufferPool\UploadBufferHandle.h">
-      <SubType>
-      </SubType>
-    </ClInclude>
+    <ClInclude Include="Source\Daydream\Graphics\Pools\BufferPool\BufferPoolHandle.h" />
+    <ClInclude Include="Source\Daydream\Graphics\Pools\BufferPool\ConstantBufferPool.h" />
     <ClInclude Include="Source\Daydream\Graphics\Pools\BufferPool\UploadBufferPool.h" />
-    <ClInclude Include="Source\Daydream\Graphics\Pools\IResourcePool.h">
+    <ClInclude Include="Source\Daydream\Graphics\Pools\ResourcePoolBase.h">
       <SubType>
       </SubType>
     </ClInclude>
     <ClInclude Include="Source\Daydream\Graphics\Pools\TexturePool\Texture2DPool.h" />
-    <ClInclude Include="Source\Daydream\Graphics\Pools\TexturePool\Texture2DPoolHandle.h" />
+    <ClInclude Include="Source\Daydream\Graphics\Pools\TexturePool\Texture2DAllocation.h" />
     <ClInclude Include="Source\Daydream\Graphics\Pools\TexturePool\Texture2DPoolKey.h" />
     <ClInclude Include="Source\Daydream\Graphics\Resources\Buffer.h" />
     <ClInclude Include="Source\Daydream\Graphics\Resources\BuiltInResources.h" />
@@ -259,7 +255,12 @@
     <ClInclude Include="Source\Daydream\Graphics\Resources\SkeletalModel.h" />
     <ClInclude Include="Source\Daydream\Graphics\Resources\Skybox.h" />
     <ClInclude Include="Source\Daydream\Graphics\Resources\Sprite.h" />
-    <ClInclude Include="Source\Daydream\Graphics\Resources\Struct\TransformConstantBufferData.h" />
+    <ClInclude Include="Source\Daydream\Graphics\Resources\Struct\RenderDataTypes.h" />
+    <ClInclude Include="Source\Daydream\Graphics\Resources\Struct\ViewProjectionData.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="Source\Daydream\Graphics\Resources\Struct\TransformData.h" />
     <ClInclude Include="Source\Daydream\Graphics\Resources\Texture\Texture.h" />
     <ClInclude Include="Source\Daydream\Graphics\Resources\Texture\Texture2D.h" />
     <ClInclude Include="Source\Daydream\Graphics\Resources\Texture\TextureCube.h" />
@@ -821,7 +822,6 @@
     <ClCompile Include="Source\Daydream\Graphics\API\Vulkan\VulkanTextureView.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\API\Vulkan\VulkanUtility.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Camera\Camera.cpp" />
-    <ClCompile Include="Source\Daydream\Graphics\Camera\EditorCamera.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Core\DeferredSceneRenderer.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Core\OrthographicCamera.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Core\RenderCommandList.cpp" />
@@ -843,13 +843,10 @@
     <ClCompile Include="Source\Daydream\Graphics\Manager\SamplerRegistry.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Manager\ShaderGroupRegistry.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Manager\ShaderRegistry.cpp" />
-    <ClCompile Include="Source\Daydream\Graphics\Pools\BufferPool\UploadBufferHandle.cpp">
-      <SubType>
-      </SubType>
-    </ClCompile>
+    <ClCompile Include="Source\Daydream\Graphics\Pools\BufferPool\BufferPoolHandle.cpp" />
+    <ClCompile Include="Source\Daydream\Graphics\Pools\BufferPool\ConstantBufferPool.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Pools\BufferPool\UploadBufferPool.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Pools\TexturePool\Texture2DPool.cpp" />
-    <ClCompile Include="Source\Daydream\Graphics\Pools\TexturePool\Texture2DPoolHandle.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Pools\TexturePool\Texture2DPoolKey.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Resources\Buffer.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Resources\BuiltInResources.cpp" />
@@ -863,7 +860,11 @@
     <ClCompile Include="Source\Daydream\Graphics\Resources\Shader.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Resources\ShaderGroup.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Resources\Skybox.cpp" />
-    <ClCompile Include="Source\Daydream\Graphics\Resources\Struct\TransformConstantBufferData.cpp" />
+    <ClCompile Include="Source\Daydream\Graphics\Resources\Struct\ViewProjectionData.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Daydream\Graphics\Resources\Struct\TransformData.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Resources\Texture\Texture.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Resources\Texture\Texture2D.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Resources\Texture\TextureCube.cpp" />
@@ -880,6 +881,7 @@
     <ClCompile Include="Source\Daydream\ImGui\ImGuiLayer.cpp" />
     <ClCompile Include="Source\Daydream\ImGui\ImGuiRenderer.cpp" />
     <ClCompile Include="Source\Daydream\Project\Project.cpp" />
+    <ClCompile Include="Source\Daydream\Scene\Components\CameraComponent.cpp" />
     <ClCompile Include="Source\Daydream\Scene\Components\Component.cpp" />
     <ClCompile Include="Source\Daydream\Scene\Components\ComponentRegistry.cpp" />
     <ClCompile Include="Source\Daydream\Scene\Components\LightComponent.cpp" />

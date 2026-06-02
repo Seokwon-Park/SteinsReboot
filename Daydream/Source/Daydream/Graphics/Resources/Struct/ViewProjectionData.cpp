@@ -1,5 +1,5 @@
 #include "DaydreamPCH.h"
-#include "Texture2DPoolHandle.h"
+#include "ViewProjectionData.h"
 
 namespace Daydream
 {

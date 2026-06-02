@@ -15,13 +15,15 @@ namespace Daydream
 		GameEntity();
 		~GameEntity();
 
+		// 이름
 		inline const String& GetName() const { return name; }
 		inline void SetName(const String& _name) { name = _name; }
 
+		// 씬
 		inline Scene* GetScene() const { return scene; }
 		inline void SetScene(Scene* _scene) { scene = _scene; }
 
-		/// 자신의 핸들을 설정하고 가져오는 함수
+		// 자신의 핸들을 설정하고 가져오는 함수
 		inline const EntityHandle& GetHandle() const { return handle; }
 		inline void SetHandle(EntityHandle _handle) { handle = _handle; }
 
@@ -31,13 +33,16 @@ namespace Daydream
 		void Update(Float32 _deltaTime);
 
 		EntityHandle GetParentHandle() const { return parentHandle; }
-		GameEntity* GetParent();
+		bool HasParent() const { return parentHandle.IsValid(); }
 
 		void SetParent(EntityHandle _parentHandle);
 		void RemoveParent();
 
 		// 자식 핸들 목록을 반환
 		const Array<EntityHandle>& GetChildrenHandles() const { return childrenHandles; }
+		void ReorderChild(EntityHandle _childHandle, UInt64 _newIndex);
+
+		void ResetSelf();
 
 
 		template <class ComponentType>
@@ -63,6 +68,7 @@ namespace Daydream
 			std::type_index id = std::type_index(typeid(ComponentType));
 			if (componentMap.find(id) != componentMap.end())
 			{
+				DAYDREAM_CORE_WARN("Component is Alreay Exist!");
 				return nullptr;
 			}
 			componentMap[id] = rawPtr;
@@ -77,20 +83,17 @@ namespace Daydream
 			return itr != componentMap.end();
 		}
 
-		Array<Unique<Component>>& GetAllComponents() { return components; };
+		const Array<Unique<Component>>& GetAllComponents() const { return components; };
 
-		void Reset()
+		void SwapComponentOrder(UInt64 _indexA, UInt64 _indexB)
 		{
-			components.clear();
-			componentMap.clear();
-			scene = nullptr;
-			parentHandle = EntityHandle(); // 유효하지 않은 핸들로 초기화
-			childrenHandles.clear();
-			name = "";
-			handle = EntityHandle(); // 자기 자신 핸들도 초기화
+			if (_indexA < components.size() && _indexB < components.size())
+			{
+				std::swap(components[_indexA], components[_indexB]);
+			}
 		}
 
-		void ReorderChild(EntityHandle _childHandle, UInt64 _newIndex);
+
 	protected:
 
 	private:
@@ -98,8 +101,11 @@ namespace Daydream
 		void AddChildInternal(EntityHandle _childHandle);
 		void DetachChildInternal(EntityHandle _childHandle);
 
-		//Target is Descendant of this Entity?
+		//Target is Descendant of this Entity
 		bool IsDescendant(GameEntity* _target);
+		
+		// 객체의 이름(에디터에 표시될 이름)
+		String name;
 
 		Array<Unique<Component>> components;
 		HashMap<std::type_index, Component*> componentMap;
@@ -110,8 +116,6 @@ namespace Daydream
 		EntityHandle parentHandle;
 		Array<EntityHandle> childrenHandles;
 
-
-		String name;
 	};
 }
 

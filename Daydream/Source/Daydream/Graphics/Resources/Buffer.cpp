@@ -5,7 +5,6 @@
 #include "Daydream/Graphics/Core/Renderer.h"
 #include "Daydream/Graphics/Core/RenderContext.h"
 
-
 namespace Daydream
 {
 	GPUBuffer::GPUBuffer(const BufferDesc& _desc)
@@ -45,14 +44,18 @@ namespace Daydream
 
 		Shared<GPUBuffer> gpuBuffer = Renderer::GetRenderDevice()->CreateGPUBuffer(desc);
 		Shared<VertexBuffer> vertexBuffer = MakeShared<VertexBuffer>(gpuBuffer, _stride);
-		Shared<UploadBuffer> uploadBuffer = UploadBuffer::Create(_size);
+		Shared<UploadBuffer> uploadBuffer = Renderer::GetUploadBufferPool()->RequestBuffer(_size);
 		uploadBuffer->UpdateData(_initialData, _size);
 
+		//참조의 경우 uploadBuffer가 이 함수를 벗어나면서 파괴되기 때문에 mutable
 		Renderer::EnqueuePreFrameCommand([=]()
 			{
 				Renderer::CopyBuffer(uploadBuffer.get(), vertexBuffer.get(), _size, 0, 0);
 				Renderer::TransitionBufferState(vertexBuffer, ResourceState::CopyDest, ResourceState::VertexBuffer);
+
 			});
+
+		Renderer::GetUploadBufferPool()->ReturnResource(desc.size, std::move(uploadBuffer));
 
 		return vertexBuffer;
 	}
@@ -71,7 +74,7 @@ namespace Daydream
 
 		Shared<GPUBuffer> gpuBuffer = Renderer::GetRenderDevice()->CreateGPUBuffer(desc);
 		Shared<IndexBuffer> indexBuffer = MakeShared<IndexBuffer>(gpuBuffer, _count);
-		Shared<UploadBuffer> uploadBuffer = UploadBuffer::Create(desc.size);
+		Shared<UploadBuffer> uploadBuffer = Renderer::GetUploadBufferPool()->RequestBuffer(desc.size);
 		uploadBuffer->UpdateData(_indices, desc.size);
 
 		Renderer::EnqueuePreFrameCommand([=]()
@@ -80,6 +83,8 @@ namespace Daydream
 				Renderer::TransitionBufferState(indexBuffer, ResourceState::CopyDest, ResourceState::IndexBuffer);
 			}
 		);
+
+		Renderer::GetUploadBufferPool()->ReturnResource(desc.size, std::move(uploadBuffer));
 
 		return indexBuffer;
 	}
@@ -109,7 +114,6 @@ namespace Daydream
 
 	UploadBuffer::~UploadBuffer()
 	{
-		//DAYDREAM_RENDERER_INFO("UploadBuffer Destroyed");
 	}
 
 	Shared<UploadBuffer> UploadBuffer::Create(UInt32 _size)

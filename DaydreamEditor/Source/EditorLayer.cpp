@@ -43,13 +43,12 @@ namespace Daydream
 		maskPSO = ResourceManager::GetResource<GraphicsPipelineState>("MaskPSO");
 
 		///////////////////////////////////////////////////////
-		auto entity = activeScene->CreateGameEntity();
+		auto entity = activeScene->GetEntity(activeScene->CreateGameEntity());
 		entity->SetName("Test");
 
-		auto entity2 = activeScene->CreateGameEntity();
+		auto entity2 = activeScene->GetEntity(activeScene->CreateGameEntity());
 		entity2->SetName("Test2");
 
-		activeScene->SetCurrentCamera(editorCamera.get());
 		//Cubemap Mesh
 		//auto meshData = MeshGenerator::CreateCube(5.0f);
 		auto meshData = MeshGenerator::CreateSphere(100.0f, 20, 20);
@@ -64,18 +63,19 @@ namespace Daydream
 		cubeMesh = Mesh::Create(cubeVBO, cubeIBO);
 		/////////////////////////////////////////////////////////////////////////////////////
 
+		//activeScene->CreateGameEntityFromModel(AssetManager::GetAssetHandleByPath("Asset/Model/scene.gltf"));
 		activeScene->CreateGameEntityFromModel(AssetManager::GetAssetHandleByPath("Asset/Model/cerberusgun/scene.gltf"));
 
 		ModelRendererComponent* component = entity->AddComponent<ModelRendererComponent>();
 		component->SetModel(model.get());
 
-		ModelRendererComponent* component2 = entity2->AddComponent<ModelRendererComponent>();
-		component2->SetModel(AssetManager::GetAssetByPath<Model>("Asset/Model/cerberusgun/scene.gltf"));
+		//ModelRendererComponent* component2 = entity2->AddComponent<ModelRendererComponent>();
+		//component2->SetModel(AssetManager::GetAssetByPath<Model>("Asset/Model/cerberusgun/scene.gltf"));
 
 		//MeshRendererComponent* component3 = entity->AddComponent<MeshRendererComponent>();
 
 		////////////////////////Light////////////////////////////
-		auto lightEntity = activeScene->CreateGameEntity("Directional Light");
+		auto lightEntity = activeScene->GetEntity(activeScene->CreateGameEntity("Directional Light"));
 		lightEntity->AddComponent<LightComponent>();
 		//lightBuffer = Daydream::ConstantBuffer::Create(sizeof(LightData));
 
@@ -100,8 +100,8 @@ namespace Daydream
 	{
 		editorCamera->Update(_deltaTime);
 		sceneHierarchyPanel->Update();
-		Matrix4x4 mat = editorCamera->GetViewProjectionMatrix();
-		Renderer::UpdateConstantBuffer(viewProjMat, mat);
+		//Matrix4x4 mat = editorCamera->GetViewProjectionMatrix();
+		//Renderer::UpdateConstantBuffer(viewProjMat, mat);
 
 		if (isViewControlled)
 		{
@@ -119,7 +119,7 @@ namespace Daydream
 		activeScene->Update(_deltaTime);
 
 		SceneData sceneData;
-		sceneData.camera = editorCamera.get();
+		sceneData.cameraData = editorCamera->GetCameraData();
 		sceneData.scene = activeScene.get();
 		sceneData.width = 1920;
 		sceneData.height = 1080;
@@ -277,6 +277,7 @@ namespace Daydream
 
 		ImGui::Image((ImTextureID)AssetManager::GetAssetByPath<Texture2D>("Resource/skybox.hdr")->GetOrCreateDefaultSRV()->GetUIHandle(), ImVec2{ viewportSize.x / 3,viewportSize.y / 3 });
 
+
 		//for (int i = 0; i < 4; i++)
 		//{
 		//	auto t = gBufferFramebuffer->GetColorAttachmentTexture(i);
@@ -326,6 +327,8 @@ namespace Daydream
 		isViewportHovered = ImGui::IsWindowHovered();
 
 		Application::GetInstance().GetImGuiLayer()->BlockEvents(!isViewportFocused && !isViewportHovered);
+
+		ImGui::Image((ImTextureID)sceneRenderer->GetResult()->GetOrCreateDefaultSRV()->GetUIHandle(), ImVec2{ viewportSize.x,viewportSize.y });
 
 		//Shared<Texture2D> viewportTexture = nullptr;
 		//switch (viewIndex)
@@ -411,7 +414,7 @@ namespace Daydream
 			if (ImGuizmo::IsUsing())
 			{
 				Matrix4x4 newLocalMat;
-				GameEntity* parent = selectedEntity->GetParent();
+				GameEntity* parent = activeScene->GetEntity(selectedEntity->GetParentHandle());
 
 				if (parent != nullptr)
 				{
@@ -534,7 +537,7 @@ namespace Daydream
 				viewportSize.y = ImGuiViewportSize.y;
 				mainWindowSize.x = ImGui::GetMainViewport()->Size.x;
 				mainWindowSize.y = ImGui::GetMainViewport()->Size.y;
-				editorCamera->UpdateAspectRatio(ImGuiViewportSize.x, ImGuiViewportSize.y);
+				//editorCamera->UpdateAspectRatio(ImGuiViewportSize.x, ImGuiViewportSize.y);
 				//Renderer::UpdateConstantBuffer(viewProjMat, editorCamera->GetViewProjectionMatrix());
 			}
 		}
@@ -576,6 +579,7 @@ namespace Daydream
 		EventDispatcher dispatcher(_event);
 		dispatcher.Dispatch<KeyPressedEvent>(BIND_EVENT_FN(EditorLayer::OnKeyPressed));
 		dispatcher.Dispatch<MouseButtonPressedEvent>(BIND_EVENT_FN(EditorLayer::OnMouseButtonPressed));
+		dispatcher.Dispatch<MouseButtonReleasedEvent>(BIND_EVENT_FN(EditorLayer::OnMouseButtonReleased));
 	}
 
 	bool EditorLayer::OnKeyPressed(KeyPressedEvent& _event)
@@ -642,14 +646,13 @@ namespace Daydream
 
 	bool EditorLayer::OnMouseButtonPressed(MouseButtonPressedEvent& _e)
 	{
+		DAYDREAM_CORE_TRACE("{0}", _e.ToString());
+
 		if (isViewportHovered && Input::GetMouseDown(Mouse::ButtonRight))
 		{
 			isViewControlled = true;
 		}
-		if (Input::GetMouseReleased(Mouse::ButtonRight))
-		{
-			isViewControlled = false;
-		}
+
 
 		if (isViewportHovered && !isGuizmoInteract && Input::GetMouseDown(Mouse::ButtonLeft))
 		{
@@ -662,6 +665,15 @@ namespace Daydream
 		}
 		//DAYDREAM_INFO("Mouse Coord = {0}, {1}", GetViewportMousePos().first, GetViewportMousePos().second);
 
+		return false;
+	}
+
+	bool EditorLayer::OnMouseButtonReleased(MouseButtonReleasedEvent& _e)
+	{
+		if (_e.GetMouseButton() == Mouse::ButtonRight)
+		{
+			isViewControlled = false;
+		}
 		return false;
 	}
 

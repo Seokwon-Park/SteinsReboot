@@ -489,12 +489,6 @@
     <ClInclude Include="Source\Daydream\Graphics\Camera\Camera.h">
       <Filter>Source\Daydream\Graphics\Camera</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Daydream\Graphics\Camera\CameraController.h">
-      <Filter>Source\Daydream\Graphics\Camera</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Daydream\Graphics\Camera\EditorCamera.h">
-      <Filter>Source\Daydream\Graphics\Camera</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Daydream\Graphics\Core\DeferredSceneRenderer.h">
       <Filter>Source\Daydream\Graphics\Core</Filter>
     </ClInclude>
@@ -561,9 +555,6 @@
     <ClInclude Include="Source\Daydream\Graphics\Pools\TexturePool\Texture2DPool.h">
       <Filter>Source\Daydream\Graphics\Pools\TexturePool</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Daydream\Graphics\Pools\TexturePool\Texture2DPoolHandle.h">
-      <Filter>Source\Daydream\Graphics\Pools\TexturePool</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Daydream\Graphics\Pools\TexturePool\Texture2DPoolKey.h">
       <Filter>Source\Daydream\Graphics\Pools\TexturePool</Filter>
     </ClInclude>
@@ -609,7 +600,7 @@
     <ClInclude Include="Source\Daydream\Graphics\Resources\Sprite.h">
       <Filter>Source\Daydream\Graphics\Resources</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Daydream\Graphics\Resources\Struct\TransformConstantBufferData.h">
+    <ClInclude Include="Source\Daydream\Graphics\Resources\Struct\TransformData.h">
       <Filter>Source\Daydream\Graphics\Resources\Struct</Filter>
     </ClInclude>
     <ClInclude Include="Source\Daydream\Graphics\Resources\Texture\Texture.h">
@@ -2034,8 +2025,12 @@
     <ClInclude Include="Vendor\stb\stb_image.h">
       <Filter>Vendor\stb</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Daydream\Graphics\Pools\IResourcePool.h" />
-    <ClInclude Include="Source\Daydream\Graphics\Pools\BufferPool\UploadBufferHandle.h" />
+    <ClInclude Include="Source\Daydream\Graphics\Pools\ResourcePoolBase.h" />
+    <ClInclude Include="Source\Daydream\Graphics\Resources\Struct\ViewProjectionData.h" />
+    <ClInclude Include="Source\Daydream\Graphics\Pools\TexturePool\Texture2DAllocation.h" />
+    <ClInclude Include="Source\Daydream\Graphics\Resources\Struct\RenderDataTypes.h" />
+    <ClInclude Include="Source\Daydream\Graphics\Pools\BufferPool\BufferPoolHandle.h" />
+    <ClInclude Include="Source\Daydream\Graphics\Pools\BufferPool\ConstantBufferPool.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Base\IO\File.cpp">
@@ -2293,9 +2288,6 @@
     <ClCompile Include="Source\Daydream\Graphics\Camera\Camera.cpp">
       <Filter>Source\Daydream\Graphics\Camera</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Daydream\Graphics\Camera\EditorCamera.cpp">
-      <Filter>Source\Daydream\Graphics\Camera</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Daydream\Graphics\Core\DeferredSceneRenderer.cpp">
       <Filter>Source\Daydream\Graphics\Core</Filter>
     </ClCompile>
@@ -2365,9 +2357,6 @@
     <ClCompile Include="Source\Daydream\Graphics\Pools\TexturePool\Texture2DPool.cpp">
       <Filter>Source\Daydream\Graphics\Pools\TexturePool</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Daydream\Graphics\Pools\TexturePool\Texture2DPoolHandle.cpp">
-      <Filter>Source\Daydream\Graphics\Pools\TexturePool</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Daydream\Graphics\Pools\TexturePool\Texture2DPoolKey.cpp">
       <Filter>Source\Daydream\Graphics\Pools\TexturePool</Filter>
     </ClCompile>
@@ -2407,7 +2396,7 @@
     <ClCompile Include="Source\Daydream\Graphics\Resources\Skybox.cpp">
       <Filter>Source\Daydream\Graphics\Resources</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Daydream\Graphics\Resources\Struct\TransformConstantBufferData.cpp">
+    <ClCompile Include="Source\Daydream\Graphics\Resources\Struct\TransformData.cpp">
       <Filter>Source\Daydream\Graphics\Resources\Struct</Filter>
     </ClCompile>
     <ClCompile Include="Source\Daydream\Graphics\Resources\Texture\Texture.cpp">
@@ -2509,6 +2498,9 @@
     <ClCompile Include="Vendor\stb\stb_image.cpp">
       <Filter>Vendor\stb</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Daydream\Graphics\Pools\BufferPool\UploadBufferHandle.cpp" />
+    <ClCompile Include="Source\Daydream\Graphics\Pools\BufferPool\BufferPoolHandle.cpp" />
+    <ClCompile Include="Source\Daydream\Graphics\Resources\Struct\ViewProjectionData.cpp" />
+    <ClCompile Include="Source\Daydream\Scene\Components\CameraComponent.cpp" />
+    <ClCompile Include="Source\Daydream\Graphics\Pools\BufferPool\ConstantBufferPool.cpp" />
   </ItemGroup>
 </Project>

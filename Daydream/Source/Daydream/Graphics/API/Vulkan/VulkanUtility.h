@@ -16,6 +16,7 @@ namespace Daydream::GraphicsUtility::Vulkan
 {
 	Pair<vk::PipelineStageFlags, vk::AccessFlags> ConvertToVulkanStageAndAccess(ResourceState _state);
 	vk::ImageLayout ConvertToVulkanImageLayout(ResourceState _state);
+	vk::ImageAspectFlags GetImageAspectFlags(RenderFormat _format);
 
 	vk::BufferCreateInfo ConvertToVkImageCreateInfo(const BufferDesc& _desc);
 	vma::AllocationCreateInfo ConvertToVMAAllocationInfo(const BufferDesc& _desc);

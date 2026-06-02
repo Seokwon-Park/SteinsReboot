@@ -31,6 +31,7 @@
     <ClInclude Include="Source\EditorPanels\ViewportPanel.h">
       <Filter>EditorPanels</Filter>
     </ClInclude>
+    <ClInclude Include="Source\EditorCamera.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\EditorApp.cpp" />
@@ -53,5 +54,6 @@
     <ClCompile Include="Source\EditorPanels\ViewportPanel.cpp">
       <Filter>EditorPanels</Filter>
     </ClCompile>
+    <ClCompile Include="Source\EditorCamera.cpp" />
   </ItemGroup>
 </Project>

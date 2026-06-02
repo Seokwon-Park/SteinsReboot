@@ -19,13 +19,4 @@ namespace Daydream
     //    //    _texture->SetSampler(ResourceManager::GetResource<Sampler>("LinearRepeat"));
     //    //}
     //}
-
-    void Daydream::RenderContext::CopyDataToTexture(const GPUTexture* _dst, const void* _data)
-    {
-        //Shared<UploadBuffer> uploadBuffer = UploadBuffer::Create(_data->size());
-        //uploadBuffer->UpdateData(_data->data(), _data->size());
-        //CopyBufferToTexture(uploadBuffer->GetGPUBuffer(), _target->GetGPUTexture());
-    }
-
-
 }

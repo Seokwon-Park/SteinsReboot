@@ -13,7 +13,6 @@ struct PSOutput
     float4 normal : SV_Target1;
     float4 albedo : SV_Target2;
     float4 material : SV_Target3;
-    uint entityHandle : SV_Target4;
 };
 
 cbuffer Entity : register(b2)
@@ -83,7 +82,6 @@ PSOutput PSMain(PSInput input)
     output.albedo = albedo;
     //output.albedo = float4(1.0f, 1.0f, 0.0f, 1.0f);
     output.material = float4(MRAO, 1.0f);
-    output.entityHandle = entityHandle;
     
     return output;
 }

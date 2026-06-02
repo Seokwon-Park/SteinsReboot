@@ -8,9 +8,11 @@
 #include "D3D12Buffer.h"
 #include "D3D12Framebuffer.h"
 #include "D3D12Utility.h"
+#include "Daydream/Asset/AssetManager.h"
 #include "Daydream/Graphics/Resources/Mesh.h"
 #include "Daydream/Graphics/Manager/ResourceManager.h"
 #include "Daydream/Graphics/Core/Renderer.h"
+
 
 namespace Daydream
 {
@@ -174,17 +176,7 @@ namespace Daydream
 		GetD3D12ActiveCommandList()->SetGraphicsRootDescriptorTable(d3d12PipelineState->GetDescriptorTableIndex(samplerName), d3d12Sampler->GetSamplerHandle());
 	}
 
-	//	DAYDREAM_CORE_ASSERT(device->GetAPI() == RendererAPIType::DirectX12, "Wrong API!");
-	//	Shared<D3D12TextureCube> d3d12Tex = SharedCast<D3D12TextureCube>(_textureCube);
-	//	GetD3D12ActiveCommandList()->SetGraphicsRootDescriptorTable(d3d12PipelineState->GetDescriptorTableIndex(_name), d3d12Tex->GetSRVGPUHandle());
-	//	String samplerName = _name + "Sampler";
-	//	const ShaderReflectionData* samplerInfo = activePipelineState->GetBindingInfo(_name);
-	//	if (samplerInfo)
-	//	{
-	//		GetD3D12ActiveCommandList()->SetGraphicsRootDescriptorTable(d3d12PipelineState->GetDescriptorTableIndex(samplerName), d3d12Tex->GetSamplerHandle());
-	//	}
-	//}
-	void Daydream::D3D12RenderContext::BindConstantBuffer(const String& _name, const GPUBuffer* _buffer)
+	void D3D12RenderContext::BindConstantBuffer(const String& _name, const GPUBuffer* _buffer)
 	{
 		if (_buffer == nullptr) return;
 		const D3D12GraphicsPipelineState* d3d12PipelineState = Cast<const D3D12GraphicsPipelineState*>(currentGraphicsPipelineState);
@@ -380,7 +372,7 @@ namespace Daydream
 
 
 		auto generateMipPSO = ResourceManager::GetResource<GraphicsPipelineState>("GenerateMipsPSO");
-		auto quadMesh = ResourceManager::GetResource<Mesh>("Quad");
+		auto quadMesh = AssetManager::GetAsset<Mesh>(AssetDefaults::DefaultQuadMeshHandle);
 
 		BindPipelineState(generateMipPSO);
 		D3D12GraphicsPipelineState* d3d12PipelineState = Cast<D3D12GraphicsPipelineState*>(generateMipPSO);

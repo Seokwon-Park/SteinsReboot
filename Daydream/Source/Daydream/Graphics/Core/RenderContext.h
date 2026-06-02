@@ -74,7 +74,7 @@ namespace Daydream
 
 		// Uploads raw pixel data to the texture. 
 		// Backends may override this to handle API-specific memory alignment requirements.
-		virtual void CopyDataToTexture(const GPUTexture* _dst, const void* _data);
+		virtual void CopyDataToTexture(const GPUTexture* _dst, const void* _data) {};
 		virtual void CopyTexture(const GPUTexture* _src, const GPUTexture* _dst, const TextureCopyRegion& _region) {};
 
 		virtual void GenerateMips(GPUTexture* _texture) {};

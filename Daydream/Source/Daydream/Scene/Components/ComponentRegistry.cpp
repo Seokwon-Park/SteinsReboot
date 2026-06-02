@@ -3,6 +3,7 @@
 
 #include "LightComponent.h"
 #include "MeshRendererComponent.h"
+#include "CameraComponent.h"
 
 namespace Daydream
 {
@@ -14,6 +15,7 @@ namespace Daydream
 		REGISTER_COMPONENT(LightComponent);
 		REGISTER_COMPONENT(ModelRendererComponent);
 		REGISTER_COMPONENT(MeshRendererComponent);
+		REGISTER_COMPONENT(CameraComponent);
 	}
 
 	void ComponentRegistry::Shutdown()

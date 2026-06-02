@@ -323,4 +323,5 @@ namespace Daydream
 		Back
 	};
 
+	enum class ProjectionType { Orthographic, Perspective };
 }

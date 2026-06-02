@@ -99,6 +99,27 @@ namespace Daydream::GraphicsUtility::Vulkan
 		}
 	}
 
+	vk::ImageAspectFlags GetImageAspectFlags(RenderFormat _format)
+	{
+		switch (_format)
+		{
+			// 1. 깊이(Depth) 전용 포맷
+		case RenderFormat::D16_UNORM:
+		case RenderFormat::D32_FLOAT:
+			return vk::ImageAspectFlagBits::eDepth;
+
+			// 2. 깊이(Depth) + 스텐실(Stencil) 혼합 포맷
+			// DX12의 R24G8_TYPELESS와 대응되는 가장 흔한 DSV 포맷들입니다.
+		case RenderFormat::D24_UNORM_S8_UINT:
+			return vk::ImageAspectFlagBits::eDepth | vk::ImageAspectFlagBits::eStencil;
+
+			// 4. 그 외의 모든 포맷 (R8G8B8A8 등)
+			// 깊이/스텐실이 아닌 모든 일반 텍스처는 전부 Color 마스크로 퉁칩니다.
+		default:
+			return vk::ImageAspectFlagBits::eColor;
+		}
+	}
+
 	vk::BufferCreateInfo ConvertToVkImageCreateInfo(const BufferDesc& _desc)
 	{
 		vk::BufferCreateInfo bufferInfo{};

@@ -25,6 +25,12 @@ namespace Daydream
 		imguiRenderer = renderDevice->CreateImGuiRenderer();
 
 		texturePool = MakeUnique<Texture2DPool>();
+		pools.push_back(texturePool.get());
+		uploadBufferPool = MakeUnique<UploadBufferPool>();
+		pools.push_back(uploadBufferPool.get());
+		constantBufferPool = MakeUnique<ConstantBufferPool>();
+		pools.push_back(constantBufferPool.get());
+
 
 		commandQueues.resize(MaxCommandListsInFlight);
 		for (auto& commandList : commandQueues)
@@ -79,6 +85,12 @@ namespace Daydream
 			renderThread->Stop();
 			renderThread = nullptr;
 		}
+
+		pools.clear();
+		texturePool = nullptr;
+		uploadBufferPool = nullptr;
+		constantBufferPool= nullptr;
+
 		skybox = nullptr;
 		imguiRenderer->Shutdown();
 		renderContext.reset();
@@ -135,7 +147,6 @@ namespace Daydream
 				renderContext->SetActiveCommandList(_swapchain->GetCurrentCommandList());
 				//clear CapturedBuffer Safe
 				//renderContext->ReleaseCapturedBuffer();
-
 			});
 	}
 
@@ -301,18 +312,17 @@ namespace Daydream
 
 	void Renderer::CopyBuffer(const Buffer* _src, const Buffer* _dst, UInt32 _copySize, UInt32 _srcOffset, UInt32 _dstOffset)
 	{
-
 		EnqueueCommand([_src, _dst, _copySize, _srcOffset, _dstOffset]()
 			{
 				renderContext->CopyBuffer(_src->GetGPUBuffer(), _dst->GetGPUBuffer(), _copySize, _srcOffset, _dstOffset);
 			});
 	}
 
-	void Renderer::CopyDataToTexture2D(const Texture2D* _dst, const void* _data)
+	void Daydream::Renderer::CopyBufferToTexture2D(const Buffer* _src, const Texture2D* _dst)
 	{
-		EnqueueCommand([_dst, _data]()
+		EnqueueCommand([_src, _dst]()
 			{
-				renderContext->CopyDataToTexture(_dst->GetGPUTexture(), _data);
+				renderContext->CopyBufferToTexture(_src->GetGPUBuffer(), _dst->GetGPUTexture());
 			});
 	}
 
@@ -344,7 +354,7 @@ namespace Daydream
 				region.srcSubresource.baseLayer = 0;
 				region.srcSubresource.layerCount = 1;
 
-				region.dstSubresource.mipLevel = _mipLevel;   
+				region.dstSubresource.mipLevel = _mipLevel;
 				region.dstSubresource.baseLayer = _faceIndex;
 				region.dstSubresource.layerCount = 1;
 
@@ -375,6 +385,7 @@ namespace Daydream
 
 	void Renderer::TransitionTextureState(const Texture* _texture, ResourceState _beforeState, ResourceState _afterState, UInt32 _baseMip, UInt32 _mipLevels, UInt32 _baseLayer, UInt32 _layerCount)
 	{
+		if (_beforeState == _afterState) return;
 		EnqueueCommand([_texture, _beforeState, _afterState, _baseMip, _mipLevels, _baseLayer, _layerCount]()
 			{
 				renderContext->TransitionTextureState(_texture->GetGPUTexture(), _beforeState, _afterState, _baseMip, _mipLevels, _baseLayer, _layerCount);
@@ -458,7 +469,15 @@ namespace Daydream
 			//싱글 스레드일 경우 그냥 실행
 			submittedQueue->Execute();
 		}
-
+		for (IResourcePool* pool : pools)
+		{
+			pool->FlushInFlight();
+			pool->CleanUp(); // If not used for 100 frames, remove from pool
+		}
 		currentLoop += 1;
+		for (IResourcePool* pool : pools)
+		{
+			pool->UpdatePoolState(currentLoop);
+		}
 	}
 }

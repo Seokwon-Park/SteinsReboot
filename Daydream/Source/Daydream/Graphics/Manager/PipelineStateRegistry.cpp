@@ -85,7 +85,6 @@ namespace Daydream
 			RenderFormat::R16G16B16A16_FLOAT, // Normal
 			RenderFormat::R8G8B8A8_UNORM,     // Albedo
 			RenderFormat::R8G8B8A8_UNORM,     // Material
-			RenderFormat::R32_UINT            // EntityID
 		};
 		psoDesc.depthStencilFormat = RenderFormat::R24G8_TYPELESS;
 		registry["GBufferPSO"] = GraphicsPipelineState::Create(psoDesc);

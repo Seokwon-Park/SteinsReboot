@@ -1,15 +1,18 @@
 #include "DaydreamPCH.h"
 #include "RenderGraph.h"
 
+#include "Daydream/Asset/AssetManager.h"
 #include "Daydream/Graphics/Core/Renderer.h"
-#include "Daydream/Graphics/Resources/Struct/TransformConstantBufferData.h"
+#include "Daydream/Graphics/Resources/Struct/TransformData.h"
+#include "Daydream/Graphics/Resources/BuiltInResources.h"
 #include "Daydream/Graphics/Utility/GraphicsUtility.h"
 
 namespace Daydream
 {
 	RenderGraph::RenderGraph()
 	{
-		transformCB = ConstantBuffer::Create(sizeof(TransformConstantBufferData));
+
+		quadMesh = AssetManager::GetAsset<Mesh>(AssetDefaults::DefaultQuadMeshHandle);
 	}
 
 	RenderGraph::~RenderGraph()
@@ -27,9 +30,44 @@ namespace Daydream
 		node.firstPass = UINT32_MAX;
 		node.lastPass = 0;
 
+		node.currentState = ResourceState::Undefined;
+
 		resources.push_back(std::move(node));
 		return { static_cast<UInt32>(resources.size() - 1) };
 	}
+	RenderGraphResourceHandle RenderGraph::AddExternalWriteResource(const String& _name, const Shared<Texture2D>& _texture)
+	{
+		ResourceNode node{};
+		node.name = _name;
+		node.format = _texture->GetFormat();
+		node.width = _texture->GetWidth();
+		node.height = _texture->GetHeight();
+
+		node.allocation.texture = _texture;
+
+		TextureViewDesc rtvDesc{};
+		rtvDesc.type = TextureViewType::RenderTarget;
+		rtvDesc.baseMip = 0;
+		rtvDesc.mipLevels = 1;
+		rtvDesc.baseLayer = 0;
+		rtvDesc.layerCount = 1;
+		node.allocation.renderTargetView = TextureView::Create(_texture, rtvDesc);
+
+		TextureViewDesc srvDesc{};
+		srvDesc.type = TextureViewType::ShaderResource;
+		srvDesc.baseMip = 0;
+		srvDesc.mipLevels = 1;
+		srvDesc.baseLayer = 0;
+		srvDesc.layerCount = 1;
+		node.allocation.shaderResourceView = TextureView::Create(_texture, srvDesc);
+
+		node.isExternal = true;
+		node.currentState = ResourceState::RenderTarget;
+
+		resources.push_back(node);
+		return { static_cast<UInt32>(resources.size() - 1) };
+	}
+
 	RenderGraphPassHandle RenderGraph::AddPass(const String& _name, const RenderGraphPassDesc& _desc)
 	{
 		PassNode node{};
@@ -37,7 +75,8 @@ namespace Daydream
 		node.pipelineState = _desc.pipelineState;
 		node.drawType = _desc.drawType;
 		node.drawList = _desc.drawList;
-
+		node.constantBufferData = _desc.constantBufferData;
+		node.shaderResourceViews = _desc.shaderResourceViews;
 		//node contains Shared pointer
 		passes.push_back(std::move(node));
 		return { static_cast<UInt32>(passes.size() - 1) };
@@ -53,7 +92,19 @@ namespace Daydream
 	{
 		if (!_pass.IsValid() || !_resource.IsValid())return;
 		if (_pass.id >= passes.size() || _resource.id >= resources.size())return;
-		passes[_pass.id].writes.push_back(_resource.id);
+		passes[_pass.id].colorWrites.push_back(_resource.id);
+	}
+
+	void RenderGraph::WriteDepthStencil(RenderGraphPassHandle _pass, RenderGraphResourceHandle _resource)
+	{
+		if (!_pass.IsValid() || !_resource.IsValid())return;
+		if (_pass.id >= passes.size() || _resource.id >= resources.size())return;
+		if (!GraphicsUtility::IsDepthFormat(resources[_resource.id].format))
+		{
+			DAYDREAM_CORE_ERROR("Write Depth Resource must be depth format");
+			return;
+		}
+		passes[_pass.id].depthStencilWrite = _resource.id;
 	}
 
 	bool RenderGraph::Compile()
@@ -96,6 +147,7 @@ namespace Daydream
 
 			auto updateLifetime = [&](UInt32 _resId)
 				{
+					if (_resId == UINT32_MAX) return;
 					ResourceNode& res = resources[_resId];
 					if (res.firstPass == UINT32_MAX)
 					{
@@ -105,7 +157,8 @@ namespace Daydream
 				};
 
 			for (UInt32 resId : pass.reads) updateLifetime(resId);
-			for (UInt32 resId : pass.writes) updateLifetime(resId);
+			for (UInt32 resId : pass.colorWrites) updateLifetime(resId);
+			updateLifetime(pass.depthStencilWrite);
 		}
 
 		return executionOrder.size() == passes.size();
@@ -116,40 +169,72 @@ namespace Daydream
 		for (UInt32 passId : executionOrder)
 		{
 			PassNode& pass = passes[passId];
-			
+
 			RenderingInfo renderingInfo{};
-			UInt32 passWidth = resources[pass.writes[0]].width;
-			UInt32 passHeight = resources[pass.writes[0]].height;
-			for (UInt32 resId : pass.writes)
+
+			UInt32 passWidth = 0;
+			UInt32 passHeight = 0;
+
+			auto prepareResource = [&](ResourceNode& resource) -> Texture2DAllocation&
+				{
+					if (passWidth == 0)
+					{
+						passWidth = resource.width;
+						passHeight = resource.height;
+					}
+
+					if (resource.isExternal) return resource.allocation;
+
+					else if (passWidth != resource.width || passHeight != resource.height)
+					{
+						DAYDREAM_RENDERER_ERROR("Resource {} has different size!", resource.name);
+					}
+
+					if (resource.firstPass == passId)
+					{
+						resource.allocation = Renderer::GetTexturePool()->AllocateTexture2DHandle(
+							resource.width, resource.height, resource.format
+						);
+					}
+
+					return resource.allocation;
+				};
+
+
+			for (UInt32 resId : pass.colorWrites)
+			{ 
+				ResourceNode& resource = resources[resId];
+				Texture2DAllocation& payload = prepareResource(resource);
+
+				AttachmentDesc attachDesc{};
+				attachDesc.view = payload.renderTargetView.get();
+				renderingInfo.colorAttachments.push_back(attachDesc);
+
+				Renderer::TransitionTextureState(payload.texture.get(), resource.currentState, ResourceState::RenderTarget);
+				resource.currentState = ResourceState::RenderTarget;
+			}
+
+			if (pass.depthStencilWrite != UINT_MAX)
+			{
+				ResourceNode& resource = resources[pass.depthStencilWrite];
+				Texture2DAllocation& payload = prepareResource(resource);
+
+				AttachmentDesc attachDesc{};
+				attachDesc.view = payload.depthStencilView.get();
+				renderingInfo.depthAttachment = attachDesc;
+
+				Renderer::TransitionTextureState(payload.texture.get(), resource.currentState, ResourceState::DepthWrite);
+				resource.currentState = ResourceState::DepthWrite;
+			}
+
+			DAYDREAM_CORE_ASSERT(passWidth != 0 && passHeight!= 0, "wrong pass size");
+
+			for (UInt32 resId : pass.reads)
 			{
 				ResourceNode& resource = resources[resId];
-				if (passWidth != resource.width || passHeight != resource.height)
-				{
-					DAYDREAM_RENDERER_ERROR("Resource {} has different size!", resource.name);
-					return;
-				}
 
-				if (resource.firstPass == passId)
-				{
-					resource.resourceHandle = Renderer::GetRenderTargetPool()->RequestTexture2DHandle(
-						resource.width, resource.height, resource.format
-					);
-				}
-								
-				AttachmentDesc attachDesc{};
-				if (!GraphicsUtility::IsDepthFormat(resource.format))
-				{
-					attachDesc.view = resource.resourceHandle.GetRenderTargetView();
-					renderingInfo.colorAttachments.push_back(attachDesc);
-
-					Renderer::TransitionTextureState(resource.resourceHandle.GetTexture(), ResourceState::Undefined, ResourceState::RenderTarget);
-				}
-				else
-				{
-					attachDesc.view = resource.resourceHandle.GetDepthStencilView();
-					renderingInfo.depthAttachment = attachDesc;
-					Renderer::TransitionTextureState(resource.resourceHandle.GetTexture(), ResourceState::Undefined, ResourceState::DepthWrite);
-				}
+				Renderer::TransitionTextureState(resource.allocation.texture.get(), resource.currentState, ResourceState::ShaderResource);
+				resource.currentState = ResourceState::ShaderResource;
 			}
 
 			renderingInfo.renderArea.x = 0;
@@ -157,7 +242,29 @@ namespace Daydream
 			renderingInfo.renderArea.width = passWidth;
 			renderingInfo.renderArea.height = passHeight;
 
+			Renderer::BeginRendering(renderingInfo);
 			Renderer::BindPipelineState(passes[passId].pipelineState);
+
+			for (UInt32 resId : pass.reads)
+			{
+				ResourceNode& resource = resources[resId];
+
+				Renderer::BindShaderResourceView(resource.name, resource.allocation.shaderResourceView.get(), BuiltIn::Samplers::LinearClampToEdge());
+			}
+
+			for (auto& cbData : pass.constantBufferData)
+			{
+				Shared<ConstantBuffer> constantBuffer = Renderer::GetConstantBufferPool()->RequestBuffer(cbData.size);
+				constantBuffer->UpdateData(cbData.data, cbData.size);
+				Renderer::BindConstantBuffer(cbData.bindName, constantBuffer);
+				Renderer::GetConstantBufferPool()->ReturnResource(cbData.size, std::move(constantBuffer));
+			}
+
+
+			for (auto& srvData : pass.shaderResourceViews)
+			{
+				Renderer::BindShaderResourceView(srvData.bindName, srvData.SRV, BuiltIn::Samplers::LinearClampToEdge());
+			}
 
 			switch (pass.drawType)
 			{
@@ -168,8 +275,12 @@ namespace Daydream
 					TransformConstantBufferData transformData;
 					transformData.world = renderItem.worldMatrix.Transposed();
 					transformData.worldInverseTranspose = transformData.world.Inversed().Transposed();
-					Renderer::UpdateConstantBuffer(transformCB, transformData);
-					Renderer::BindConstantBuffer("World", transformCB);
+
+					Shared<ConstantBuffer> constantBuffer = Renderer::GetConstantBufferPool()->RequestBuffer(sizeof(TransformConstantBufferData));
+					constantBuffer->UpdateData(&transformData, sizeof(transformData));
+					Renderer::BindConstantBuffer("World", constantBuffer);
+					Renderer::GetConstantBufferPool()->ReturnResource(constantBuffer->GetSize(), std::move(constantBuffer));
+					
 					Renderer::BindMesh(renderItem.mesh);
 					Renderer::BindMaterial(renderItem.material);
 					Renderer::DrawIndexed(renderItem.mesh->GetIndexCount());
@@ -183,30 +294,51 @@ namespace Daydream
 					TransformConstantBufferData transformData;
 					transformData.world = renderItem.worldMatrix.Transposed();
 					transformData.worldInverseTranspose = transformData.world.Inversed().Transposed();
-					Renderer::UpdateConstantBuffer(transformCB, transformData);
-					Renderer::BindConstantBuffer("World", transformCB);
+
+					Shared<ConstantBuffer> constantBuffer = Renderer::GetConstantBufferPool()->RequestBuffer(sizeof(TransformConstantBufferData));
+					constantBuffer->UpdateData(&transformData, sizeof(transformData));
+					Renderer::BindConstantBuffer("World", constantBuffer);
+					Renderer::GetConstantBufferPool()->ReturnResource(constantBuffer->GetSize(), std::move(constantBuffer));
+
 					Renderer::BindMesh(renderItem.mesh);
 					Renderer::DrawIndexed(renderItem.mesh->GetIndexCount());
 				}
 				break;
 			}
 			case PassDrawType::FullScreenQuad:
-				break;
+			{
+				Renderer::BindMesh(quadMesh);
+				Renderer::DrawIndexed(quadMesh->GetIndexCount());
+			}
+			break;
 			case PassDrawType::Compute:
 				break;
 			default:
 				break;
 			}
+			Renderer::EndRendering(renderingInfo);
+
+
 
 			//pass를 그리고 난 다음 읽는데 쓴 resource들이 더이상 필요가 없는지 확인
 			for (UInt32 resId : pass.reads)
 			{
 				ResourceNode& resource = resources[resId];
+
+				if (resource.isExternal) continue;
+
 				if (resource.lastPass == passId)
 				{
-					Renderer::GetRenderTargetPool()->ReturnTexture2DHandle(std::move(resource.resourceHandle), Renderer::GetCurrentLoop());
+					Texture2DPoolKey key{};
+					key.width = resource.width;
+					key.height = resource.height;
+					key.format = resource.format;
+
+					Renderer::GetTexturePool()->ReturnResource(key, std::move(resource.allocation));
 				}
 			}
+
+
 		}
 	}
 
@@ -238,7 +370,7 @@ namespace Daydream
 
 				//writer가 작성해야되는 리소스들 중에서
 				bool dependent = false;
-				for (UInt32 writtenResId : passes[writerId].writes)
+				for (UInt32 writtenResId : passes[writerId].colorWrites)
 				{
 					auto it = std::find(passes[readerId].reads.begin(), passes[readerId].reads.end(), writtenResId);
 

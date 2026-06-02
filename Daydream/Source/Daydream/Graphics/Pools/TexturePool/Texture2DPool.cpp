@@ -12,18 +12,19 @@ namespace Daydream
 	Texture2DPool::~Texture2DPool()
 	{
 	}
-	Texture2DPoolHandle Texture2DPool::RequestTexture2DHandle(UInt32 _width, UInt32 _height, RenderFormat _format)
+	Texture2DAllocation Texture2DPool::AllocateTexture2DHandle(UInt32 _width, UInt32 _height, RenderFormat _format)
 	{
 		Texture2DPoolKey key;
 		key.width = _width;
 		key.height = _height;
 		key.format = _format;
 
-		Texture2DPoolHandle handle{};
+		Texture2DAllocation resource;
+
 		//렌더타겟 풀에서 key에 해당하는 렌더타겟 큐에 할당할 렌더타겟이 있으면 할당, 없으면 생성해서 리턴
 		if (!freeQueue[key].empty())
 		{
-			handle = std::move(freeQueue[key].front());
+			resource = std::move(freeQueue[key].front().payload); // PoolItem.Payload
 			freeQueue[key].pop();
 		}
 		else
@@ -37,7 +38,7 @@ namespace Daydream
 			if (!GraphicsUtility::IsDepthFormat(_format))
 			{
 				textureDesc.textureUsage = TextureUsage::ShaderResource | TextureUsage::RenderTarget;
-				handle.texture = Texture2D::Create(textureDesc);
+				resource.texture = Texture2D::Create(textureDesc);
 
 				TextureViewDesc rtvDesc{};
 				rtvDesc.type = TextureViewType::RenderTarget;
@@ -45,7 +46,7 @@ namespace Daydream
 				rtvDesc.mipLevels = 1;
 				rtvDesc.baseLayer = 0;
 				rtvDesc.layerCount = 1;
-				handle.renderTargetView = TextureView::Create(handle.texture, rtvDesc);
+				resource.renderTargetView = TextureView::Create(resource.texture, rtvDesc);
 
 				TextureViewDesc srvDesc{};
 				srvDesc.type = TextureViewType::ShaderResource;
@@ -53,63 +54,37 @@ namespace Daydream
 				srvDesc.mipLevels = 1;
 				srvDesc.baseLayer = 0;
 				srvDesc.layerCount = 1;
-				handle.shaderResourceView = TextureView::Create(handle.texture, srvDesc);
+				resource.shaderResourceView = TextureView::Create(resource.texture, srvDesc);
 			}
 			else // depth 포멧인 경우
 			{
 				textureDesc.textureUsage = TextureUsage::ShaderResource | TextureUsage::DepthStencil;
-				handle.texture = Texture2D::Create(textureDesc);
+				resource.texture = Texture2D::Create(textureDesc);
 
 				TextureViewDesc dsvDesc{};
 				dsvDesc.type = TextureViewType::DepthStencil;
+				dsvDesc.format = RenderFormat::D24_UNORM_S8_UINT;
 				dsvDesc.baseMip = 0;
 				dsvDesc.mipLevels = 1;
 				dsvDesc.baseLayer = 0;
 				dsvDesc.layerCount = 1;
-				handle.depthStencilView = TextureView::Create(handle.texture, dsvDesc);
+				resource.depthStencilView = TextureView::Create(resource.texture, dsvDesc);
 
 				TextureViewDesc srvDesc{};
 				srvDesc.type = TextureViewType::ShaderResource;
+				srvDesc.format = RenderFormat::R24_UNORM_X8_TYPELESS;
 				srvDesc.baseMip = 0;
 				srvDesc.mipLevels = 1;
 				srvDesc.baseLayer = 0;
 				srvDesc.layerCount = 1;
-				handle.shaderResourceView = TextureView::Create(handle.texture, srvDesc);
+				resource.shaderResourceView = TextureView::Create(resource.texture, srvDesc);
 			}
 		}
-		return handle;
+		return resource;
 	}
-	void Texture2DPool::ReturnTexture2DHandle(Texture2DPoolHandle&& _handle, UInt32 _lastUsedLoop)
+	Texture2DAllocation Texture2DPool::AllocateTexture2DHandle(const Texture2DPoolKey& _key)
 	{
-		_handle.lastUsedLoop = _lastUsedLoop;
-
-		pendingQueue.push(std::move(_handle));
-	}
-
-	void Texture2DPool::FlushInFlight(UInt32 _currentLoop, UInt32 _maxFramesInFlight)
-	{
-		while (!pendingQueue.empty() && pendingQueue.front().lastUsedLoop + _maxFramesInFlight <= _currentLoop)
-		{
-			pendingQueue.front().lastUsedLoop = _currentLoop;
-
-			Texture2DPoolKey key;
-			key.width = pendingQueue.front().texture->GetWidth();
-			key.height = pendingQueue.front().texture->GetHeight();
-			key.format = pendingQueue.front().texture->GetFormat();
-		
-			freeQueue[key].push(std::move(pendingQueue.front()));
-			pendingQueue.pop();
-		}
-	}
-	void Daydream::Texture2DPool::CleanUp(UInt32 _currentLoop, UInt32 _removeLimit)
-	{
-		for (auto& [key, handles] : freeQueue)
-		{
-			while (!handles.empty() && handles.front().lastUsedLoop + _removeLimit <= _currentLoop)
-			{
-				handles.pop();
-			}
-		}
+		return AllocateTexture2DHandle(_key.width, _key.height, _key.format);
 	}
 }
 

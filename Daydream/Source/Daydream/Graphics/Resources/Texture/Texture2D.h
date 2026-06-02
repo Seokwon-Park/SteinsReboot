@@ -4,7 +4,6 @@
 
 namespace Daydream
 {
-
 	class Texture2D : public Texture
 	{
 	public:

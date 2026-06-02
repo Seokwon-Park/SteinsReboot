@@ -14,6 +14,19 @@ namespace Daydream
 		Compute         // 컴퓨트 셰이더 패스
 	};
 
+	struct ExternalConstantBufferData
+	{
+		String bindName;
+		const void* data;
+		UInt32 size;
+	};
+
+	struct ExternalShaderResourceView
+	{
+		String bindName;
+		TextureView* SRV;
+	};
+
 	struct RenderGraphResourceDesc
 	{
 		RenderFormat format;
@@ -26,8 +39,9 @@ namespace Daydream
 		const GraphicsPipelineState* pipelineState;
 		RenderGraphDrawList drawList;
 		PassDrawType drawType;
+		Array<ExternalConstantBufferData> constantBufferData;
+		Array<ExternalShaderResourceView> shaderResourceViews;
 	};
-
 
 	struct RenderGraphResourceHandle
 	{
@@ -48,10 +62,12 @@ namespace Daydream
 		~RenderGraph();
 
 		RenderGraphResourceHandle AddResource(const String& _name, const RenderGraphResourceDesc& _desc);
+		RenderGraphResourceHandle AddExternalWriteResource(const String& _name, const Shared<Texture2D>& _texture);
 		RenderGraphPassHandle AddPass(const String& _name, const RenderGraphPassDesc& _desc);
 
 		void Read(RenderGraphPassHandle _pass, RenderGraphResourceHandle _resource);
 		void Write(RenderGraphPassHandle _pass, RenderGraphResourceHandle _resource);
+		void WriteDepthStencil(RenderGraphPassHandle _pass, RenderGraphResourceHandle _resource);
 
 		bool Compile();
 		void Execute();
@@ -68,7 +84,11 @@ namespace Daydream
 			UInt32 firstPass;
 			UInt32 lastPass;
 
-			Texture2DPoolHandle resourceHandle;
+			Texture2DAllocation allocation;
+
+			ResourceState currentState = ResourceState::Undefined;
+
+			Bool isExternal = false;
 		};
 
 		struct PassNode
@@ -80,7 +100,11 @@ namespace Daydream
 			PassDrawType drawType;
 
 			Array<UInt32> reads;
-			Array<UInt32> writes;
+			Array<UInt32> colorWrites;
+			UInt32 depthStencilWrite = UINT32_MAX;
+
+			Array<ExternalConstantBufferData> constantBufferData;
+			Array<ExternalShaderResourceView> shaderResourceViews;
 		};
 
 		void BuildDependencyGraph(Array<Array<UInt32>>& _edges, Array<UInt32>& _inDegree) const;
@@ -89,6 +113,6 @@ namespace Daydream
 		Array<PassNode> passes;
 		Array<UInt32> executionOrder;
 
-		Shared<ConstantBuffer> transformCB;
+		Mesh* quadMesh;
 	};
 }

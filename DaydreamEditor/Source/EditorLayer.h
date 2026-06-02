@@ -6,10 +6,17 @@
 #include "EditorPanels/PropertyPanel.h"
 #include "EditorPanels/AssetBrowserPanel.h"
 #include "EditorPanels/SkyboxPanel.h"
+#include "EditorCamera.h"
 
 
 namespace Daydream
 {
+	enum class EditorMode
+	{
+		Edit,
+		Play,
+	};
+
 	struct EntityInfo
 	{
 		UInt32 dummy[2]{};
@@ -30,6 +37,7 @@ namespace Daydream
 
 		bool OnKeyPressed(KeyPressedEvent& _e);
 		bool OnMouseButtonPressed(MouseButtonPressedEvent& _e);
+		bool OnMouseButtonReleased(MouseButtonReleasedEvent& _e);
 
 		void CreateProject();
 
