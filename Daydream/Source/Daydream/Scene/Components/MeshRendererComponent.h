@@ -17,6 +17,8 @@ namespace Daydream
 		virtual void Init() override;
 		virtual void Update(Float32 _deltaTime) override;
 
+		virtual void OnPropertyChanged() override {};
+
 		inline void SetMesh(const AssetHandle _meshHandle) { meshHandle = _meshHandle; }
 		inline AssetHandle GetMeshHandle() { return meshHandle; }
 		inline void SetMaterial(const AssetHandle _materialHandle) { materialHandle = _materialHandle; }

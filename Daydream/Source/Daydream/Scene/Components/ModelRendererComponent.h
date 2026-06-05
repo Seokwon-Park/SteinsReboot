@@ -16,6 +16,8 @@ namespace Daydream
 		virtual void Init() override;
 		virtual void Update(Float32 _deltaTime) override {};
 
+		virtual void OnPropertyChanged() override {};
+
 		void SetModel(Model* _model);
 
 		REFLECT_START()

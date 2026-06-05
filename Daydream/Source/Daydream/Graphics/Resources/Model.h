@@ -12,6 +12,7 @@ namespace Daydream
 		String name;
 		Transform transform = Transform();
 		Int32 meshIndex = -1; // 이 노드가 메쉬를 보유하고 있는지?(modelData.meshes의 인덱스)
+		Int32 materialIndex = -1; // 이 노드가 메쉬를 보유하고 있는지?(modelData.meshes의 인덱스)
 		Array<NodeData> children; // 자식 노드들
 	};
 
@@ -41,11 +42,11 @@ namespace Daydream
 
 		const Array<AssetHandle>& GetMeshes() const { return meshes; }
 		const Array<AssetHandle>& GetMaterials() const { return materials; }
-		const ModelData* GetModelData() const { return modelData.get(); }
+		const NodeData& GetRootNode() const { return rootNode; }
 		static Shared<Model> Create(Shared<ModelData> _data);
 		//static Shared<Model> Create(Shared<Mesh> _mesh);
 	private:
-		Shared<ModelData> modelData;
+		NodeData rootNode;
 		Array<AssetHandle> meshes;
 		Array<AssetHandle> materials;
 	};

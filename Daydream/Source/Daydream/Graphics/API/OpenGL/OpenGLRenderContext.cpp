@@ -183,7 +183,7 @@ namespace Daydream
 		RenderContext::SetTexture2D(_name, _texture);
 
 		const ShaderReflectionData* bindingInfo = activePipelineState->GetBindingInfo(_name);
-		if (bindingInfo == nullptr) return; 
+		if (bindingInfo == nullptr) return;
 
 		OpenGLTexture2D* glTexture = Cast<OpenGLTexture2D*>(_texture.get());
 		glBindTextureUnit(bindingInfo->binding, glTexture->GetTextureID());

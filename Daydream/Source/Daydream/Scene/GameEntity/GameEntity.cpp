@@ -98,7 +98,7 @@ namespace Daydream
 			}
 		}
 
-		//유효하지 않은 경우 newParent는 nullptr -> 다시말하면 부모 노드를 삭제하고싶다(RemoveParent)
+		//유효하지 않은 경우 newParent는 nullptr이 들어옴 -> 다시말하면 부모 노드를 삭제하고싶다(RemoveParent)
 
 		//만약 기존 부모노드가 있는경우 부모노드로부터 자신을 제거해줘야한다.
 		if (HasParent())

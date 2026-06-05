@@ -68,9 +68,9 @@ namespace Daydream
 		{
 			return EntityHandle();
 		}
-		const ModelData* data = model->GetModelData();
-		EntityHandle modelRootEntity = CreateGameEntity(data->rootNode.name);
-		ProcessModelNode(modelRootEntity, data->rootNode, model);
+		const NodeData& rootNode = model->GetRootNode();
+		EntityHandle modelRootEntity = ProcessModelNode(rootNode, model->GetMeshes(), model->GetMaterials());
+
 
 		return modelRootEntity;
 	}
@@ -234,34 +234,25 @@ namespace Daydream
 		rootEntities.insert(rootEntities.begin() + _newIndex, movedHandle);
 	}
 
-	void Scene::ProcessModelNode(EntityHandle _parentEntityHandle, const NodeData& _curNode, const Model* _model)
+	EntityHandle Scene::ProcessModelNode(const NodeData& _curNode, const Array<AssetHandle>& _meshHandles, const Array<AssetHandle>& _matHandles)
 	{
 		String entityName = _curNode.name;
 		if (entityName.empty()) entityName = "Node";
 
-		auto modelData = _model->GetModelData();
-		EntityHandle nodeEntityHandle = CreateGameEntity(entityName);
-		GameEntity* nodeEntity = GetEntity(nodeEntityHandle);
+		EntityHandle entityHandle = CreateGameEntity(entityName);
+		GameEntity* nodeEntity = GetEntity(entityHandle);
 		//nodeEntity->GetComponent<TransformComponent>()->SetTransform(_curNode.transform);
-
-		// 부모 연결
-		if (_parentEntityHandle.IsValid())
-		{
-			nodeEntity->SetParent(_parentEntityHandle);
-		}
 
 		// 트랜스폼 컴포넌트 가져와서 설정 (Matrix Decompose 등)
 		TransformComponent* transform = nodeEntity->GetComponent<TransformComponent>();
 		transform->SetTransform(_curNode.transform);
 
 		// 3. 메쉬 처리 로직 (1개 vs N개)
-		const Array<AssetHandle>& meshHandles = _model->GetMeshes();
-		const Array<AssetHandle>& materialHandles = _model->GetMaterials(); 
 		if (_curNode.meshIndex != -1)
 		{
 			UInt32 index = _curNode.meshIndex;
-			AssetHandle meshHandle = meshHandles[index];
-			AssetHandle materialHandle = materialHandles[modelData->meshes[index].materialIndex];
+			AssetHandle meshHandle = _meshHandles[_curNode.meshIndex];
+			AssetHandle materialHandle = _matHandles[_curNode.materialIndex];
 
 			MeshRendererComponent* meshRenderer = nodeEntity->AddComponent<MeshRendererComponent>();
 			meshRenderer->SetMesh(meshHandle);
@@ -297,7 +288,11 @@ namespace Daydream
 		// 여기서 넘겨주는 부모는 방금 만든 nodeEntity
 		for (const auto& childNode : _curNode.children)
 		{
-			ProcessModelNode(nodeEntityHandle, childNode, _model);
+			EntityHandle childHandle = ProcessModelNode(childNode, _meshHandles, _matHandles);
+			GameEntity* childEntity = GetEntity(childHandle);
+			childEntity->SetParent(entityHandle);
 		}
+
+		return entityHandle;
 	}
 }

@@ -146,6 +146,7 @@
     <ClInclude Include="Source\Daydream\Core\Window.h" />
     <ClInclude Include="Source\Daydream\Core\WindowDefine.h" />
     <ClInclude Include="Source\Daydream\Core\WindowManager.h" />
+    <ClInclude Include="Source\Daydream\Enum\EnumDefines.h" />
     <ClInclude Include="Source\Daydream\Enum\RendererEnums.h" />
     <ClInclude Include="Source\Daydream\Event\ApplicationEvent.h" />
     <ClInclude Include="Source\Daydream\Event\Event.h" />
@@ -823,7 +824,6 @@
     <ClCompile Include="Source\Daydream\Graphics\API\Vulkan\VulkanUtility.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Camera\Camera.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Core\DeferredSceneRenderer.cpp" />
-    <ClCompile Include="Source\Daydream\Graphics\Core\OrthographicCamera.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Core\RenderCommandList.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Core\RenderCommandQueue.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Core\RenderContext.cpp" />

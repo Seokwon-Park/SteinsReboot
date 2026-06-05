@@ -75,6 +75,7 @@ namespace Daydream
 		RenderGraphResourceHandle albedo = renderGraph->AddResource("AlbedoTexture", { RenderFormat::R8G8B8A8_UNORM, width, height });
 		RenderGraphResourceHandle normal = renderGraph->AddResource("NormalTexture", { RenderFormat::R16G16B16A16_FLOAT, width, height });
 		RenderGraphResourceHandle rmao = renderGraph->AddResource("RMAOTexture", { RenderFormat::R8G8B8A8_UNORM, width, height });
+		RenderGraphResourceHandle gbufferDepth = renderGraph->AddResource("GBufferDepth", { RenderFormat::R24G8_TYPELESS, width, height });
 		RenderGraphResourceHandle shadowDepth = renderGraph->AddResource("DepthTexture", { RenderFormat::R24G8_TYPELESS, width, height });
 
 		RenderGraphResourceHandle finalResource = renderGraph->AddExternalWriteResource("result", result);
@@ -146,10 +147,13 @@ namespace Daydream
 		renderGraph->Write(gBufferPass, normal);
 		renderGraph->Write(gBufferPass, albedo);
 		renderGraph->Write(gBufferPass, rmao);
+		renderGraph->WriteDepthStencil(gBufferPass, gbufferDepth);
 
 		RenderGraphPassDesc deferredLightingPassDesc{};
 		deferredLightingPassDesc.pipelineState = BuiltIn::PSO::Deferred();
 		deferredLightingPassDesc.drawType = PassDrawType::FullScreenQuad;
+		deferredLightingPassDesc.constantBufferData.push_back({ "LightViewProjection", &lightViewProj, sizeof(ViewProjectionData) });
+		deferredLightingPassDesc.constantBufferData.push_back({ "Lights", &lightData, sizeof(SceneLightingData) });
 		deferredLightingPassDesc.shaderResourceViews.push_back({ "IrradianceTexture",scene->GetSkybox()->GetIrradianceTexture()->GetOrCreateDefaultSRV() });
 		deferredLightingPassDesc.shaderResourceViews.push_back({ "Prefilter",scene->GetSkybox()->GetPrefilterTexture()->GetOrCreateDefaultSRV() });
 		deferredLightingPassDesc.shaderResourceViews.push_back({ "BRDFLUT", scene->GetSkybox()->GetBRDFTexture()->GetOrCreateDefaultSRV() });
@@ -192,6 +196,7 @@ namespace Daydream
 		renderGraph->Read(lightingPass, normal);
 		renderGraph->Read(lightingPass, albedo);
 		renderGraph->Read(lightingPass, rmao);
+		renderGraph->Read(lightingPass, shadowDepth);
 		renderGraph->Write(lightingPass, finalResource);
 
 		renderGraph->Compile();

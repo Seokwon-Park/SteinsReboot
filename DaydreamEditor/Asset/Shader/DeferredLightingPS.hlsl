@@ -112,15 +112,15 @@ Texture2D BRDFLUT : register(t6);
 [[vk::combinedImageSampler]][[vk::binding(11, 0)]]
 SamplerState BRDFLUTSampler : register(s6);
 
-[[vk::combinedImageSampler]][[vk::binding(12, 0)]]
-Texture2D<uint> EntityIDTexture : register(t7);
-[[vk::combinedImageSampler]][[vk::binding(12, 0)]]
-SamplerState EntityIDTextureSampler : register(s7);
+//[[vk::combinedImageSampler]][[vk::binding(12, 0)]]
+//Texture2D<uint> EntityIDTexture : register(t7);
+//[[vk::combinedImageSampler]][[vk::binding(12, 0)]]
+//SamplerState EntityIDTextureSampler : register(s7);
 
-[[vk::combinedImageSampler]][[vk::binding(13, 0)]]
-Texture2D<uint> OutlineTexture : register(t8);
-[[vk::combinedImageSampler]][[vk::binding(13, 0)]]
-SamplerState OutlineTextureSampler : register(s8);
+//[[vk::combinedImageSampler]][[vk::binding(13, 0)]]
+//Texture2D<uint> OutlineTexture : register(t8);
+//[[vk::combinedImageSampler]][[vk::binding(13, 0)]]
+//SamplerState OutlineTextureSampler : register(s8);
 
 [[vk::combinedImageSampler]][[vk::binding(14, 0)]]
 Texture2D DepthTexture : register(t9);
@@ -237,49 +237,49 @@ PSOutput PSMain(PSInput input)
     // --- 1. G-Buffer에서 데이터 샘플링 ---
     float2 uv = input.uv;
 
-    int3 pixelCoord = int3(input.position.xy, 0);
+    //int3 pixelCoord = int3(input.position.xy, 0);
     
-    // R32 텍스처에서 값 읽기
-    uint value = OutlineTexture.Load(pixelCoord).r;
+    //// R32 텍스처에서 값 읽기
+    //uint value = OutlineTexture.Load(pixelCoord).r;
     
-    // selected id가 아닌 픽셀에 대해서 검사
-    if (value != 1 && selectedID != 0)
-    {
-        for (int y = -outlineThickness; y <= outlineThickness; ++y)
-        {
-            for (int x = -outlineThickness; x <= outlineThickness; ++x)
-            {
-                // 자기 자신은 검사 패스
-                if (x == 0 && y == 0)
-                    continue;
+    //// selected id가 아닌 픽셀에 대해서 검사
+    //if (value != 1 && selectedID != 0)
+    //{
+    //    for (int y = -outlineThickness; y <= outlineThickness; ++y)
+    //    {
+    //        for (int x = -outlineThickness; x <= outlineThickness; ++x)
+    //        {
+    //            // 자기 자신은 검사 패스
+    //            if (x == 0 && y == 0)
+    //                continue;
 
-                // 주변 픽셀 좌표 계산
-                int3 neighborPos = pixelCoord + int3(x, y, 0);
+    //            // 주변 픽셀 좌표 계산
+    //            int3 neighborPos = pixelCoord + int3(x, y, 0);
             
-                uint neighborValue = OutlineTexture.Load(neighborPos).r;
+    //            uint neighborValue = OutlineTexture.Load(neighborPos).r;
 
-                //내가 이웃 픽셀의 외곽선 픽셀이 되어야 하는 경우
-                if (neighborValue == 1)
-                {
-                    // 이웃 픽셀의 실제 값
-                    uint realVisibleID = EntityIDTexture.Load(neighborPos).r;
+    //            //내가 이웃 픽셀의 외곽선 픽셀이 되어야 하는 경우
+    //            if (neighborValue == 1)
+    //            {
+    //                // 이웃 픽셀의 실제 값
+    //                uint realVisibleID = EntityIDTexture.Load(neighborPos).r;
                 
-                    if (realVisibleID == selectedID)
-                    {
-                        // 이 픽셀이 실제로도 그 물체 근처라면 (가려지지 않음)
-                        output.color = float4(1.0f, 0.5f, 0.0f, 1.0f); // 밝은 주황
-                    }
-                    else
-                    {
-                        // 마스크상으로는 외곽선인데, 실제로는 다른 게 보임 (가려진 경우)
-                        output.color = float4(0.8f, 0.3f, 0.0f, 1.0f); // 어두운 주황
-                    }
+    //                if (realVisibleID == selectedID)
+    //                {
+    //                    // 이 픽셀이 실제로도 그 물체 근처라면 (가려지지 않음)
+    //                    output.color = float4(1.0f, 0.5f, 0.0f, 1.0f); // 밝은 주황
+    //                }
+    //                else
+    //                {
+    //                    // 마스크상으로는 외곽선인데, 실제로는 다른 게 보임 (가려진 경우)
+    //                    output.color = float4(0.8f, 0.3f, 0.0f, 1.0f); // 어두운 주황
+    //                }
                 
-                    return output;
-                }
-            }
-        }
-    }
+    //                return output;
+    //            }
+    //        }
+    //    }
+    //}
 
     float4 posData = PositionTexture.Sample(PositionTextureSampler, uv);
     float3 worldPosition = posData.xyz;

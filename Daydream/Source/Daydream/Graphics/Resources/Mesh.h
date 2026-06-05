@@ -42,7 +42,6 @@ namespace Daydream
 		Array<Vertex> vertices;
 		Array<UInt32> indices;
 		Vector3 centerOffset;
-		UInt32 materialIndex;
 		Path basePath;
 		String name;
 	};

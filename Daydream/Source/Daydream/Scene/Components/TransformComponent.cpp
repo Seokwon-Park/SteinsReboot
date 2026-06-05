@@ -20,6 +20,11 @@ namespace Daydream
 
 	}
 
+	void TransformComponent::OnPropertyChanged()
+	{
+		SetDirty();
+	}
+
 	const Matrix4x4& TransformComponent::GetWorldMatrix() const
 	{
 		if (isDirty)
@@ -36,7 +41,6 @@ namespace Daydream
 				worldMatrix = localMat;
 			}
 
-			// 2. 갱신을 완료했으니 플래그를 끕니다.
 			isDirty = false;
 		}
 		return worldMatrix;
@@ -67,6 +71,5 @@ namespace Daydream
 		{
 			child->SetDirty();
 		}
-
 	}
 }

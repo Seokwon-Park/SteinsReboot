@@ -17,6 +17,8 @@ namespace Daydream
 		virtual void Init() override;
 		virtual void Update(Float32 _deltaTime) override;
 
+		virtual void OnPropertyChanged() override{};
+
 		const ViewProjectionData& GetCameraViewProj() { return viewProjData; }
 
 

@@ -98,6 +98,7 @@ namespace Daydream
 
 		Quaternion rotation = Quaternion::CreateFromAxis(xaxis, yaxis, zaxis);
 		_outRotation = rotation.ToEuler();
+		_outRotation = Math::RadianToDegree(_outRotation);
 
 		return true;
 	}

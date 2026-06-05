@@ -63,8 +63,9 @@ namespace Daydream
 		cubeMesh = Mesh::Create(cubeVBO, cubeIBO);
 		/////////////////////////////////////////////////////////////////////////////////////
 
-		//activeScene->CreateGameEntityFromModel(AssetManager::GetAssetHandleByPath("Asset/Model/scene.gltf"));
-		activeScene->CreateGameEntityFromModel(AssetManager::GetAssetHandleByPath("Asset/Model/cerberusgun/scene.gltf"));
+		activeScene->CreateGameEntityFromModel(AssetManager::GetAssetHandleByPath("Asset/Model/scene.gltf"));
+		//activeScene->CreateGameEntityFromModel(AssetManager::GetAssetHandleByPath("Asset/Model/Ceberus/Cerberus_LP.FBX"));
+		//activeScene->CreateGameEntityFromModel(AssetManager::GetAssetHandleByPath("Asset/Model/cerberusgun/scene.gltf"));
 
 		ModelRendererComponent* component = entity->AddComponent<ModelRendererComponent>();
 		component->SetModel(model.get());
@@ -440,7 +441,6 @@ namespace Daydream
 				Vector3 translation, rotationVec, scale;
 				Quaternion rotationQuat;
 
-				// Decompose 구현에 따라 다르지만, 회전은 짐벌락 방지를 위해 Quaternion으로 뽑는 게 좋습니다.
 				// Matrix4x4::Decompose(newLocalMat, translation, rotationQuat, scale); 
 
 				// 작성하신 Decompose 함수 시그니처에 맞춰 사용하세요.
@@ -646,7 +646,7 @@ namespace Daydream
 
 	bool EditorLayer::OnMouseButtonPressed(MouseButtonPressedEvent& _e)
 	{
-		DAYDREAM_CORE_TRACE("{0}", _e.ToString());
+		//DAYDREAM_CORE_TRACE("{0}", _e.ToString());
 
 		if (isViewportHovered && Input::GetMouseDown(Mouse::ButtonRight))
 		{

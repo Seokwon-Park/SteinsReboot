@@ -2031,6 +2031,7 @@
     <ClInclude Include="Source\Daydream\Graphics\Resources\Struct\RenderDataTypes.h" />
     <ClInclude Include="Source\Daydream\Graphics\Pools\BufferPool\BufferPoolHandle.h" />
     <ClInclude Include="Source\Daydream\Graphics\Pools\BufferPool\ConstantBufferPool.h" />
+    <ClInclude Include="Source\Daydream\Enum\EnumDefines.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Base\IO\File.cpp">
@@ -2289,9 +2290,6 @@
       <Filter>Source\Daydream\Graphics\Camera</Filter>
     </ClCompile>
     <ClCompile Include="Source\Daydream\Graphics\Core\DeferredSceneRenderer.cpp">
-      <Filter>Source\Daydream\Graphics\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Daydream\Graphics\Core\OrthographicCamera.cpp">
       <Filter>Source\Daydream\Graphics\Core</Filter>
     </ClCompile>
     <ClCompile Include="Source\Daydream\Graphics\Core\RenderCommandList.cpp">

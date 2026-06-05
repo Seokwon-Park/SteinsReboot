@@ -1,7 +1,11 @@
 #pragma once
 
+#include "EnumDefines.h"
+
+
 namespace Daydream
 {
+
 	enum class RendererAPIType
 	{
 		None,
@@ -13,7 +17,7 @@ namespace Daydream
 	};
 
 	////////////////////////////////////////// Texture  ////////////////////////////////////////// 
-	enum class TextureUsage
+	enum class TextureUsage 
 	{
 		None = 0,
 		ShaderResource = 1 << 0,
@@ -24,16 +28,15 @@ namespace Daydream
 		TransferDestination = 1 << 5,
 	};
 
+	//inline TextureUsage operator|(TextureUsage a, TextureUsage b)
+	//{
+	//	return static_cast<TextureUsage>(static_cast<int>(a) | static_cast<int>(b));
+	//}
 
-	inline TextureUsage operator|(TextureUsage a, TextureUsage b)
-	{
-		return static_cast<TextureUsage>(static_cast<int>(a) | static_cast<int>(b));
-	}
-
-	inline TextureUsage operator&(TextureUsage a, TextureUsage b)
-	{
-		return static_cast<TextureUsage>(static_cast<int>(a) & static_cast<int>(b));
-	}
+	//inline TextureUsage operator&(TextureUsage a, TextureUsage b)
+	//{
+	//	return static_cast<TextureUsage>(static_cast<int>(a) & static_cast<int>(b));
+	//}
 
 	enum class TextureViewType
 	{
@@ -41,38 +44,6 @@ namespace Daydream
 		RenderTarget,
 		DepthStencil,
 		UnorderedAccess
-	};
-
-	///////////////////////////////////////////////////////////////////////////////////////////
-
-	enum class BufferUsage : UInt32
-	{
-		None = 0,
-		Vertex = 1 << 0,
-		Index = 1 << 1,
-		Constant = 1 << 2,      // D3D11/12 CBV, Vulkan UniformBuffer, OpenGL UBO
-		Storage = 1 << 3,       // D3D11/12 UAV(Structured/Raw), Vulkan StorageBuffer, OpenGL SSBO
-		TransferSource = 1 << 4,// D3D12 COPY_SOURCE, Vulkan TransferSrc, OpenGL CopyRead, D3D11 Copy source intent(no dedicated bind flag)
-		TransferDest = 1 << 5,  // D3D12 COPY_DEST, Vulkan TransferDst, OpenGL CopyWrite, D3D11 Copy destination intent(no dedicated bind flag)
-		Indirect = 1 << 6       
-	};
-
-	inline BufferUsage operator|(BufferUsage a, BufferUsage b)
-	{
-		return static_cast<BufferUsage>(static_cast<UInt32>(a) | static_cast<UInt32>(b));
-	}
-
-	inline BufferUsage operator&(BufferUsage a, BufferUsage b)
-	{
-		return static_cast<BufferUsage>(static_cast<UInt32>(a) & static_cast<UInt32>(b));
-	}
-
-	enum class MemoryUsage
-	{
-		Static,
-		Dynamic,
-		Upload,
-		Readback
 	};
 
 	// Texture
@@ -95,6 +66,32 @@ namespace Daydream
 		Texture3D
 	};
 
+	///////////////////////////////////////////////////////////////////////////////////////////
+
+	////////////////////////////////////////// Buffer ////////////////////////////////////////// 
+
+
+	enum class BufferUsage
+	{
+		None = 0,
+		Vertex = 1 << 0,
+		Index = 1 << 1,
+		Constant = 1 << 2,      // D3D11/12 CBV, Vulkan UniformBuffer, OpenGL UBO
+		Storage = 1 << 3,       // D3D11/12 UAV(Structured/Raw), Vulkan StorageBuffer, OpenGL SSBO
+		TransferSource = 1 << 4,// D3D12 COPY_SOURCE, Vulkan TransferSrc, OpenGL CopyRead, D3D11 Copy source intent(no dedicated bind flag)
+		TransferDest = 1 << 5,  // D3D12 COPY_DEST, Vulkan TransferDst, OpenGL CopyWrite, D3D11 Copy destination intent(no dedicated bind flag)
+		Indirect = 1 << 6       
+	};
+
+	enum class MemoryUsage
+	{
+		Static,
+		Dynamic,
+		Upload,
+		Readback
+	};
+
+	///////////////////////////////////////////////////////////////////////////////////////////
 
 	enum class ResourceState : UInt32
 	{
@@ -114,6 +111,8 @@ namespace Daydream
 		ConstantBuffer,
 		UnorderedAccess,            
 	};
+
+	////////////////////////////////////////// Shader ////////////////////////////////////////// 
 
 	enum class ShaderType
 	{
@@ -136,6 +135,9 @@ namespace Daydream
 		DaydreamComputeBit = 1 << 5,
 		ShaderAllBit = DaydreamVertexBit | DaydreamHullBit | DaydreamDomainBit | DaydreamGeometryBit | DaydreamPixelBit | DaydreamComputeBit
 	};
+
+	///////////////////////////////////////////////////////////////////////////////////////////
+
 
 	enum class AttachmentLoadOp {
 		Load,      // 이전 내용을 그대로 로드
@@ -325,3 +327,6 @@ namespace Daydream
 
 	enum class ProjectionType { Orthographic, Perspective };
 }
+
+DEFINE_ENUMTYPE_FLAG_OPERATORS(Daydream::TextureUsage);
+DEFINE_ENUMTYPE_FLAG_OPERATORS(Daydream::BufferUsage);

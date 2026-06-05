@@ -66,6 +66,9 @@ namespace Daydream
 				lightViewProj.viewMatrix = Matrix4x4::CreateLookToLH(transform.position, transform.GetForward(), transform.GetUp());
 				lightViewProj.projectionMatrix = Matrix4x4::CreateOrthographicLH(-20.0f, 20.0f, -20.0f, 20.0f, -200.0f, 200.0f);
 				lightViewProj.viewProjectionMatrix = lightViewProj.viewMatrix * lightViewProj.projectionMatrix;
+				lightViewProj.viewMatrix.Transpose();
+				lightViewProj.projectionMatrix.Transpose();
+				lightViewProj.viewProjectionMatrix.Transpose();
 			}
 			if (lightComponent != nullptr)
 			{

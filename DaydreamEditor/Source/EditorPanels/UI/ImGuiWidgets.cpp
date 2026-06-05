@@ -14,13 +14,14 @@
 
 namespace Daydream::UI
 {
-	void DrawFloatController(const String& _label, Float32& _value, Float32 _speed, Float32 _minValue, Float32 _maxValue, Float32 _resetValue, Float32 _columnWidth)
+	bool DrawFloatController(const String& _label, Float32& _value, Float32 _speed, Float32 _minValue, Float32 _maxValue, Float32 _resetValue, Float32 _columnWidth)
 	{
 		ImGuiTableFlags flags = ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_Resizable;
 
+		bool isValueChanged = false;
+
 		if (ImGui::BeginTable(_label.c_str(), 2, flags)) // 고유 ID, 열 2개, 플래그
 		{
-			// 열의 속성을 설정합니다. (너비, 크기 조절 등)
 			// ImGuiTableColumnFlags_WidthFixed: 초기 너비 고정
 			// ImGuiTableColumnFlags_WidthStretch: 창 크기에 따라 너비 조절 (기본값)
 			ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, _columnWidth);
@@ -38,15 +39,18 @@ namespace Daydream::UI
 
 			ImGui::SameLine();
 			std::string dragID = "##" + _label;
-			ImGui::DragFloat(dragID.c_str(), &_value, _speed, _minValue, _maxValue, "%.2f");
+			isValueChanged |= ImGui::DragFloat(dragID.c_str(), &_value, _speed, _minValue, _maxValue, "%.2f");
 
 			ImGui::PopStyleVar();
 			ImGui::EndTable();
 		}
+		return isValueChanged;
 	}
 
-	void DrawAxisControl(const String& _label, Float32& _value, Float32 _speed, Float32 _minValue, Float32 _maxValue, Float32 _resetValue, Vector4 _color)
+	bool DrawAxisControl(const String& _label, Float32& _value, Float32 _speed, Float32 _minValue, Float32 _maxValue, Float32 _resetValue, Vector4 _color)
 	{
+		bool isValueChanged = false;
+
 		float lineHeight = GImGui->Font->LegacySize + GImGui->Style.FramePadding.y * 2.0f;
 		ImVec4 color(_color.x, _color.y, _color.z, _color.w);
 		ImVec2 buttonSize = { lineHeight + 2.0f , lineHeight };
@@ -59,26 +63,31 @@ namespace Daydream::UI
 		if (ImGui::Button(_label.c_str(), buttonSize))
 		{
 			_value = _resetValue;
+			isValueChanged = true;
 		}
 		ImGui::PopStyleColor(3);
 
 		// 드래그 슬라이더
 		ImGui::SameLine();
 		std::string dragID = "##" + _label;
-		ImGui::DragFloat(dragID.c_str(), &_value, _speed, _minValue, _maxValue, "%.2f");
+		isValueChanged |= ImGui::DragFloat(dragID.c_str(), &_value, _speed, _minValue, _maxValue, "%.2f");
+
+		return isValueChanged;
+
 	}
 
-	void DrawVector3Controller(const String& _label, Vector3& _values, Float32 _resetValue, Float32 _columnWidth)
+	bool DrawVector3Controller(const String& _label, Vector3& _values, Float32 _resetValue, Float32 _columnWidth)
 	{
 		ImGuiIO& io = ImGui::GetIO();
 		auto boldFont = io.Fonts->Fonts[0];
 
 		ImGuiTableFlags flags = ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_Resizable;
 
+		bool isVectorChanged = false;
+
 		ImGui::PushID(_label.c_str());
 		if (ImGui::BeginTable(_label.c_str(), 2, flags)) // 고유 ID, 열 2개, 플래그
 		{
-			// 열의 속성을 설정합니다. (너비, 크기 조절 등)
 			// ImGuiTableColumnFlags_WidthFixed: 초기 너비 고정
 			// ImGuiTableColumnFlags_WidthStretch: 창 크기에 따라 너비 조절 (기본값)
 			ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, _columnWidth);
@@ -94,17 +103,17 @@ namespace Daydream::UI
 			ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 2,0 });
 			ImGui::PushFont(boldFont);
 
-			DrawAxisControl("X", _values.x, 0.1f, 0.0f, 0.0f, 0.0f, { 0.8f, 0.1f,0.1f, 1.0f });
+			isVectorChanged |= DrawAxisControl("X", _values.x, 0.1f, 0.0f, 0.0f, 0.0f, { 0.8f, 0.1f,0.1f, 1.0f });
 
 			ImGui::PopItemWidth();
 
 			ImGui::SameLine();
-			DrawAxisControl("Y", _values.y, 0.1f, 0.0f, 0.0f, 0.0f, { 0.1f, 0.8f,0.1f, 1.0f });
+			isVectorChanged |= DrawAxisControl("Y", _values.y, 0.1f, 0.0f, 0.0f, 0.0f, { 0.1f, 0.8f,0.1f, 1.0f });
 
 			ImGui::PopItemWidth();
 
 			ImGui::SameLine();
-			DrawAxisControl("Z", _values.z, 0.1f, 0.0f, 0.0f, 0.0f, { 0.1f, 0.1f,0.8f, 1.0f });
+			isVectorChanged |= DrawAxisControl("Z", _values.z, 0.1f, 0.0f, 0.0f, 0.0f, { 0.1f, 0.1f,0.8f, 1.0f });
 
 			ImGui::PopItemWidth();
 
@@ -116,16 +125,19 @@ namespace Daydream::UI
 		ImGui::Columns(1);
 
 		ImGui::PopID();
-	}
-	void DrawVector3Controller(const String& _label, Vector3& _values, const char* _Xtag, const char* _Ytag, const char* _Ztag, Float32 _resetValue, Float32 _columnWidth)
-	{
 
+		return isVectorChanged;
 	}
-	void DrawTransformController(const String& _label, Transform& _transform, Float32 _resetValue, Float32 _columnWidth)
+
+	bool DrawTransformController(const String& _label, Transform& _transform, Float32 _resetValue, Float32 _columnWidth)
 	{
-		DrawVector3Controller("Position", _transform.position);
-		DrawVector3Controller("Rotation", _transform.rotation);
-		DrawVector3Controller("Scale", _transform.scale);
+		bool isTransformChanged = false;
+
+		isTransformChanged |= DrawVector3Controller("Position", _transform.position);
+		isTransformChanged |= DrawVector3Controller("Rotation", _transform.rotation);
+		isTransformChanged |= DrawVector3Controller("Scale", _transform.scale);
+
+		return isTransformChanged;
 	}
 	void DrawMaterialController(const String& _label, Material* _material)
 	{
@@ -159,27 +171,25 @@ namespace Daydream::UI
 
 		if (ImGui::Combo("##Light Type", &currentItem, lightTypeNames, IM_ARRAYSIZE(lightTypeNames)))
 		{
-			// 사용자가 드롭다운 메뉴에서 다른 항목을 선택했다면,
-			// 변경된 인덱스 값을 다시 enum 타입으로 변환하여 원본 데이터에 저장합니다.
 			_light.type = currentItem;
 		}
 
 		switch (_light.type)
 		{
 		case Directional:
-			DrawFloatController("Intensity", _light.intensity, 0.1f, 0.0f, 10000.0f);
+			DrawFloatController("Intensity", _light.intensity, 0.1f, 0.0f, 10000.0f, 0.0f, 100.0f);
 			DrawColorController("Color", _light.color);
 			break;
 		case Point:
-			DrawFloatController("Intensity", _light.intensity, 0.1f, 0.0f, 10000.0f);
-			DrawFloatController("Range", _light.range, 0.1f, 0.0f, 0.0f);
+			DrawFloatController("Intensity", _light.intensity, 0.1f, 0.0f, 10000.0f, 0.0f, 100.0f);
+			DrawFloatController("Range", _light.range, 0.1f, 0.0f, 0.0f, 0.0f, 100.0f);
 			DrawColorController("Color", _light.color);
 			break;
 		case Spot:
-			DrawFloatController("Intensity", _light.intensity, 0.1f, 0.0f, 10000.0f);
-			DrawFloatController("Range", _light.range, 0.1f, 0.0f, 0.0f);
-			DrawFloatController("InnerConeAngle", _light.spotInnerAngle, 0.1f, 0.0f, _light.spotOuterAngle);
-			DrawFloatController("OuterConeAngle", _light.spotOuterAngle, 0.1f, 0.0f, 360.0f);
+			DrawFloatController("Intensity", _light.intensity, 0.1f, 0.0f, 10000.0f, 0.0f, 100.0f);
+			DrawFloatController("Range", _light.range, 0.1f, 0.0f, 0.0f, 0.0f, 100.0f);
+			DrawFloatController("InnerConeAngle", _light.spotInnerAngle, 0.1f, 0.0f, _light.spotOuterAngle, 0.0f, 100.0f);
+			DrawFloatController("OuterConeAngle", _light.spotOuterAngle, 0.1f, 0.0f, 360.0f, 0.0f, 100.0f);
 			DrawColorController("Color", _light.color);
 			break;
 		default:
@@ -321,15 +331,15 @@ namespace Daydream::UI
 		CheckboxU32("use MetallicMap", &_data.useMetallicMap);
 		if (!_data.useMetallicMap)
 		{
-			DrawFloatController("MetallicFactor", _data.metallic, 0.005f, 0.0f, 1.0f);
+			DrawFloatController("MetallicFactor", _data.metallic, 0.005f, 0.0f, 1.0f, 0.0f, 100.0f);
 		}
 		CheckboxU32("use RoughnessMap", &_data.useRoughnessMap);
 		if (!_data.useRoughnessMap)
 		{
-			DrawFloatController("RoughnessFactor", _data.roughness, 0.005f, 0.0f, 1.0f);
+			DrawFloatController("RoughnessFactor", _data.roughness, 0.005f, 0.0f, 1.0f, 0.0f, 100.0f);
 		}
-		DrawFloatController("Exposure", _data.exposure, 0.005f, 0.0f, 1.0f);
-		DrawFloatController("Gamma", _data.gamma, 0.005f, 0.0f, 10.0f);
+		DrawFloatController("Exposure", _data.exposure, 0.005f, 0.0f, 1.0f, 0.0f, 100.0f);
+		DrawFloatController("Gamma", _data.gamma, 0.005f, 0.0f, 10.0f, 0.0f, 100.0f);
 
 
 		ImGui::PopID();

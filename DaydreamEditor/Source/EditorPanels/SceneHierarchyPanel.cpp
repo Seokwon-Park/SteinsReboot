@@ -212,19 +212,14 @@ namespace Daydream
 
 	void SceneHierarchyPanel::DrawDropTargetBetween(EntityHandle _parentHandle, UInt64 _insertIndex)
 	{
-		// 1. 이 높이가 'TreeNode' 사이의 '전체' 간격이 됩니다.
-			//    ImGui의 기본값인 4.0f 정도가 좋습니다. (너무 크면 간격이 넓어짐)
 		const float dropZoneHeight = 2.0f;
 
 		float windowWidth = ImGui::GetContentRegionAvail().x;
 		if (windowWidth < 50.0f) windowWidth = 200.0f;
 
-		// 2. InvisibleButton이 스스로 레이아웃 공간(4px)을 차지하게 둡니다.
-		//    (커서 조작 로직(SetCursorPos)이 없는 것이 중요합니다)
 		std::string buttonID = "##drop_zone_" + std::to_string(_parentHandle.GetID()) + "_" + std::to_string(_insertIndex);
 		ImGui::InvisibleButton(buttonID.c_str(), ImVec2(windowWidth, dropZoneHeight));
 
-		// 3. 버튼의 실제 영역 정보를 가져옵니다.
 		ImVec2 rectMin = ImGui::GetItemRectMin();
 		// ImVec2 rectMax = ImGui::GetItemRectMax(); // 라인만 그릴 거면 Max는 불필요
 

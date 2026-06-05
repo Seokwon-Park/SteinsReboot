@@ -13,7 +13,7 @@ namespace Daydream
 {
 	Model::Model(Shared<ModelData> _data)
 	{
-		modelData = _data;
+		rootNode = _data->rootNode;
 	}
 	Model::~Model()
 	{

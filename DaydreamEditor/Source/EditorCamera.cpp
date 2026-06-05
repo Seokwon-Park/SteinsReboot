@@ -80,6 +80,7 @@ namespace Daydream
 	inline void EditorCamera::SetPosition(Vector3 _position)
 	{
 		transform.position = _position;
+		UpdateViewMatrix();
 	}
 
 	void EditorCamera::UpdateAspectRatio(UInt32 _width, UInt32 _height)

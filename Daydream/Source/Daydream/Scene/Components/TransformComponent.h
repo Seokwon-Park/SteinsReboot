@@ -16,6 +16,8 @@ namespace Daydream
 		virtual void Init() override;
 		virtual void Update(Float32 _deltaTime) override;
 
+		virtual void OnPropertyChanged() override;
+
 		const Matrix4x4& GetWorldMatrix() const;
 
 		 void SetParent(TransformComponent* _newParent);
@@ -25,6 +27,7 @@ namespace Daydream
 			transform = _transform; 
 			isDirty = true;
 		}
+
 		inline void SetTransform(Vector3 _position, Vector3 _rotation, Vector3 _scale)
 		{
 			transform.position = _position;

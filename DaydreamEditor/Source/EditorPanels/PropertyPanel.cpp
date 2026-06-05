@@ -22,7 +22,6 @@ namespace Daydream
 
             if (ImGui::BeginTable("##EntityNameTable", 2, flags)) // 고유 ID, 열 2개, 플래그
             {
-                // 열의 속성을 설정합니다. (너비, 크기 조절 등)
                 // ImGuiTableColumnFlags_WidthFixed: 초기 너비 고정
                 // ImGuiTableColumnFlags_WidthStretch: 창 크기에 따라 너비 조절 (기본값)
                 ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 100.0f);
@@ -178,7 +177,10 @@ namespace Daydream
             case FieldType::Transform:
             {
                 Transform* data = static_cast<Transform*>(field.data);
-                UI::DrawTransformController("Transform", *data);
+                if (UI::DrawTransformController("Transform", *data))
+                {
+                    _component->OnPropertyChanged();
+                }
                 break;
             }
             case FieldType::Texture:

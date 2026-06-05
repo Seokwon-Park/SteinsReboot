@@ -104,15 +104,15 @@ namespace Daydream
 		// true: CCW (반시계), false: CW (시계)
 		glFrontFace(rsDesc.frontCounterClockwise ? GL_CCW : GL_CW);
 
-		//// Depth Clip Enable
-		//if (rsDesc.depthClipEnable)
-		//{
-		//	glDisable(GL_DEPTH_CLAMP); // Clipping 활성화 (기본 동작)
-		//}
-		//else
-		//{
-		//	glEnable(GL_DEPTH_CLAMP);  // Clipping 비활성화 (Clamping)
-		//}
+		// Depth Clip Enable
+		if (rsDesc.depthClipEnable)
+		{
+			glDisable(GL_DEPTH_CLAMP); // Clipping 활성화 (기본 동작)
+		}
+		else
+		{
+			glEnable(GL_DEPTH_CLAMP);  // Clipping 비활성화 (Clamping)
+		}
 
 		//// Scissor Enable
 		//if (rsDesc.scissorEnable)

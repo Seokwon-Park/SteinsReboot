@@ -1,0 +1,8 @@
+Material:
+  PSO: GBufferPSO
+  Textures:
+    mat_MetallicMap: 00000000-0000-0000-0000-000000000000
+    mat_AlbedoMap: 1e96da1f-7ed0-413d-a2a5-b11aa114ea8d
+    mat_NormalMap: 00000000-0000-0000-0000-000000000000
+    mat_RoughnessMap: 00000000-0000-0000-0000-000000000000
+    mat_AOMap: 00000000-0000-0000-0000-000000000000

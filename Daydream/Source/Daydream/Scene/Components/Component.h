@@ -23,6 +23,8 @@ namespace Daydream
 
 		virtual void Init() = 0;
 		virtual void Update(Float32 _deltaTime) = 0;
+		
+		virtual void OnPropertyChanged() = 0;
 
 		virtual const char* GetName() const = 0;
 

@@ -40,7 +40,9 @@ namespace Daydream
 		baseDirectory = _filepath.GetParentPath();
 
 		UInt32 flags = aiProcess_Triangulate |   // 모든 면을 삼각형으로 변환
+			//aiProcess_PreTransformVertices |
 			aiProcess_ConvertToLeftHanded; // | // 왼손 좌표계 사용
+
 		//aiProcess_OptimizeGraph;// |
 		//aiProcess_FlipUVs |				// UV 좌표 뒤집기 (OpenGL용)
 		//aiProcess_GenNormals |			// 노말 벡터 생성
@@ -52,8 +54,8 @@ namespace Daydream
 		DAYDREAM_INFO("Load File {}", _filepath.ToGenericString());
 
 		const aiScene* scene = importer.ReadFile(_filepath.ToString(), flags);
-		bool result = !scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode;
-		DAYDREAM_CORE_ASSERT(nullptr != scene, "{0}", importer.GetErrorString());
+		bool result = scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode;
+		DAYDREAM_CORE_ASSERT(!result && scene != nullptr, "{0}", importer.GetErrorString());
 
 		Shared<ModelData> modelData;
 
@@ -66,14 +68,14 @@ namespace Daydream
 		if (scene->mNumMeshes > 0)
 			modelData->meshes.reserve(scene->mNumMeshes);
 
-		for (UInt32 i = 0; i < scene->mNumMaterials; i++)
-		{
-			ProcessMaterial(scene->mMaterials[i], modelData, baseDirectory);
-		}
-
 		for (UInt32 i = 0; i < scene->mNumMeshes; i++)
 		{
 			ProcessMesh(scene->mMeshes[i], scene, modelData);
+		}
+
+		for (UInt32 i = 0; i < scene->mNumMaterials; i++)
+		{
+			ProcessMaterial(scene->mMaterials[i], modelData, baseDirectory);
 		}
 
 		//Vector3 vmin(1000, 1000, 1000);
@@ -108,7 +110,7 @@ namespace Daydream
 		//}
 
 		Matrix4x4 identity;
-		modelData->rootNode = ProcessNode(scene->mRootNode, scene, modelData->meshes, identity);
+		ProcessNode(scene->mRootNode, scene, modelData->meshes, modelData->rootNode);
 		return modelData;
 	}
 
@@ -116,72 +118,66 @@ namespace Daydream
 	{
 		//ProcessNode(_scene->mRootNode, _scene, );
 	}
-	NodeData ModelLoader::ProcessNode(aiNode* _curNode, const aiScene* _scene, const Array<MeshData>& _meshDatas, const Matrix4x4& _parentTransform)
+	void ModelLoader::ProcessNode(aiNode* _curNode, const aiScene* _scene, const Array<MeshData>& _meshDatas, NodeData& _curNodeData)
 	{
-		bool isRootNode = _scene->mRootNode == _curNode;
-		bool hasMesh = (_curNode->mNumMeshes > 0);
-		bool isDummyNode = !hasMesh;
+		// 현재 노드의 Transform의 worldMatrix를 가져온다.
+		Matrix4x4 localTransformMatrix = ConvertAssimpMatrix(_curNode->mTransformation);
 
-		//Matrix4x4 parentTransform = _parentTransform;
-		Matrix4x4 localTransform = ConvertAssimpMatrix(_curNode->mTransformation);
-		Matrix4x4 nextTransform = localTransform * _parentTransform;
+		bool hasMesh = (_curNode->mNumMeshes > 0);
+
+		// 만약 메쉬도 없고 matrix도 identity이고 자식노드도 1개라면 이 노드는 굳이 필요가 없다.
+		if (!hasMesh && localTransformMatrix.IsIdentity() && _curNode->mNumChildren == 1)
+		{
+			ProcessNode(_curNode->mChildren[0], _scene, _meshDatas, _curNodeData);
+			return;
+		}
+		
+		_curNodeData.name = _curNode->mName.C_Str();
+		_curNodeData.transform = Transform::Decompose(localTransformMatrix);
 
 		UInt32 meshSize = _scene->mNumMeshes;
-
-		//if (!hasMesh && _curNode->mNumChildren == 1)
-		//{
-		//	// 내 자식을 처리해서 바로 리턴해버림 (나는 생략됨)
-		//	return ProcessNode(_curNode->mChildren[0], _scene, _meshDatas);
-		//}
-
-		NodeData node{};
-		node.name = _curNode->mName.C_Str();
-
+		//이 노드에 메쉬가 하나인 경우 이 노드가 메쉬를 가진다.
 		if (_curNode->mNumMeshes == 1)
 		{
 			UInt32 meshIndex = _curNode->mMeshes[0];
 			if (meshIndex < meshSize)
 			{
-				node.meshIndex = meshIndex;
-				Matrix4x4 tmp = Matrix4x4::CreateTranslation(_meshDatas[meshIndex].centerOffset) * nextTransform;
-				node.transform = Transform::Decompose(tmp);
+				_curNodeData.meshIndex = meshIndex;
+				_curNodeData.materialIndex = _scene->mMeshes[meshIndex]->mMaterialIndex;
+				//Matrix4x4 tmp = Matrix4x4::CreateTranslation(_meshDatas[meshIndex].centerOffset) * nextTransform;
+				//node.transform = Transform::Decompose(tmp);
+
 			}
 			//translation += rotation * (centerOffset * scale);
 		}
-		// CASE B: 메쉬가 여러 개 있는 경우 (멀티 머티리얼 등)
-		// -> 현재 노드는 '그룹' 역할만 하고, 서브 노드들을 만들어 메쉬를 담당시킴
+		//메쉬가 여러개인 경우 자식을 메쉬 수만큼 만들어준다.
 		else if (_curNode->mNumMeshes > 1)
 		{
-			// node.meshIndex는 INVALID 상태 유지
-
 			for (UInt32 i = 0; i < _curNode->mNumMeshes; i++)
 			{
 				UInt32 meshIndex = _curNode->mMeshes[i];
 
 				// 서브 노드 생성
-				NodeData subNode{};
-				subNode.name = node.name + "_SubMesh_" + std::to_string(i);
-				subNode.meshIndex = meshIndex;
-
-				// [보정] 서브 노드의 위치를 오프셋만큼 이동
-				// 서브 노드는 부모(현재 노드) 기준이므로 회전/스케일 없이 위치만 이동하면 됨
-				//subNode.transform.rotation = Quaternion::Identity();
-				//subNode.transform.scale = Vector3(1.0f);
+				NodeData subNodeData{};
+				subNodeData.name = _curNodeData.name + "_Mesh_" + std::to_string(i);
+				subNodeData.meshIndex = meshIndex;
+				subNodeData.materialIndex = _scene->mMeshes[meshIndex]->mMaterialIndex;
+				
+				//SubNode의 경우 curNodeData의 Transform을 기준으로 0,0,0이 되므로 transform을 설정할 필요가 없음
 
 				// 자식으로 등록
-				node.children.push_back(subNode);
+				_curNodeData.children.push_back(subNodeData);
 			}
 		}
 
-		// 자식 노드 순회
-
+		// 자식 노드 순회(위에서 생성한 자식 메쉬 노드들은 NodeData, 여기는 aiNode*의 child)
 		for (UInt32 i = 0; i < _curNode->mNumChildren; i++)
 		{
-			NodeData childNode = ProcessNode(_curNode->mChildren[i], _scene, _meshDatas, nextTransform);
-			node.children.push_back(childNode);
+			NodeData childNode;
+			ProcessNode(_curNode->mChildren[i], _scene, _meshDatas, childNode);
+			_curNodeData.children.push_back(childNode);
 		}
 
-		return node;
 	}
 	void ModelLoader::ProcessMesh(aiMesh* _mesh, const aiScene* _scene, Shared<ModelData> _modelData)
 	{
@@ -232,15 +228,16 @@ namespace Daydream
 
 		//DAYDREAM_CORE_TRACE("{},{},{}", minBound.x, minBound.y, minBound.z);
 		//DAYDREAM_CORE_TRACE("{},{},{}", maxBound.x, maxBound.y, maxBound.z);
-		Vector3 center = (minBound + maxBound) * 0.5f;
-		meshData.centerOffset = center;
+		//Vector3 center = (minBound + maxBound) * 0.5f;
+		//meshData.centerOffset = center;
+		////이 메쉬의 중심이 0,0,0에서 얼마나 떨어져 있나?
 
-		//// 3. 정점 재배치 (recentering)
-		//// 모든 정점에서 중심점을 빼서, 메쉬의 로컬 원점을 (0,0,0)인 중심으로 이동시킴
-		for (auto& v : meshData.vertices)
-		{
-			v.position = v.position - center;
-		}
+		////// 3. 정점 재배치 (recentering)
+		////// 모든 정점에서 중심점을 빼서, 메쉬의 로컬 원점을 (0,0,0)인 중심으로 이동시킴
+		//for (auto& v : meshData.vertices)
+		//{
+		//	v.position = v.position - center;
+		//}
 
 		for (UInt32 i = 0; i < _mesh->mNumFaces; i++)
 		{
@@ -250,8 +247,7 @@ namespace Daydream
 				meshData.indices.push_back(face.mIndices[j]);
 			}
 		}
-		meshData.materialIndex = _mesh->mMaterialIndex;
-
+		
 		_modelData->meshes.push_back(meshData);
 	}
 	void ModelLoader::ProcessMaterial(aiMaterial* _material, Shared<ModelData> _modelData, const Path& _baseDirectory)

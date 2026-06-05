@@ -86,7 +86,7 @@ namespace Daydream
 						case AssetType::None: // is not AssetFile
 						{
 							thumbnail = AssetManager::GetAssetByPath<Texture2D>("Resource\\FileIcon.png");
-							ImGui::ImageButton(filenameString.c_str(), (ImTextureID)thumbnail->GetImGuiHandle(), { thumbnailSize, thumbnailSize });
+							ImGui::ImageButton(filenameString.c_str(), (ImTextureID)thumbnail->GetOrCreateDefaultSRV()->GetUIHandle(), {thumbnailSize, thumbnailSize});
 							break;
 						}
 						case AssetType::Texture2D:

@@ -42,9 +42,9 @@ namespace Daydream
 
 		//For Editor
 		void ReorderRootEntity(EntityHandle _entityHandle, UInt64 _newIndex);
-			
+
 	private:
-		void ProcessModelNode(EntityHandle _parentEntity, const NodeData& _curNode, const Model* _model);
+		EntityHandle ProcessModelNode(const NodeData& _curNode, const Array<AssetHandle>& _meshHandles, const Array<AssetHandle>& _matHandles);
 		String name;
 
 		Array<Unique<GameEntity>> entityPool;
@@ -56,7 +56,7 @@ namespace Daydream
 		Array<EntityHandle> rootEntities;
 
 		EntityHandle cameraEntity;
-		
+
 		Skybox* skybox;
 
 	};

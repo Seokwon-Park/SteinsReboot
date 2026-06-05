@@ -23,6 +23,7 @@ namespace Daydream::GraphicsUtility::DirectX
 		DAYDREAM_CORE_ASSERT(false, "Unknown ShaderDataType!");
 		return DXGI_FORMAT_UNKNOWN;
 	}
+
 	DXGI_FORMAT ConvertToDXGIFormat(RenderFormat _format)
 	{
 		switch (_format)
