@@ -51,16 +51,7 @@ namespace Daydream
 
 		//Cubemap Mesh
 		//auto meshData = MeshGenerator::CreateCube(5.0f);
-		auto meshData = MeshGenerator::CreateSphere(100.0f, 20, 20);
-		Array<Vector3> positions;
-		for (Vertex v : meshData.vertices)
-		{
-			positions.push_back(v.position);
-		}
 
-		cubeVBO = VertexBuffer::CreateStatic(sizeof(Vector3) * positions.size(), 12, positions.data());
-		cubeIBO = IndexBuffer::Create(meshData.indices.data(), meshData.indices.size());
-		cubeMesh = Mesh::Create(cubeVBO, cubeIBO);
 		/////////////////////////////////////////////////////////////////////////////////////
 
 		activeScene->CreateGameEntityFromModel(AssetManager::GetAssetHandleByPath("Asset/Model/scene.gltf"));
@@ -277,6 +268,8 @@ namespace Daydream
 		//ImGui::Image((ImTextureID)depthFramebuffer->GetDepthAttachmentTexture()->GetImGuiHandle(), ImVec2{ viewportSize.x / 3,viewportSize.y / 3 });
 
 		ImGui::Image((ImTextureID)AssetManager::GetAssetByPath<Texture2D>("Resource/skybox.hdr")->GetOrCreateDefaultSRV()->GetUIHandle(), ImVec2{ viewportSize.x / 3,viewportSize.y / 3 });
+
+		ImGui::Image((ImTextureID)sceneRenderer->GetShadowMapView()->GetUIHandle(), ImVec2{ viewportSize.x / 3,viewportSize.y / 3 });
 
 
 		//for (int i = 0; i < 4; i++)
@@ -497,258 +490,258 @@ namespace Daydream
 		{
 			panel->OnImGuiRender();
 		}
-	}
+		}
 
-	void EditorLayer::UpdateViewportSize()
-	{
-		ImVec2 ImGuiViewportSize = ImGui::GetContentRegionAvail();
-		bool currentActive = ImGui::IsAnyItemActive();
-		//static bool isResizing = true;
-		ImVec2 CurWindowSize = ImGui::GetMainViewport()->Size;
-		bool isWindowResized = mainWindowSize.x != ImGui::GetMainViewport()->Size.x || mainWindowSize.y != ImGui::GetMainViewport()->Size.y;
-		//bool isViewportResized = viewportFramebuffer->GetWidth() != ImGuiViewportSize.x || viewportFramebuffer->GetHeight() != ImGuiViewportSize.y;
-		auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
-		auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
-		auto viewportOffset = ImGui::GetWindowPos(); // Includes tab bar(height 21)
-		viewportBounds[0] = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
-		viewportBounds[1] = { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
-		if (currentActive) return; // 활성화 상태면(크기를 아직 드래그하고 있으면) 크기조절 X
-		//if (isViewportResized) // 윈도우 크기가 저장된 값과 다르거나 Imgui 윈도우 크기가 framebuffer크기와 다르면 리사이즈 된거임
+			void EditorLayer::UpdateViewportSize()
 		{
-			// 최종 크기로 카메라 및 프레임버퍼 업데이트
-			// 이 시점에는 이미 currentContentRegionSize가 최종 크기
-			if (ImGuiViewportSize.x > 1.0f && ImGuiViewportSize.y > 1.0f)
+			ImVec2 ImGuiViewportSize = ImGui::GetContentRegionAvail();
+			bool currentActive = ImGui::IsAnyItemActive();
+			//static bool isResizing = true;
+			ImVec2 CurWindowSize = ImGui::GetMainViewport()->Size;
+			bool isWindowResized = mainWindowSize.x != ImGui::GetMainViewport()->Size.x || mainWindowSize.y != ImGui::GetMainViewport()->Size.y;
+			//bool isViewportResized = viewportFramebuffer->GetWidth() != ImGuiViewportSize.x || viewportFramebuffer->GetHeight() != ImGuiViewportSize.y;
+			auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
+			auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
+			auto viewportOffset = ImGui::GetWindowPos(); // Includes tab bar(height 21)
+			viewportBounds[0] = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
+			viewportBounds[1] = { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
+			if (currentActive) return; // 활성화 상태면(크기를 아직 드래그하고 있으면) 크기조절 X
+			//if (isViewportResized) // 윈도우 크기가 저장된 값과 다르거나 Imgui 윈도우 크기가 framebuffer크기와 다르면 리사이즈 된거임
 			{
+				// 최종 크기로 카메라 및 프레임버퍼 업데이트
+				// 이 시점에는 이미 currentContentRegionSize가 최종 크기
+				if (ImGuiViewportSize.x > 1.0f && ImGuiViewportSize.y > 1.0f)
+				{
 
-				//Renderer::EndSwapchainRenderPass(Renderer::GetCurrentWindow());
-				//// D3D12Framebuffer 리사이즈 (GPU 동기화 로직 포함)
-				//viewportFramebuffer->Resize(static_cast<UInt32>(ImGuiViewportSize.x), static_cast<UInt32>(ImGuiViewportSize.y));
-				//Renderer::BeginSwapchainRenderPass(Renderer::GetCurrentWindow());
+					//Renderer::EndSwapchainRenderPass(Renderer::GetCurrentWindow());
+					//// D3D12Framebuffer 리사이즈 (GPU 동기화 로직 포함)
+					//viewportFramebuffer->Resize(static_cast<UInt32>(ImGuiViewportSize.x), static_cast<UInt32>(ImGuiViewportSize.y));
+					//Renderer::BeginSwapchainRenderPass(Renderer::GetCurrentWindow());
 
-				//크기가 달라졌으면 렌더러에 프레임버퍼 크기를 변경해달라고 요청함
-				//Renderer::RequestResizeFramebuffer(viewportFramebuffer, static_cast<UInt32>(ImGuiViewportSize.x), static_cast<UInt32>(ImGuiViewportSize.y));
-				//Renderer::RequestResizeFramebuffer(gBufferFramebuffer, static_cast<UInt32>(ImGuiViewportSize.x), static_cast<UInt32>(ImGuiViewportSize.y));
-				//Renderer::RequestResizeFramebuffer(maskFramebuffer, static_cast<UInt32>(ImGuiViewportSize.x), static_cast<UInt32>(ImGuiViewportSize.y));
-				// 카메라의 뷰포트 크기 업데이트
-				// camera->SetViewportSize(currentContentRegionSize.x, currentContentRegionSize.y);
+					//크기가 달라졌으면 렌더러에 프레임버퍼 크기를 변경해달라고 요청함
+					//Renderer::RequestResizeFramebuffer(viewportFramebuffer, static_cast<UInt32>(ImGuiViewportSize.x), static_cast<UInt32>(ImGuiViewportSize.y));
+					//Renderer::RequestResizeFramebuffer(gBufferFramebuffer, static_cast<UInt32>(ImGuiViewportSize.x), static_cast<UInt32>(ImGuiViewportSize.y));
+					//Renderer::RequestResizeFramebuffer(maskFramebuffer, static_cast<UInt32>(ImGuiViewportSize.x), static_cast<UInt32>(ImGuiViewportSize.y));
+					// 카메라의 뷰포트 크기 업데이트
+					// camera->SetViewportSize(currentContentRegionSize.x, currentContentRegionSize.y);
 
-				// 다음 프레임 비교를 위해 최종 크기 저장
-				viewportSize.x = ImGuiViewportSize.x;
-				viewportSize.y = ImGuiViewportSize.y;
-				mainWindowSize.x = ImGui::GetMainViewport()->Size.x;
-				mainWindowSize.y = ImGui::GetMainViewport()->Size.y;
-				//editorCamera->UpdateAspectRatio(ImGuiViewportSize.x, ImGuiViewportSize.y);
-				//Renderer::UpdateConstantBuffer(viewProjMat, editorCamera->GetViewProjectionMatrix());
+					// 다음 프레임 비교를 위해 최종 크기 저장
+					viewportSize.x = ImGuiViewportSize.x;
+					viewportSize.y = ImGuiViewportSize.y;
+					mainWindowSize.x = ImGui::GetMainViewport()->Size.x;
+					mainWindowSize.y = ImGui::GetMainViewport()->Size.y;
+					//editorCamera->UpdateAspectRatio(ImGuiViewportSize.x, ImGuiViewportSize.y);
+					//Renderer::UpdateConstantBuffer(viewProjMat, editorCamera->GetViewProjectionMatrix());
+				}
 			}
-		}
 
-		//isResizing = currentActive;
-		//if (viewportSize != Vector2(ImGuiViewportSize.x, ImGuiViewportSize.y))
-		//{
-		//	Renderer::EndSwapchainFramebuffer();
-		//	viewportFramebuffer->Resize(ImGuiViewportSize.x, ImGuiViewportSize.y);
-		//	viewportSize = Vector2(ImGuiViewportSize.x, ImGuiViewportSize.y);
-		//	camera->UpdateAspectRatio(ImGuiViewportSize.x, ImGuiViewportSize.y);
-		//	viewProjMat->Update(&camera->GetViewProjectionMatrix(), sizeof(Daydream::Matrix4x4));
-		//	Renderer::BeginSwapchainFramebuffer();
-		//}
-	}
-
-	Pair<Int32, Int32> EditorLayer::GetViewportMousePos()
-	{
-		auto [mouseX, mouseY] = ImGui::GetMousePos();
-		mouseX -= viewportBounds[0].x;
-		mouseY -= viewportBounds[0].y;
-		//glm::vec2 viewportSize = viewportBounds[1] - viewportBounds[0];
-		//my = viewportSize.y - my;
-		return { mouseX, mouseY };
-	}
-
-	void EditorLayer::OnDetach()
-	{
-		//viewportPanel = nullptr;
-		//propertyPanel = nullptr;
-		//sceneHierarchyPanel = nullptr;
-		//assetBrowserPanel = nullptr;
-		//skyboxPanel = nullptr;
-		//viewportFramebuffer = nullptr;
-	}
-
-	void EditorLayer::OnEvent(Event& _event)
-	{
-		EventDispatcher dispatcher(_event);
-		dispatcher.Dispatch<KeyPressedEvent>(BIND_EVENT_FN(EditorLayer::OnKeyPressed));
-		dispatcher.Dispatch<MouseButtonPressedEvent>(BIND_EVENT_FN(EditorLayer::OnMouseButtonPressed));
-		dispatcher.Dispatch<MouseButtonReleasedEvent>(BIND_EVENT_FN(EditorLayer::OnMouseButtonReleased));
-	}
-
-	bool EditorLayer::OnKeyPressed(KeyPressedEvent& _event)
-	{
-		if (Input::GetMousePressed(Mouse::ButtonRight))
-		{
-			//DAYDREAM_INFO("BLOCK EVENT");
-			return true;
-		}
-
-		switch (_event.GetKeyCode())
-		{
-		case Key::D1:
-		{
-			viewIndex = 0;
-			break;
-		}
-		case Key::D2:
-		{
-			viewIndex = 1;
-			break;
-		}
-		case Key::D3:
-		{
-			viewIndex = 2;
-			break;
-		}
-		case Key::D4:
-		{
-			viewIndex = 3;
-			break;
-		}
-		case Key::D5:
-		{
-			viewIndex = 4;
-			break;
-		}
-
-
-
-		case Key::Q:
-		{
-			guizmoType = -1;
-			break;
-		}
-		case Key::W:
-		{
-			guizmoType = ImGuizmo::OPERATION::TRANSLATE;
-			break;
-		}
-		case Key::E:
-		{
-			guizmoType = ImGuizmo::OPERATION::ROTATE;
-			break;
-		}
-		case Key::R:
-		{
-			guizmoType = ImGuizmo::OPERATION::SCALE;
-			break;
-		}
-		}
-		return false;
-	}
-
-	bool EditorLayer::OnMouseButtonPressed(MouseButtonPressedEvent& _e)
-	{
-		//DAYDREAM_CORE_TRACE("{0}", _e.ToString());
-
-		if (isViewportHovered && Input::GetMouseDown(Mouse::ButtonRight))
-		{
-			isViewControlled = true;
-		}
-
-
-		if (isViewportHovered && !isGuizmoInteract && Input::GetMouseDown(Mouse::ButtonLeft))
-		{
-			//DAYDREAM_INFO("{}", gBufferFramebuffer->ReadEntityHandleFromPixel(GetViewportMousePos()));
-			//int test = gBufferFramebuffer->ReadEntityHandleFromPixel(GetViewportMousePos());
-			//if (test != 0)
+			//isResizing = currentActive;
+			//if (viewportSize != Vector2(ImGuiViewportSize.x, ImGuiViewportSize.y))
 			//{
-			//	sceneHierarchyPanel->SetSelectedEntity(activeScene->GetEntity(EntityHandle(test)));
+			//	Renderer::EndSwapchainFramebuffer();
+			//	viewportFramebuffer->Resize(ImGuiViewportSize.x, ImGuiViewportSize.y);
+			//	viewportSize = Vector2(ImGuiViewportSize.x, ImGuiViewportSize.y);
+			//	camera->UpdateAspectRatio(ImGuiViewportSize.x, ImGuiViewportSize.y);
+			//	viewProjMat->Update(&camera->GetViewProjectionMatrix(), sizeof(Daydream::Matrix4x4));
+			//	Renderer::BeginSwapchainFramebuffer();
 			//}
 		}
-		//DAYDREAM_INFO("Mouse Coord = {0}, {1}", GetViewportMousePos().first, GetViewportMousePos().second);
 
-		return false;
-	}
-
-	bool EditorLayer::OnMouseButtonReleased(MouseButtonReleasedEvent& _e)
-	{
-		if (_e.GetMouseButton() == Mouse::ButtonRight)
+		Pair<Int32, Int32> EditorLayer::GetViewportMousePos()
 		{
-			isViewControlled = false;
-		}
-		return false;
-	}
-
-	void EditorLayer::CreateProject()
-	{
-	}
-
-	void EditorLayer::BeginDockspace()
-	{
-		static bool dockspaceOpen = true;
-		static bool optFullscreen = true;
-		static bool optPadding = false;
-		static ImGuiDockNodeFlags dockspaceFlags = ImGuiDockNodeFlags_None;
-
-		// We are using the ImGuiWindowFlags_NoDocking flag to make the parent window not dockable into,
-		// because it would be confusing to have two docking targets within each others.
-		//ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
-		ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoDocking;
-		if (optFullscreen)
-		{
-			const ImGuiViewport* viewport = ImGui::GetMainViewport();
-			ImGui::SetNextWindowPos(viewport->WorkPos);
-			ImGui::SetNextWindowSize(viewport->WorkSize);
-			ImGui::SetNextWindowViewport(viewport->ID);
-			ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-			ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-			windowFlags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
-			windowFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
-		}
-		else
-		{
-			dockspaceFlags &= ~ImGuiDockNodeFlags_PassthruCentralNode;
+			auto [mouseX, mouseY] = ImGui::GetMousePos();
+			mouseX -= viewportBounds[0].x;
+			mouseY -= viewportBounds[0].y;
+			//glm::vec2 viewportSize = viewportBounds[1] - viewportBounds[0];
+			//my = viewportSize.y - my;
+			return { mouseX, mouseY };
 		}
 
-		// When using ImGuiDockNodeFlags_PassthruCentralNode, DockSpace() will render our background
-		// and handle the pass-thru hole, so we ask Begin() to not render a background.
-		if (dockspaceFlags & ImGuiDockNodeFlags_PassthruCentralNode)
-			windowFlags |= ImGuiWindowFlags_NoBackground;
+		void EditorLayer::OnDetach()
+		{
+			//viewportPanel = nullptr;
+			//propertyPanel = nullptr;
+			//sceneHierarchyPanel = nullptr;
+			//assetBrowserPanel = nullptr;
+			//skyboxPanel = nullptr;
+			//viewportFramebuffer = nullptr;
+		}
 
-		// Important: note that we proceed even if Begin() returns false (aka window is collapsed).
-		// This is because we want to keep our DockSpace() active. If a DockSpace() is inactive,
-		// all active windows docked into it will lose their parent and become undocked.
-		// We cannot preserve the docking relationship between an active window and an inactive docking, otherwise
-		// any change of dockspace/settings would lead to windows being stuck in limbo and never being visible.
-		if (!optPadding)
-			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+		void EditorLayer::OnEvent(Event& _event)
+		{
+			EventDispatcher dispatcher(_event);
+			dispatcher.Dispatch<KeyPressedEvent>(BIND_EVENT_FN(EditorLayer::OnKeyPressed));
+			dispatcher.Dispatch<MouseButtonPressedEvent>(BIND_EVENT_FN(EditorLayer::OnMouseButtonPressed));
+			dispatcher.Dispatch<MouseButtonReleasedEvent>(BIND_EVENT_FN(EditorLayer::OnMouseButtonReleased));
+		}
 
-		//ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, Daydream::Application::GetInstance().isMaximzed ? ImVec2(6.0f, 6.0f) : ImVec2(0.0f, 0.0f));
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, false ? ImVec2(6.0f, 6.0f) : ImVec2(0.0f, 0.0f));
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 2.0f);
-		ImGui::PushStyleColor(ImGuiCol_MenuBarBg, ImVec4{ 0.0f, 0.0f, 0.0f, 0.0f });
+		bool EditorLayer::OnKeyPressed(KeyPressedEvent& _event)
+		{
+			if (Input::GetMousePressed(Mouse::ButtonRight))
+			{
+				//DAYDREAM_INFO("BLOCK EVENT");
+				return true;
+			}
 
-		ImGui::Begin("DockingSpace", &dockspaceOpen, windowFlags);
-		//m_DockSpacePos = { ImGui::GetWindowPos().x, ImGui::GetWindowPos().y };
-		//STS_CORE_WARN("Dock Space Coord = {0}, {1}", m_DockSpacePos.x, m_DockSpacePos.y);
-		ImGui::PopStyleColor(); // MenuBarBg
-		ImGui::PopStyleVar(2);
+			switch (_event.GetKeyCode())
+			{
+			case Key::D1:
+			{
+				viewIndex = 0;
+				break;
+			}
+			case Key::D2:
+			{
+				viewIndex = 1;
+				break;
+			}
+			case Key::D3:
+			{
+				viewIndex = 2;
+				break;
+			}
+			case Key::D4:
+			{
+				viewIndex = 3;
+				break;
+			}
+			case Key::D5:
+			{
+				viewIndex = 4;
+				break;
+			}
 
-		if (!optPadding)
-			ImGui::PopStyleVar();
 
-		if (optFullscreen)
+
+			case Key::Q:
+			{
+				guizmoType = -1;
+				break;
+			}
+			case Key::W:
+			{
+				guizmoType = ImGuizmo::OPERATION::TRANSLATE;
+				break;
+			}
+			case Key::E:
+			{
+				guizmoType = ImGuizmo::OPERATION::ROTATE;
+				break;
+			}
+			case Key::R:
+			{
+				guizmoType = ImGuizmo::OPERATION::SCALE;
+				break;
+			}
+			}
+			return false;
+		}
+
+		bool EditorLayer::OnMouseButtonPressed(MouseButtonPressedEvent& _e)
+		{
+			//DAYDREAM_CORE_TRACE("{0}", _e.ToString());
+
+			if (isViewportHovered && Input::GetMouseDown(Mouse::ButtonRight))
+			{
+				isViewControlled = true;
+			}
+
+
+			if (isViewportHovered && !isGuizmoInteract && Input::GetMouseDown(Mouse::ButtonLeft))
+			{
+				//DAYDREAM_INFO("{}", gBufferFramebuffer->ReadEntityHandleFromPixel(GetViewportMousePos()));
+				//int test = gBufferFramebuffer->ReadEntityHandleFromPixel(GetViewportMousePos());
+				//if (test != 0)
+				//{
+				//	sceneHierarchyPanel->SetSelectedEntity(activeScene->GetEntity(EntityHandle(test)));
+				//}
+			}
+			//DAYDREAM_INFO("Mouse Coord = {0}, {1}", GetViewportMousePos().first, GetViewportMousePos().second);
+
+			return false;
+		}
+
+		bool EditorLayer::OnMouseButtonReleased(MouseButtonReleasedEvent& _e)
+		{
+			if (_e.GetMouseButton() == Mouse::ButtonRight)
+			{
+				isViewControlled = false;
+			}
+			return false;
+		}
+
+		void EditorLayer::CreateProject()
+		{
+		}
+
+		void EditorLayer::BeginDockspace()
+		{
+			static bool dockspaceOpen = true;
+			static bool optFullscreen = true;
+			static bool optPadding = false;
+			static ImGuiDockNodeFlags dockspaceFlags = ImGuiDockNodeFlags_None;
+
+			// We are using the ImGuiWindowFlags_NoDocking flag to make the parent window not dockable into,
+			// because it would be confusing to have two docking targets within each others.
+			//ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+			ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoDocking;
+			if (optFullscreen)
+			{
+				const ImGuiViewport* viewport = ImGui::GetMainViewport();
+				ImGui::SetNextWindowPos(viewport->WorkPos);
+				ImGui::SetNextWindowSize(viewport->WorkSize);
+				ImGui::SetNextWindowViewport(viewport->ID);
+				ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+				ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+				windowFlags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+				windowFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+			}
+			else
+			{
+				dockspaceFlags &= ~ImGuiDockNodeFlags_PassthruCentralNode;
+			}
+
+			// When using ImGuiDockNodeFlags_PassthruCentralNode, DockSpace() will render our background
+			// and handle the pass-thru hole, so we ask Begin() to not render a background.
+			if (dockspaceFlags & ImGuiDockNodeFlags_PassthruCentralNode)
+				windowFlags |= ImGuiWindowFlags_NoBackground;
+
+			// Important: note that we proceed even if Begin() returns false (aka window is collapsed).
+			// This is because we want to keep our DockSpace() active. If a DockSpace() is inactive,
+			// all active windows docked into it will lose their parent and become undocked.
+			// We cannot preserve the docking relationship between an active window and an inactive docking, otherwise
+			// any change of dockspace/settings would lead to windows being stuck in limbo and never being visible.
+			if (!optPadding)
+				ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+
+			//ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, Daydream::Application::GetInstance().isMaximzed ? ImVec2(6.0f, 6.0f) : ImVec2(0.0f, 0.0f));
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, false ? ImVec2(6.0f, 6.0f) : ImVec2(0.0f, 0.0f));
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 2.0f);
+			ImGui::PushStyleColor(ImGuiCol_MenuBarBg, ImVec4{ 0.0f, 0.0f, 0.0f, 0.0f });
+
+			ImGui::Begin("DockingSpace", &dockspaceOpen, windowFlags);
+			//m_DockSpacePos = { ImGui::GetWindowPos().x, ImGui::GetWindowPos().y };
+			//STS_CORE_WARN("Dock Space Coord = {0}, {1}", m_DockSpacePos.x, m_DockSpacePos.y);
+			ImGui::PopStyleColor(); // MenuBarBg
 			ImGui::PopStyleVar(2);
 
-		// Submit the DockSpace
-		ImGuiIO& io = ImGui::GetIO();
-		ImGuiStyle& style = ImGui::GetStyle();
-		float minWinSizeX = style.WindowMinSize.x;
-		style.WindowMinSize.x = 370.0f;
-		if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
-		{
-			ImGuiID dockspace_id = ImGui::GetID("EngineDockingSpace");
-			ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspaceFlags);
-		}
+			if (!optPadding)
+				ImGui::PopStyleVar();
 
-		ImGui::End();
+			if (optFullscreen)
+				ImGui::PopStyleVar(2);
+
+			// Submit the DockSpace
+			ImGuiIO& io = ImGui::GetIO();
+			ImGuiStyle& style = ImGui::GetStyle();
+			float minWinSizeX = style.WindowMinSize.x;
+			style.WindowMinSize.x = 370.0f;
+			if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
+			{
+				ImGuiID dockspace_id = ImGui::GetID("EngineDockingSpace");
+				ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspaceFlags);
+			}
+
+			ImGui::End();
+		}
 	}
-}

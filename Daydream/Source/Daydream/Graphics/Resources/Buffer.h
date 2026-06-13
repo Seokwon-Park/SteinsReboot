@@ -93,7 +93,15 @@ namespace Daydream
 	protected:
 	};
 
+	class ReadbackBuffer : public Buffer
+	{
+	public:
+		ReadbackBuffer(Shared<GPUBuffer> _buffer);
+		~ReadbackBuffer();
 
+		static Shared<ReadbackBuffer> Create(UInt32 _size);
+	protected:
+	};
 
 }
 

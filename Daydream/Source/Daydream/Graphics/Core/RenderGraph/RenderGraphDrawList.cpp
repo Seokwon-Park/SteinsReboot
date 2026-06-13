@@ -20,5 +20,12 @@ namespace Daydream
 
 		renderItems.push_back(item);
 	}
+	void RenderGraphDrawList::AddDrawObject(Mesh* _mesh)
+	{
+		RenderItem item{};
+		item.mesh = _mesh;
+
+		renderItems.push_back(item);
+	}
 }
 

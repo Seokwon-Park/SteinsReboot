@@ -28,6 +28,7 @@ namespace Daydream
 			return true;
 		}
 	}
+
 	Shared<Texture2D> AssetImporter::LoadTexture2D(const AssetMetadata& _metaData)
 	{
 		Path texturePath = _metaData.filePath;
@@ -189,26 +190,26 @@ namespace Daydream
 
 				if (!albedo.IsValid())
 				{
-					albedo = AssetDefaults::DefaultAlbedoHandle;
+					albedo = AssetDefaults::AlbedoHandle;
 				}
 
 				if (!normal.IsValid())
 				{
-					normal = AssetDefaults::DefaultNormalHandle;
+					normal = AssetDefaults::NormalHandle;
 				}
 
 				if (!roughness.IsValid())
 				{
-					roughness = AssetDefaults::DefaultRoughnessHandle;
+					roughness = AssetDefaults::RoughnessHandle;
 				}
 
 				if (!metallic.IsValid())
 				{
-					metallic = AssetDefaults::DefaultMetallicHandle;
+					metallic = AssetDefaults::MetallicHandle;
 				}
 				if (!ao.IsValid())
 				{
-					ao = AssetDefaults::DefaultAOHandle;
+					ao = AssetDefaults::AOHandle;
 				}
 
 				newMaterial->SetTextureBinding("mat_AlbedoMap", albedo);

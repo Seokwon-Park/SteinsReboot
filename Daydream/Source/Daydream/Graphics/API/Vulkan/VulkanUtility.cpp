@@ -544,7 +544,7 @@ namespace Daydream::GraphicsUtility::Vulkan
 		return vk::CompareOp::eNever;
 	}
 
-	vk::CullModeFlags ConvertToVulkanCullMode(const CullMode& _cullMode)
+	vk::CullModeFlags ConvertToVkCullMode(const CullMode& _cullMode)
 	{
 		switch (_cullMode)
 		{
@@ -560,7 +560,7 @@ namespace Daydream::GraphicsUtility::Vulkan
 		return  vk::CullModeFlagBits::eFrontAndBack;
 	}
 
-	vk::PolygonMode ConvertToVulkanFillMode(const FillMode& _fillMode)
+	vk::PolygonMode ConvertToVkFillMode(const FillMode& _fillMode)
 	{
 		switch (_fillMode)
 		{
@@ -574,7 +574,56 @@ namespace Daydream::GraphicsUtility::Vulkan
 		return vk::PolygonMode::eFill;
 	}
 
-	vk::SamplerCreateInfo TranslateToVulkanSamplerCreateInfo(const SamplerDesc& _desc)
+
+	vk::CompareOp ConvertToVkCompareOp(const CompareFunction& _compareFunc)
+	{
+		switch (_compareFunc)
+		{
+		case CompareFunction::Never:        return vk::CompareOp::eNever;
+		case CompareFunction::Less:         return vk::CompareOp::eLess;
+		case CompareFunction::Equal:        return vk::CompareOp::eEqual;
+		case CompareFunction::LessEqual:    return vk::CompareOp::eLessOrEqual;
+		case CompareFunction::Greater:      return vk::CompareOp::eGreater;
+		case CompareFunction::NotEqual:     return vk::CompareOp::eNotEqual;
+		case CompareFunction::GreaterEqual: return vk::CompareOp::eGreaterOrEqual;
+		case CompareFunction::Always:       return vk::CompareOp::eAlways;
+		default:                            return vk::CompareOp::eLess;
+		}
+	}
+
+	vk::StencilOp ConvertToVkStencilOp(const StencilOperation& _stencilOp)
+	{
+		switch (_stencilOp)
+		{
+		case StencilOperation::Keep:              return vk::StencilOp::eKeep;
+		case StencilOperation::Zero:              return vk::StencilOp::eZero;
+		case StencilOperation::Replace:           return vk::StencilOp::eReplace;
+		case StencilOperation::IncrementSaturate: return vk::StencilOp::eIncrementAndClamp;
+		case StencilOperation::DecrementSaturate: return vk::StencilOp::eDecrementAndClamp;
+		case StencilOperation::Invert:            return vk::StencilOp::eInvert;
+		case StencilOperation::IncrementWrap:     return vk::StencilOp::eIncrementAndWrap;
+		case StencilOperation::DecrementWrap:     return vk::StencilOp::eDecrementAndWrap;
+		default:                                  return vk::StencilOp::eKeep;
+		}
+	}
+
+	vk::StencilOpState ConvertToVkStencilOpState(const StencilOperationDesc& _opDesc, UInt8 _readMask, UInt8 _writeMask)
+	{
+		vk::StencilOpState state{};
+		state.failOp = ConvertToVkStencilOp(_opDesc.failOp);
+		state.passOp = ConvertToVkStencilOp(_opDesc.passOp);
+		state.depthFailOp = ConvertToVkStencilOp(_opDesc.depthFailOp);
+		state.compareOp = ConvertToVkCompareOp(_opDesc.compareFunc);
+
+		state.compareMask = _readMask;
+		state.writeMask = _writeMask;
+
+		state.reference = 0;
+
+		return state;
+	}
+
+	vk::SamplerCreateInfo TranslateToVkSamplerCreateInfo(const SamplerDesc& _desc)
 	{
 		vk::SamplerCreateInfo info{};
 
@@ -598,20 +647,38 @@ namespace Daydream::GraphicsUtility::Vulkan
 	}
 
 
-	vk::PipelineRasterizationStateCreateInfo TranslateToVulkanRasterizerCreateInfo(const RasterizerStateDesc& _desc)
+	vk::PipelineRasterizationStateCreateInfo TranslateToVkRasterizationStateCreateInfo(const RasterizerStateDesc& _desc)
 	{
-		vk::PipelineRasterizationStateCreateInfo rasterizer{};
-		rasterizer.depthClampEnable = VK_FALSE;
-		rasterizer.rasterizerDiscardEnable = VK_FALSE;
-		rasterizer.polygonMode = ConvertToVulkanFillMode(_desc.fillMode);
-		rasterizer.lineWidth = 1.0f;
-		rasterizer.cullMode = ConvertToVulkanCullMode(_desc.cullMode);
-		rasterizer.frontFace = _desc.frontCounterClockwise ? vk::FrontFace::eCounterClockwise : vk::FrontFace::eClockwise;
-		rasterizer.depthBiasEnable = VK_FALSE;
-		rasterizer.depthBiasConstantFactor = 0.0f; // Optional
-		rasterizer.depthBiasClamp = 0.0f; // Optional
-		rasterizer.depthBiasSlopeFactor = 0.0f; // Optional
-		return rasterizer;
+		vk::PipelineRasterizationStateCreateInfo rsCreateInfo{};
+		rsCreateInfo.depthClampEnable = VK_FALSE;
+		rsCreateInfo.rasterizerDiscardEnable = VK_FALSE;
+		rsCreateInfo.polygonMode = ConvertToVkFillMode(_desc.fillMode);
+		rsCreateInfo.lineWidth = 1.0f;
+		rsCreateInfo.cullMode = ConvertToVkCullMode(_desc.cullMode);
+		rsCreateInfo.frontFace = _desc.frontCounterClockwise ? vk::FrontFace::eCounterClockwise : vk::FrontFace::eClockwise;
+		rsCreateInfo.depthBiasEnable = VK_FALSE;
+		rsCreateInfo.depthBiasConstantFactor = 0.0f; // Optional
+		rsCreateInfo.depthBiasClamp = 0.0f; // Optional
+		rsCreateInfo.depthBiasSlopeFactor = 0.0f; // Optional
+		return rsCreateInfo;
+	}
+
+	vk::PipelineDepthStencilStateCreateInfo TranslateToVkDepthStencilStateCreateInfo(const DepthStencilStateDesc& _desc)
+	{
+		vk::PipelineDepthStencilStateCreateInfo dssCreateInfo{};
+		dssCreateInfo.depthTestEnable = _desc.depthEnable;
+		dssCreateInfo.depthWriteEnable = _desc.depthWriteEnable;
+		dssCreateInfo.depthCompareOp = ConvertToVkCompareOp(_desc.depthFunc);
+		dssCreateInfo.depthBoundsTestEnable = vk::False;
+		dssCreateInfo.stencilTestEnable = _desc.stencilEnable;
+		dssCreateInfo.front = ConvertToVkStencilOpState(_desc.frontFace, _desc.stencilReadMask, _desc.stencilWriteMask);
+		dssCreateInfo.back = ConvertToVkStencilOpState(_desc.backFace, _desc.stencilReadMask, _desc.stencilWriteMask);
+		dssCreateInfo.minDepthBounds = 0.0f;
+		dssCreateInfo.maxDepthBounds = 1.0f;
+		dssCreateInfo.flags = {};
+		dssCreateInfo.pNext = nullptr;
+
+		return dssCreateInfo;
 	}
 
 }

@@ -131,7 +131,7 @@ namespace Daydream
 		inputAssembly.primitiveRestartEnable = VK_FALSE;
 		
 
-		vk::PipelineRasterizationStateCreateInfo rasterizer = GraphicsUtility::Vulkan::TranslateToVulkanRasterizerCreateInfo(_desc.rasterizerState);
+		vk::PipelineRasterizationStateCreateInfo rasterizer = GraphicsUtility::Vulkan::TranslateToVkRasterizationStateCreateInfo(_desc.rasterizerState);
 		//vk::PipelineRasterizationStateCreateInfo rasterizer{};
 		//rasterizer.depthClampEnable = VK_FALSE;
 		//rasterizer.rasterizerDiscardEnable = VK_FALSE;
@@ -180,23 +180,8 @@ namespace Daydream
 		colorBlending.blendConstants[2] = 0.0f; // Optional
 		colorBlending.blendConstants[3] = 0.0f; // Optional
 
-		vk::PipelineDepthStencilStateCreateInfo depthStencil{};
-		depthStencil.pNext = nullptr; // 확장기능
-		depthStencil.flags = {}; // 나중에 사용될 예약된 필드
-		depthStencil.depthTestEnable = VK_TRUE;
-		depthStencil.depthWriteEnable = VK_TRUE;
-		depthStencil.depthCompareOp = vk::CompareOp::eLess;
-		depthStencil.depthBoundsTestEnable = VK_FALSE;
-		depthStencil.stencilTestEnable = VK_TRUE;
-		depthStencil.front.failOp = vk::StencilOp::eKeep;           // 스텐실 테스트 실패 시
-		depthStencil.front.passOp = vk::StencilOp::eKeep;           // 스텐실 테스트 통과, 깊이 테스트 통과 시
-		depthStencil.front.depthFailOp = vk::StencilOp::eKeep;      // 스텐실 테스트 통과, 깊이 테스트 실패 시
-		depthStencil.front.compareOp = vk::CompareOp::eAlways;      // 스텐실 비교 연산
-		depthStencil.front.compareMask = 0xFF;                    // 비교 마스크
-		depthStencil.front.writeMask = 0xFF;                      // 쓰기 마스크
-		depthStencil.front.reference = 0;                         // 참조 값
+		vk::PipelineDepthStencilStateCreateInfo depthStencil = GraphicsUtility::Vulkan::TranslateToVkDepthStencilStateCreateInfo(_desc.depthStencilState);
 
-		depthStencil.back = depthStencil.front;
 
 		vk::PipelineLayoutCreateInfo pipelineLayoutInfo{};
 		pipelineLayoutInfo.setLayoutCount = static_cast<UInt32>(rawDescriptorSetLayouts.size()); // Optional

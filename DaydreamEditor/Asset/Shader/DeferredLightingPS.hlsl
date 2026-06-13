@@ -52,12 +52,12 @@ cbuffer Lights : register(b2)
     uint spotLightCount;
 };
 
-cbuffer EditorData : register(b3) 
-{
-    uint2 padding;
-    uint selectedID; // 현재 선택된 Entity ID (0 = 아무것도 선택 안됨)
-    int outlineThickness;
-};
+//cbuffer EditorData : register(b3)
+//{
+//    uint2 padding;
+//    uint selectedID; // 현재 선택된 Entity ID (0 = 아무것도 선택 안됨)
+//    int outlineThickness;
+//};
 
 cbuffer LightViewProjection : register(b4) 
 {
@@ -366,9 +366,7 @@ PSOutput PSMain(PSInput input)
 
         shadowFactor = shadowSum / 9.0;
 
-        // --- [수정된 부분 끝] ---
-
-        // (선택 사항) 범위 밖 처리: 섀도우 맵 밖은 항상 빛을 받도록
+        // 범위 밖 처리: 섀도우 맵 밖은 항상 빛을 받도록
             if (lightScreen.z > 1.0 || lightScreen.z < 0.0 ||
             lightTexcoord.x > 1.0 || lightTexcoord.x < 0.0 ||
             lightTexcoord.y > 1.0 || lightTexcoord.y < 0.0)

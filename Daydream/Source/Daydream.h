@@ -54,7 +54,7 @@
 #include "Daydream/Graphics/Resources/Texture/Texture2D.h"
 #include "Daydream/Graphics/Resources/Texture/TextureCube.h"
 #include "Daydream/Graphics/Resources/Texture/TextureView.h"
-#include "Daydream/Graphics/Resources/Struct/RenderDataTypes.h"
+#include "Daydream/Graphics/Resources/Struct/RenderDataStruct.h"
 
 #include "Daydream/Graphics/Manager/ResourceManager.h"
 

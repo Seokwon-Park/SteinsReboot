@@ -56,14 +56,20 @@ namespace Daydream
 
 		//glfwWindowHint(GLFW_TITLEBAR, false);
 
-		if (desc.rendererAPI != RendererAPIType::OpenGL)
+		if (!desc.useDefaultClientAPI) 
 		{
 			glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 		}
+
 		glfwWindow = glfwCreateWindow((Int32)desc.width, (Int32)desc.height, desc.title.c_str(), nullptr, nullptr);
 		glfwCount++;
-	
-		MakeContextCurrent();
+
+		if (desc.useDefaultClientAPI)
+		{
+			glfwMakeContextCurrent(glfwWindow);
+		}
+
+		//MakeContextCurrent();
 		
 		glfwSetWindowUserPointer(glfwWindow, &windowData);
 
@@ -174,6 +180,7 @@ namespace Daydream
 			glfwTerminate();
 		}
 	}
+
 	void WindowsWindow::OnUpdate()
 	{
 		glfwPollEvents();
@@ -208,19 +215,12 @@ namespace Daydream
 	}
 	void WindowsWindow::MakeContextCurrent() const
 	{
-		if (desc.rendererAPI == RendererAPIType::OpenGL)
-		{
-			glfwMakeContextCurrent(glfwWindow);
-		}
+		glfwMakeContextCurrent(glfwWindow);
 	}
 	void WindowsWindow::ReleaseContext() const
 	{
+
+
 		glfwMakeContextCurrent(nullptr);
-		if (desc.rendererAPI == RendererAPIType::OpenGL)
-		{
-			glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-			GLFWwindow* uploadContext = glfwCreateWindow(1,1, "Upload", nullptr, glfwWindow);
-			glfwMakeContextCurrent(uploadContext);
-		}
 	}
 }

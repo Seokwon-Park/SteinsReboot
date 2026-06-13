@@ -15,6 +15,8 @@ namespace Daydream
 	protected:
 
 	private:
+		Mesh* skyboxMesh;
+
 		ViewProjectionData lightViewProjData;
 
 		Shared<ConstantBuffer> lightViewProjectionBuffer;

@@ -20,6 +20,8 @@ cbuffer World : register(b0)
 
 cbuffer LightViewProjection : register(b1)
 {
+    matrix view;
+    matrix projection;
     matrix viewProjection;
 };
 

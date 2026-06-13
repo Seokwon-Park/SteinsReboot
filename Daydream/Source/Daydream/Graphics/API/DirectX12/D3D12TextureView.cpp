@@ -11,8 +11,9 @@ namespace Daydream
 		ID3D12Device* device = _device->GetDevice();
 		ID3D12Resource* resource = _texture->GetID3D12Resource();
 
-		RenderFormat targetFormat = (_desc.format == RenderFormat::UNKNOWN) ? _texture->GetDesc().format : _desc.format;
-		DXGI_FORMAT dxgiFormat = GraphicsUtility::DirectX::ConvertToDXGIFormat(targetFormat);
+		RenderFormat format = (_desc.format == RenderFormat::UNKNOWN) ? _texture->GetDesc().format : _desc.format;
+		DXGI_FORMAT dxgiFormat = GraphicsUtility::DirectX::ConvertToDXGIFormat(format);
+		
 
 		bool isArray = (_texture->GetDesc().type == TextureType::TextureCube || _texture->GetDesc().layerCount > 1);
 
@@ -20,6 +21,15 @@ namespace Daydream
 		{
 		case TextureViewType::ShaderResource:
 		{
+			if (GraphicsUtility::IsDepthFormat(format))
+			{
+				dxgiFormat = GraphicsUtility::DirectX::ConvertToDepthSRVFormat(format);
+			}
+			else if (GraphicsUtility::IsStencilFormat(format))
+			{
+				dxgiFormat = GraphicsUtility::DirectX::ConvertToStencilSRVFormat(format);
+			}
+
 			D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
 			srvDesc.Format = dxgiFormat;
 			srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -76,7 +86,7 @@ namespace Daydream
 		case TextureViewType::DepthStencil:
 		{
 			D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
-			dsvDesc.Format = dxgiFormat;
+			dsvDesc.Format = GraphicsUtility::DirectX::ConvertToDSVFormat(format);
 			dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
 
 			if (isArray)

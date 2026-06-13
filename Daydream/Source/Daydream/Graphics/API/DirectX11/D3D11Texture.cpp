@@ -11,7 +11,7 @@ namespace Daydream
 		:GPUTexture(_desc)
 	{
 		DXGI_FORMAT format = GraphicsUtility::DirectX::ConvertToDXGIFormat(_desc.format);
-		UInt32 bindFlags = GraphicsUtility::DirectX11::ConvertToD3D11BindFlags(_desc.textureUsage);
+		UInt32 bindFlags = GraphicsUtility::DirectX11::ConvertToD3D11TextureBindFlags(_desc.textureUsage);
 
 		switch (_desc.type)
 		{

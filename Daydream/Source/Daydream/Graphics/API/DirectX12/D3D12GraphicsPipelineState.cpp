@@ -182,6 +182,7 @@ namespace Daydream
 		{
 			pipelineStateDesc.RTVFormats[i] = GraphicsUtility::DirectX::ConvertToDXGIFormat(desc.renderTargetFormats[i]);
 		}
+		pipelineStateDesc.DSVFormat = GraphicsUtility::DirectX::ConvertToDSVFormat(desc.depthStencilFormat);
 		pipelineStateDesc.SampleMask = UINT_MAX;
 
 		pipelineStateDesc.BlendState.AlphaToCoverageEnable = FALSE;
@@ -196,32 +197,7 @@ namespace Daydream
 		for (UINT i = 0; i < D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT; ++i)
 			pipelineStateDesc.BlendState.RenderTarget[i] = defaultRenderTargetBlendDesc;
 
-		pipelineStateDesc.DSVFormat = GraphicsUtility::DirectX::ConvertToDXGIFormat(desc.depthStencilFormat); 
-		D3D12_DEPTH_STENCIL_DESC dsDesc{};
-		// 깊이/스텐실 상태 설정 (d3dx12 없이 직접 - 깊이 테스트 비활성화)
-		dsDesc.DepthEnable = pipelineStateDesc.DSVFormat != DXGI_FORMAT_UNKNOWN;
-		dsDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-		dsDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS; // 또는 적절한 함수
-		dsDesc.StencilEnable = pipelineStateDesc.DSVFormat != DXGI_FORMAT_UNKNOWN; // 스텐실 테스트 끔
-		dsDesc.StencilReadMask = D3D12_DEFAULT_STENCIL_READ_MASK;   // 0xFF (모든 비트 읽기)
-		dsDesc.StencilWriteMask = D3D12_DEFAULT_STENCIL_WRITE_MASK; // 0xFF (모든 비트 쓰기)
-
-		// FrontFace (기본적으로 DepthFunc과 동일하게 설정)
-		dsDesc.FrontFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;      // 스텐실 테스트 실패 시 동작 유지
-		dsDesc.FrontFace.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP; // 깊이 테스트 실패 시 동작 유지
-		dsDesc.FrontFace.StencilPassOp = D3D12_STENCIL_OP_KEEP;      // 스텐실 및 깊이 테스트 모두 통과 시 동작 유지
-		dsDesc.FrontFace.StencilFunc = D3D12_COMPARISON_FUNC_ALWAYS; // 스텐실 함수 항상 통과
-
-		// BackFace (기본적으로 FrontFace와 동일하게 설정)
-		dsDesc.BackFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
-		dsDesc.BackFace.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP;
-		dsDesc.BackFace.StencilPassOp = D3D12_STENCIL_OP_KEEP;
-		dsDesc.BackFace.StencilFunc = D3D12_COMPARISON_FUNC_ALWAYS;
-
-		pipelineStateDesc.DepthStencilState = dsDesc;
-		//// 아래 값들은 DepthEnable=FALSE 이므로 무시됨
-		//desc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
-		//desc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_NEVER;
+		pipelineStateDesc.DepthStencilState = GraphicsUtility::DirectX12::ConvertToD3D12DepthStencilDesc(_desc.depthStencilState);
 
 		hr = device->GetDevice()->CreateGraphicsPipelineState(&pipelineStateDesc, IID_PPV_ARGS(pipeline.GetAddressOf()));
 		if (FAILED(hr))
@@ -235,6 +211,7 @@ namespace Daydream
 	D3D12GraphicsPipelineState::~D3D12GraphicsPipelineState()
 	{
 	}
+
 	UInt32 D3D12GraphicsPipelineState::GetDescriptorTableIndex(String _resourceName) const
 	{
 		auto itr = descriptorTable.find(_resourceName);

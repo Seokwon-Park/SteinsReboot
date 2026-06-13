@@ -6,6 +6,7 @@
 #include "Daydream/Enum/RendererEnums.h"
 #include "Daydream/Graphics/Resources/Buffer.h"
 #include "Daydream/Graphics/Resources/Sampler.h"
+#include "Daydream/Graphics/States/DepthStencilState.h"
 
 
 namespace Daydream::GraphicsUtility::OpenGL
@@ -24,4 +25,7 @@ namespace Daydream::GraphicsUtility::OpenGL
 	GLint ConvertToGLMinFilter(FilterMode _minFilter, FilterMode _mipFilter);
 	GLint ConvertToGLMagFilter(FilterMode _filterMode);
 	GLint ConvertToGLWrapMode(WrapMode _wrapMode);
+
+	GLenum ConvertToGLCompareFunc(const CompareFunction& _compareFunc);
+	GLenum ConvertToGLStencilOp(const StencilOperation& _stencilOp);
 }

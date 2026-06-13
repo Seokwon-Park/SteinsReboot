@@ -14,6 +14,9 @@ namespace Daydream
 		virtual void SetViewport(UInt32 _x, UInt32 _y, UInt32 _width, UInt32 _height)  override;
 		virtual void DrawIndexed(UInt32 _indexCount, UInt32 _startIndex = 0, UInt32 _baseVertex = 0)  override;
 
+		virtual void EnableThreadedRendering() override;
+		virtual void DisableThreadedRendering() override;
+
 		virtual void BeginRendering(const RenderingInfo& _renderingInfo) override;
 		virtual void EndRendering(const RenderingInfo& _renderingInfo) override;
 

@@ -7,6 +7,7 @@
 #include "Daydream/Graphics/Resources/Buffer.h"
 #include "Daydream/Graphics/Resources/Sampler.h"
 #include "Daydream/Graphics/States/RasterizerState.h"
+#include "Daydream/Graphics/States/DepthStencilState.h"
 #include "D3D12MemAlloc.h"
 
 namespace Daydream::GraphicsUtility::DirectX12
@@ -34,6 +35,11 @@ namespace Daydream::GraphicsUtility::DirectX12
 	constexpr D3D12_CULL_MODE ConvertToD3D12CullMode(const CullMode& _cullMode);
 	constexpr D3D12_FILL_MODE ConvertToD3D12FillMode(const FillMode& _fillMode);
 
+	D3D12_COMPARISON_FUNC ConvertToD3D12ComparisonFunc(const CompareFunction& _compareFunc);
+	D3D12_STENCIL_OP ConvertToD3D12StencilOperation(const StencilOperation& _stencilOp);
+	D3D12_DEPTH_STENCILOP_DESC ConvertToD3D12StencilOperationDesc(const StencilOperationDesc& _opDesc);
+
 	D3D12_SAMPLER_DESC ConvertToD3D12SamplerDesc(const SamplerDesc& _desc);
 	D3D12_RASTERIZER_DESC ConvertToD3D12RasterizerDesc(const RasterizerStateDesc& _desc);
+	D3D12_DEPTH_STENCIL_DESC ConvertToD3D12DepthStencilDesc(const DepthStencilStateDesc& _desc);
 }

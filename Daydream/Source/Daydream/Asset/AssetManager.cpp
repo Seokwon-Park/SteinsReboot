@@ -197,12 +197,12 @@ namespace Daydream
 		instance->CreateBuiltinMesh();
 
 		AssetMetadata metadata;
-		metadata.handle = AssetDefaults::DefaultMaterialHandle;
+		metadata.handle = AssetDefaults::MaterialHandle;
 		metadata.filePath = "";
 		metadata.type = AssetType::Material;
 		metadata.name = "";
 
-		instance->assetRegistry[AssetDefaults::DefaultMaterialHandle] = metadata;
+		instance->assetRegistry[AssetDefaults::MaterialHandle] = metadata;
 	}
 
 	const AssetMetadata& AssetManager::GetAssetMetadata(AssetHandle _handle)
@@ -352,32 +352,32 @@ namespace Daydream
 		pixelData[1] = 255;
 		pixelData[2] = 255;
 		pixelData[3] = 255;
-		assetPathMap["DefaultTexture"] = AssetDefaults::DefaultAlbedoHandle;
-		loadedAssetCache[AssetDefaults::DefaultAlbedoHandle] = Texture2D::Create(desc, pixelData.data());
+		assetPathMap["DefaultTexture"] = AssetDefaults::AlbedoHandle;
+		loadedAssetCache[AssetDefaults::AlbedoHandle] = Texture2D::Create(desc, pixelData.data());
 
 		pixelData[0] = 128;
 		pixelData[1] = 128;
 		pixelData[2] = 255;
-		assetPathMap["DefaultNormal"] = AssetDefaults::DefaultNormalHandle;
-		loadedAssetCache[AssetDefaults::DefaultNormalHandle] = Texture2D::Create(desc, pixelData.data());
+		assetPathMap["DefaultNormal"] = AssetDefaults::NormalHandle;
+		loadedAssetCache[AssetDefaults::NormalHandle] = Texture2D::Create(desc, pixelData.data());
 
 		pixelData[0] = 128;
 		pixelData[1] = 128;
 		pixelData[2] = 128;
-		assetPathMap["DefaultRoughness"] = AssetDefaults::DefaultRoughnessHandle;
-		loadedAssetCache[AssetDefaults::DefaultRoughnessHandle] = Texture2D::Create(desc, pixelData.data());
+		assetPathMap["DefaultRoughness"] = AssetDefaults::RoughnessHandle;
+		loadedAssetCache[AssetDefaults::RoughnessHandle] = Texture2D::Create(desc, pixelData.data());
 
 		pixelData[0] = 0;
 		pixelData[1] = 0;
 		pixelData[2] = 0;
-		assetPathMap["DefaultMetallic"] = AssetDefaults::DefaultMetallicHandle;
-		loadedAssetCache[AssetDefaults::DefaultMetallicHandle] = Texture2D::Create(desc, pixelData.data());
+		assetPathMap["DefaultMetallic"] = AssetDefaults::MetallicHandle;
+		loadedAssetCache[AssetDefaults::MetallicHandle] = Texture2D::Create(desc, pixelData.data());
 
 		pixelData[0] = 255;
 		pixelData[1] = 255;
 		pixelData[2] = 255;
-		assetPathMap["DefaultAO"] = AssetDefaults::DefaultAOHandle;
-		loadedAssetCache[AssetDefaults::DefaultAOHandle] = Texture2D::Create(desc, pixelData.data());
+		assetPathMap["DefaultAO"] = AssetDefaults::AOHandle;
+		loadedAssetCache[AssetDefaults::AOHandle] = Texture2D::Create(desc, pixelData.data());
 	}
 
 	void AssetManager::CreateBuiltinMesh()
@@ -394,10 +394,10 @@ namespace Daydream
 		Shared<VertexBuffer> vertexBuffer = VertexBuffer::CreateStatic(sizeof(vertices), 20, vertices);
 		Shared<IndexBuffer> indexBuffer = IndexBuffer::Create(indices, 6);
 
-		assetPathMap["DefaultQuadMesh"] = AssetDefaults::DefaultQuadMeshHandle;
-		loadedAssetCache[AssetDefaults::DefaultQuadMeshHandle] = Mesh::Create(vertexBuffer, indexBuffer);
+		assetPathMap["DefaultQuadMesh"] = AssetDefaults::QuadMeshHandle;
+		loadedAssetCache[AssetDefaults::QuadMeshHandle] = Mesh::Create(vertexBuffer, indexBuffer);
 
-		auto meshData = MeshGenerator::CreateCube();
+		MeshData meshData = MeshGenerator::CreateCube();
 		Array<Vector3> positions;
 		for (const Vertex& v : meshData.vertices)
 		{
@@ -405,8 +405,20 @@ namespace Daydream
 		}
 		vertexBuffer = VertexBuffer::CreateStatic(sizeof(Vector3) * (UInt32)positions.size(), 12, positions.data());
 		indexBuffer = IndexBuffer::Create(meshData.indices.data(), (UInt32)meshData.indices.size());
-		assetPathMap["DefaultBoxMesh"] = AssetDefaults::DefaultBoxMeshHandle;
-		loadedAssetCache[AssetDefaults::DefaultBoxMeshHandle] = Mesh::Create(vertexBuffer, indexBuffer);
+		assetPathMap["DefaultBoxMesh"] = AssetDefaults::BoxMeshHandle;
+		loadedAssetCache[AssetDefaults::BoxMeshHandle] = Mesh::Create(vertexBuffer, indexBuffer);
+
+		meshData = MeshGenerator::CreateSphere(1.0f, 20, 20);
+		positions.clear();
+		for (const Vertex& v : meshData.vertices)
+		{
+			positions.push_back(v.position);
+		}
+
+		vertexBuffer = VertexBuffer::CreateStatic(sizeof(Vector3) * positions.size(), 12, positions.data());
+		indexBuffer = IndexBuffer::Create(meshData.indices.data(), meshData.indices.size());
+		assetPathMap["DefaultSkyboxSphereMesh"] = AssetDefaults::SkyboxSphereHandle;
+		loadedAssetCache[AssetDefaults::SkyboxSphereHandle] = Mesh::Create(vertexBuffer, indexBuffer);
 	}
 
 	void AssetManager::ProcessDirectory(const Path& _directoryPath, bool _isRecursive)

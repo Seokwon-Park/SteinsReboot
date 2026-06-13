@@ -59,7 +59,6 @@ namespace Daydream
 			return false;
 		}
 
-		// StringView는 data()와 length()를 가지고 있으므로 안전하게 쓰기 가능
 		fout.write(_text.data(), _text.length());
 		fout.close();
 

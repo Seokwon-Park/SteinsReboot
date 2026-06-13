@@ -529,9 +529,10 @@ namespace Daydream
 		);
 	}
 
-	void VulkanRenderContext::TransitionTextureState(const GPUTexture* _texture, ResourceState _beforeState, ResourceState _afterState, UInt32 _baseMip, UInt32 _mipLevels, UInt32 _baseLayer, UInt32 _layerCount)
+	void Daydream::VulkanRenderContext::TransitionTextureState(GPUTexture* _texture, ResourceState _afterState, UInt32 _baseMip, UInt32 _mipLevels, UInt32 _baseLayer, UInt32 _layerCount)
 	{
-		if (_beforeState == _afterState)
+		ResourceState beforeState = _texture->GetState();
+		if (beforeState == _afterState)
 		{
 			DAYDREAM_RENDERER_WARN("Before State == After State");
 			return;
@@ -541,7 +542,7 @@ namespace Daydream
 
 		vk::PipelineStageFlags srcStage;
 		vk::AccessFlags srcAccess;
-		std::tie(srcStage, srcAccess) = GraphicsUtility::Vulkan::ConvertToVulkanStageAndAccess(_beforeState);
+		std::tie(srcStage, srcAccess) = GraphicsUtility::Vulkan::ConvertToVulkanStageAndAccess(beforeState);
 
 		vk::PipelineStageFlags dstStage;
 		vk::AccessFlags dstAccess;
@@ -556,11 +557,12 @@ namespace Daydream
 		barrier.subresourceRange.layerCount = _layerCount;
 		barrier.subresourceRange.baseMipLevel = _baseMip;
 		barrier.subresourceRange.levelCount = _mipLevels;
-		barrier.oldLayout = GraphicsUtility::Vulkan::ConvertToVulkanImageLayout(_beforeState);
+		barrier.oldLayout = GraphicsUtility::Vulkan::ConvertToVulkanImageLayout(beforeState);
 		barrier.newLayout = GraphicsUtility::Vulkan::ConvertToVulkanImageLayout(_afterState);
 		barrier.srcAccessMask = srcAccess;
 		barrier.dstAccessMask = dstAccess;
 
+		_texture->SetState(_afterState);
 		GetActiveCommandBuffer().pipelineBarrier
 		(
 			srcStage,               // srcStageMask
@@ -570,23 +572,23 @@ namespace Daydream
 			0, nullptr,            // bufferMemoryBarriers
 			1, &barrier              // imageMemoryBarriers
 		);
-		return;
 	}
 
 
-	void VulkanRenderContext::TransitionBufferState(const GPUBuffer* _buffer, ResourceState _beforeState, ResourceState _afterState)
+	void VulkanRenderContext::TransitionBufferState(GPUBuffer* _buffer, ResourceState _afterState)
 	{
-		if (_beforeState == _afterState)
+		ResourceState beforeState = _buffer->GetState();
+		if (beforeState == _afterState)
 		{
 			DAYDREAM_RENDERER_WARN("Before State == After State");
 			return;
 		}
 
-		const VulkanGPUBuffer* vkBuffer = Cast<const VulkanGPUBuffer*>(_buffer);
+		VulkanGPUBuffer* vkBuffer = Cast<VulkanGPUBuffer*>(_buffer);
 
 		vk::PipelineStageFlags srcStage;
 		vk::AccessFlags srcAccess;
-		std::tie(srcStage, srcAccess) = GraphicsUtility::Vulkan::ConvertToVulkanStageAndAccess(_beforeState);
+		std::tie(srcStage, srcAccess) = GraphicsUtility::Vulkan::ConvertToVulkanStageAndAccess(beforeState);
 
 		vk::PipelineStageFlags dstStage;
 		vk::AccessFlags dstAccess;
@@ -602,6 +604,7 @@ namespace Daydream
 		barrier.size = VK_WHOLE_SIZE;
 		barrier.pNext = nullptr;
 
+		_buffer->SetState(_afterState);
 		GetActiveCommandBuffer().pipelineBarrier
 		(
 			srcStage,               // srcStageMask

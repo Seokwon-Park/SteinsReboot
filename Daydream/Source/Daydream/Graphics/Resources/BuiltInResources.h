@@ -12,6 +12,7 @@ namespace Daydream
 			const GraphicsPipelineState* Depth();
 			const GraphicsPipelineState* GBuffer();
 			const GraphicsPipelineState* Deferred();
+			const GraphicsPipelineState* EnvironmentCubemap();
 		}
 
 		namespace Samplers

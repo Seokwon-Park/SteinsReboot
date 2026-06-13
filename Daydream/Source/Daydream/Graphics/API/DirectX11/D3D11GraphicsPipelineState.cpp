@@ -72,11 +72,12 @@ namespace Daydream
 
 		//CW
 		D3D11_RASTERIZER_DESC rastDesc = GraphicsUtility::DirectX11::ConvertToD3D11RasterizerDesc(_desc.rasterizerState);
-
-		//D3D11_DEPTH_STENCIL_DESC depthDesc;
-		//D3D11_BLEND_DESC blendDesc;
-		
 		_device->GetDevice()->CreateRasterizerState(&rastDesc, rasterizer.GetAddressOf());
+
+		D3D11_DEPTH_STENCIL_DESC dsDesc = GraphicsUtility::DirectX11::ConvertToD3D11DepthStencilDesc(_desc.depthStencilState);
+		_device->GetDevice()->CreateDepthStencilState(&dsDesc, depthStencil.GetAddressOf());
+
+		//D3D11_BLEND_DESC blendDesc;
 	}
 
 	void D3D11GraphicsPipelineState::Bind() const
@@ -91,7 +92,8 @@ namespace Daydream
 		device->GetContext()->DSSetShader(domainShader, nullptr, 0);
 		device->GetContext()->GSSetShader(geometryShader, nullptr, 0);
 
-		device->GetContext()->OMSetDepthStencilState(nullptr, 0);
+		device->GetContext()->OMSetDepthStencilState(depthStencil.Get(), 0);
+		//device->GetContext()->OMSetBlendState(nullptr, nullptr, 0);
 
 		device->GetContext()->IASetInputLayout(inputLayout.Get());
 		device->GetContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);

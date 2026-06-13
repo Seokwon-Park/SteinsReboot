@@ -31,14 +31,13 @@ namespace Daydream
 		constantBufferPool = MakeUnique<ConstantBufferPool>();
 		pools.push_back(constantBufferPool.get());
 
-
 		commandQueues.resize(MaxCommandListsInFlight);
 		for (auto& commandList : commandQueues)
 		{
 			commandList = MakeUnique<RenderCommandQueue>();
 		}
 
-		// memory_order_relaxed´Â µ¿±âÈ­ ¼ø¼­°¡ Áß¿äÇÏÁö ¾ÊÀº ´Ü¼ø ÃÊ±âÈ­¿¡ »ç¿ë
+		// memory_order_relaxedëŠ” ë™ê¸°í™” ìˆœì„œê°€ ì¤‘ìš”í•˜ì§€ ì•Šì€ ë‹¨ìˆœ ì´ˆê¸°í™”ì— ì‚¬ìš©
 		for (auto& queueBusy : commandQueueBusyFlags)
 		{
 			queueBusy.store(false, std::memory_order_relaxed);
@@ -56,7 +55,7 @@ namespace Daydream
 		/*	RenderCommand::Init(renderDevice.get());*/
 	}
 
-	void Renderer::InitRenderDevice(Daydream::RendererAPIType _API)
+	void Renderer::InitRenderDevice(RendererAPIType _API)
 	{
 		renderDevice = RenderDevice::Create(_API);
 		DAYDREAM_CORE_ASSERT(renderDevice, "Failed to create graphics device!");
@@ -71,6 +70,11 @@ namespace Daydream
 
 	void Renderer::PostInit()
 	{
+		if (useRenderThread)
+		{
+			renderContext->EnableThreadedRendering();
+		}
+
 		skybox = MakeUnique<Skybox>();
 		skybox->CreateResources();
 		EnqueuePreFrameCommand([]() {skybox->GenerateDefault(); });
@@ -89,7 +93,7 @@ namespace Daydream
 		pools.clear();
 		texturePool = nullptr;
 		uploadBufferPool = nullptr;
-		constantBufferPool= nullptr;
+		constantBufferPool = nullptr;
 
 		skybox = nullptr;
 		imguiRenderer->Shutdown();
@@ -175,7 +179,7 @@ namespace Daydream
 			});
 	}
 
-	void Daydream::Renderer::BeginRendering(Swapchain* _swapchain, Color _clearColor)
+	void Renderer::BeginRendering(Swapchain* _swapchain, Color _clearColor)
 	{
 		EnqueueCommand([_swapchain, _clearColor]()
 			{
@@ -318,7 +322,7 @@ namespace Daydream
 			});
 	}
 
-	void Daydream::Renderer::CopyBufferToTexture2D(const Buffer* _src, const Texture2D* _dst)
+	void Renderer::CopyBufferToTexture2D(const Buffer* _src, const Texture2D* _dst)
 	{
 		EnqueueCommand([_src, _dst]()
 			{
@@ -334,9 +338,9 @@ namespace Daydream
 				TextureCopyRegion region = {};
 				region.extent[0] = _src->GetWidth();
 				region.extent[1] = _src->GetHeight();
-				region.extent[2] = 1; // 2D´Ï±î ±íÀÌ´Â 1
+				region.extent[2] = 1; // 2Dë‹ˆê¹Œ ê¹Šì´ëŠ” 1
 
-				region.srcSubresource.layerCount = 1; // 2D´Ï±î ·¹ÀÌ¾îµµ 1
+				region.srcSubresource.layerCount = 1; // 2Dë‹ˆê¹Œ ë ˆì´ì–´ë„ 1
 				renderContext->CopyTexture(_src->GetGPUTexture(), _dst->GetGPUTexture(), region);
 			});
 	}
@@ -383,34 +387,41 @@ namespace Daydream
 			});
 	}
 
-	void Renderer::TransitionTextureState(const Texture* _texture, ResourceState _beforeState, ResourceState _afterState, UInt32 _baseMip, UInt32 _mipLevels, UInt32 _baseLayer, UInt32 _layerCount)
+	void Renderer::TransitionTextureState(Texture* _texture, ResourceState _afterState, UInt32 _baseMip, UInt32 _mipLevels, UInt32 _baseLayer, UInt32 _layerCount)
 	{
-		if (_beforeState == _afterState) return;
-		EnqueueCommand([_texture, _beforeState, _afterState, _baseMip, _mipLevels, _baseLayer, _layerCount]()
+		EnqueueCommand([_texture, _afterState, _baseMip, _mipLevels, _baseLayer, _layerCount]()
 			{
-				renderContext->TransitionTextureState(_texture->GetGPUTexture(), _beforeState, _afterState, _baseMip, _mipLevels, _baseLayer, _layerCount);
+				if (_texture->GetGPUTexture()->GetState() == _afterState)
+				{
+					return;
+				}
+				renderContext->TransitionTextureState(_texture->GetGPUTexture(), _afterState, _baseMip, _mipLevels, _baseLayer, _layerCount);
 			});
 	}
 
-	void Renderer::TransitionTextureState(const Shared<Texture>& _texture, ResourceState _beforeState, ResourceState _afterState, UInt32 _baseMip, UInt32 _mipLevels, UInt32 _baseLayer, UInt32 _layerCount)
+	void Renderer::TransitionTextureState(const Shared<Texture>& _texture, ResourceState _afterState, UInt32 _baseMip, UInt32 _mipLevels, UInt32 _baseLayer, UInt32 _layerCount)
 	{
-		TransitionTextureState(_texture.get(), _beforeState, _afterState, _baseMip, _mipLevels, _baseLayer, _layerCount);
+		TransitionTextureState(_texture.get(), _afterState, _baseMip, _mipLevels, _baseLayer, _layerCount);
 	}
 
 
-	void Renderer::TransitionBufferState(const GPUBuffer* _buffer, ResourceState _beforeState, ResourceState _afterState)
+	void Renderer::TransitionBufferState(Buffer* _buffer, ResourceState _afterState)
 	{
-		EnqueueCommand([_buffer, _beforeState, _afterState]()
+		EnqueueCommand([_buffer, _afterState]()
 			{
-				renderContext->TransitionBufferState(_buffer, _beforeState, _afterState);
+				if (_buffer->GetGPUBuffer()->GetState() == _afterState)
+				{
+					return;
+				}
+				renderContext->TransitionBufferState(_buffer->GetGPUBuffer(), _afterState);
 			});
 	}
 
-	void Renderer::TransitionBufferState(const Shared<Buffer>& _buffer, ResourceState _beforeState, ResourceState _afterState)
+	void Renderer::TransitionBufferState(const Shared<Buffer>& _buffer, ResourceState _afterState)
 	{
-		EnqueueCommand([_buffer, _beforeState, _afterState]()
+		EnqueueCommand([_buffer, _afterState]()
 			{
-				renderContext->TransitionBufferState(_buffer->GetGPUBuffer(), _beforeState, _afterState);
+				renderContext->TransitionBufferState(_buffer->GetGPUBuffer(), _afterState);
 			});
 	}
 
@@ -434,39 +445,39 @@ namespace Daydream
 
 	void Renderer::Submit()
 	{
-		// ÇöÀç ¸ŞÀÎ½º·¹µå°¡ ÀÛ¼ºÇÑ Å¥ÀÇ ÀÎµ¦½º¿Í Æ÷ÀÎÅÍ °¡Á®¿À±â
+		// í˜„ì¬ ë©”ì¸ìŠ¤ë ˆë“œê°€ ì‘ì„±í•œ íì˜ ì¸ë±ìŠ¤ì™€ í¬ì¸í„° ê°€ì ¸ì˜¤ê¸°
 		const UInt32 submittedQueueIndex = recordingQueueIndex;
 		RenderCommandQueue* submittedQueue = commandQueues[submittedQueueIndex].get();
 
 		if (useRenderThread && renderThread)
 		{
-			// Å¥ÀÇ »óÅÂ¸¦ »ç¿ëÁßÀ¸·Î Àá±İ
-			// memory_order_release´Â ÀÌ ½ÃÁ¡ ÀÌÀüÀÇ ¸ğµç ¸Ş¸ğ¸® ±â·ÏÀÌ ´Ù¸¥ ½º·¹µå¿¡°Ô È®½ÇÈ÷ º¸ÀÌµµ·Ï º¸Àå
+			// íì˜ ìƒíƒœë¥¼ ì‚¬ìš©ì¤‘ìœ¼ë¡œ ì ê¸ˆ
+			// memory_order_releaseëŠ” ì´ ì‹œì  ì´ì „ì˜ ëª¨ë“  ë©”ëª¨ë¦¬ ê¸°ë¡ì´ ë‹¤ë¥¸ ìŠ¤ë ˆë“œì—ê²Œ í™•ì‹¤íˆ ë³´ì´ë„ë¡ ë³´ì¥
 			commandQueueBusyFlags[submittedQueueIndex].store(true, std::memory_order_release);
 
-			// ·»´õ½º·¹µå¿¡ ºñµ¿±â ½ÇÇà ¿äÃ» + ÀÛ¾÷ÀÌ ³¡³ª¸é ½ÇÇàÇÒ ÇÔ¼ö
+			// ë Œë”ìŠ¤ë ˆë“œì— ë¹„ë™ê¸° ì‹¤í–‰ ìš”ì²­ + ì‘ì—…ì´ ëë‚˜ë©´ ì‹¤í–‰í•  í•¨ìˆ˜
 			renderThread->Submit(submittedQueue, [submittedQueueIndex]()
 				{
-					// [·»´õ ½º·¹µå¿¡¼­ ½ÇÇàµÊ] ÀÛ¾÷ÀÌ ³¡³µÀ¸¹Ç·Î Å¥ »óÅÂ¸¦ '»ç¿ë °¡´É(false)'À¸·Î º¯°æ
+					// [ë Œë” ìŠ¤ë ˆë“œì—ì„œ ì‹¤í–‰ë¨] ì‘ì—…ì´ ëë‚¬ìœ¼ë¯€ë¡œ í ìƒíƒœë¥¼ 'ì‚¬ìš© ê°€ëŠ¥(false)'ìœ¼ë¡œ ë³€ê²½
 					commandQueueBusyFlags[submittedQueueIndex].store(false, std::memory_order_release);
-					// waitÇÏ°í ÀÖÀ» commandQueueStateCV¿¡°Ô ÀÛ¾÷ÀÌ ³¡³µÀ½À» ¾Ë¸²
+					// waití•˜ê³  ìˆì„ commandQueueStateCVì—ê²Œ ì‘ì—…ì´ ëë‚¬ìŒì„ ì•Œë¦¼
 					commandQueueStateCV.notify_all();
 				});
 
-			// »õ·Î ¸í·ÉÀ» Ãß°¡ÇÒ Å¥ÀÇ ÀÎµ¦½º·Î ¾÷µ¥ÀÌÆ®
+			// ìƒˆë¡œ ëª…ë ¹ì„ ì¶”ê°€í•  íì˜ ì¸ë±ìŠ¤ë¡œ ì—…ë°ì´íŠ¸
 			recordingQueueIndex = (recordingQueueIndex + 1) % MaxCommandListsInFlight;
 			std::unique_lock<std::mutex> lock(commandQueueStateMutex);
 			commandQueueStateCV.wait(lock, []()
 				{
-					// ¸ŞÀÎ ½º·¹µå°¡ ´ÙÀ½À¸·Î ¾²·Á°í ÇÏ´Â Å¥¸¦, ·»´õ ½º·¹µå°¡ ¾ÆÁ÷µµ Áö¿ìÁö ¸øÇÏ°íÀÖ´Ù¸é
-					// ¸ŞÀÎ ½º·¹µå´Â CPU¸¦ Á¡À¯ÇÏÁö ¾Ê°í ¿©±â¼­ ´ë±â
-					// ·»´õ ½º·¹µå°¡ ¾Æ±î Á¦ÃâÇÒ Äİ¹éÀ» ÅëÇØ false·Î ¹Ù²ãÁÖ¸é ±ú¾î³ª¼­ ´ÙÀ½ ÇÁ·¹ÀÓ ·ÎÁ÷À» ÁøÇà
+					// ë©”ì¸ ìŠ¤ë ˆë“œê°€ ë‹¤ìŒìœ¼ë¡œ ì“°ë ¤ê³  í•˜ëŠ” íë¥¼, ë Œë” ìŠ¤ë ˆë“œê°€ ì•„ì§ë„ ì§€ìš°ì§€ ëª»í•˜ê³ ìˆë‹¤ë©´
+					// ë©”ì¸ ìŠ¤ë ˆë“œëŠ” CPUë¥¼ ì ìœ í•˜ì§€ ì•Šê³  ì—¬ê¸°ì„œ ëŒ€ê¸°
+					// ë Œë” ìŠ¤ë ˆë“œê°€ ì•„ê¹Œ ì œì¶œí•  ì½œë°±ì„ í†µí•´ falseë¡œ ë°”ê¿”ì£¼ë©´ ê¹¨ì–´ë‚˜ì„œ ë‹¤ìŒ í”„ë ˆì„ ë¡œì§ì„ ì§„í–‰
 					return !commandQueueBusyFlags[recordingQueueIndex].load(std::memory_order_acquire);
 				});
 		}
 		else
 		{
-			//½Ì±Û ½º·¹µåÀÏ °æ¿ì ±×³É ½ÇÇà
+			//ì‹±ê¸€ ìŠ¤ë ˆë“œì¼ ê²½ìš° ê·¸ëƒ¥ ì‹¤í–‰
 			submittedQueue->Execute();
 		}
 		for (IResourcePool* pool : pools)

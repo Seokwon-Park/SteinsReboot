@@ -31,6 +31,11 @@ namespace Daydream
 		if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(debugLayer.GetAddressOf()))))
 		{
 			debugLayer->EnableDebugLayer();
+			//ComPtr<ID3D12Debug1> debugLayer1;
+			//if (SUCCEEDED(debugLayer.As(&debugLayer1)))
+			//{
+			//	debugLayer1->SetEnableGPUBasedValidation(true);
+			//}
 			// Enable additional debug layers.
 			dxgiFactoryFlags |= DXGI_CREATE_FACTORY_DEBUG;
 		}

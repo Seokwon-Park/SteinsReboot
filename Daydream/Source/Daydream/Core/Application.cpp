@@ -20,10 +20,12 @@ namespace Daydream
 		DAYDREAM_CORE_ASSERT(!instance, "Application already exists!");
 		instance = this;
 
+		appSpec = _specification;
+
 		prop.width = 1280;
 		prop.height = 720;
 		prop.title = _specification.Name;
-		prop.rendererAPI = _specification.rendererAPI;
+		prop.useDefaultClientAPI = _specification.rendererAPI == RendererAPIType::OpenGL;
 
 		imGuiLayer = nullptr;
 		mainThreadID = std::this_thread::get_id();
@@ -103,8 +105,6 @@ namespace Daydream
 
 	bool Application::Run()
 	{
-		//OpenGL Context Switching(when RenderThread is enabled)
-		TransferContextForRenderThread(GetMainWindowPtr()); 
 		while (isRunning)
 		{
 			timeStep.UpdateTime();
@@ -152,9 +152,9 @@ namespace Daydream
 			//	DAYDREAM_CORE_TRACE("KEY UP TEST");
 			//}
 			Renderer::EndFrame(mainWindow->GetSwapchain());
+			imGuiLayer->UpdateImGuiWindows();
 			Renderer::Submit();
 
-			imGuiLayer->UpdateImGuiWindows();
 			mainWindow->OnUpdateInputState();
 			mainWindow->OnUpdate();
 
@@ -200,7 +200,7 @@ namespace Daydream
 	bool Application::InitRenderer()
 	{
 		//렌더러 초기화
-		Renderer::Init(prop.rendererAPI);
+		Renderer::Init(appSpec.rendererAPI);
 		//렌더러에서 윈도우에 대한 스왑체인 생성
 		if (!Renderer::CreateSwapchainForWindow(*mainWindow))
 		{
@@ -261,14 +261,5 @@ namespace Daydream
 			//	Renderer::SetWindow(_e.GetWindowName());
 		}
 		return false;
-	}
-
-	void Application::TransferContextForRenderThread(DaydreamWindow* _window)
-	{
-		if (Renderer::IsRenderThreadEnabled())
-		{
-			_window->ReleaseContext();
-			Renderer::EnqueueCommand([_window]() {_window->MakeContextCurrent(); });
-		}
 	}
 }

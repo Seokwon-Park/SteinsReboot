@@ -8,7 +8,7 @@ namespace Daydream
 	{
 		device = _device;
 
-		vk::SamplerCreateInfo samplerInfo = GraphicsUtility::Vulkan::TranslateToVulkanSamplerCreateInfo(_desc);
+		vk::SamplerCreateInfo samplerInfo = GraphicsUtility::Vulkan::TranslateToVkSamplerCreateInfo(_desc);
 		sampler = device->GetDevice().createSamplerUnique(samplerInfo);
 	}
 

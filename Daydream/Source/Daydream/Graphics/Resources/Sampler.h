@@ -2,35 +2,7 @@
 
 namespace Daydream
 {
-    enum class FilterMode
-    {
-        Nearest,        // 최근접 필터링
-        Linear,         // 선형 필터링
-        NearestMipmapNearest, // 밉맵 사용, 최근접 필터링
-        LinearMipmapNearest,  // 밉맵 사용, 선형 필터링
-        NearestMipmapLinear,  // 밉맵 사용, 선형 필터링
-        LinearMipmapLinear    // 밉맵 사용, 선형 필터링
-    };
 
-    enum class WrapMode
-    {
-        Repeat,         // 반복
-        ClampToEdge,    // 경계에 고정
-        ClampToBorder,  // 경계색으로 고정
-        MirrorRepeat    // 거울처럼 반복
-    };
-
-    enum class ComparisonFunc
-    {
-        Never,
-        Less,
-        Equal,
-        LessEqual,
-        Greater,
-        NotEqual,
-        GreaterEqual,
-        Always
-    };
 
     struct SamplerDesc
     {

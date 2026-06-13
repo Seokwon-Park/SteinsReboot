@@ -22,6 +22,7 @@ namespace Daydream
 		static constexpr UInt32 MaxFramesInFlight = 3;
 		static constexpr UInt32 MaxCommandListsInFlight = 3;
 
+
 		template<typename RenderFunction>
 		static void EnqueueCommand(RenderFunction&& _command)
 		{
@@ -68,7 +69,23 @@ namespace Daydream
 		static void BindShaderResourceView(const String& _name, const TextureView* _textureView, const Sampler* _samplerState);
 		static void BindConstantBuffer(const String& _name, const ConstantBuffer* _buffer);
 		static void BindConstantBuffer(const String& _name, const Shared<ConstantBuffer>& _buffer);
-		
+
+		static void UpdateConstantBuffer(ConstantBuffer* _buffer, const void* _data, UInt32 _size)
+		{
+			std::vector<UInt8> dataCopy((const UInt8*)_data, (const UInt8*)_data + _size);
+
+			EnqueueCommand([_buffer, data = std::move(dataCopy)]()
+				{
+					// 렌더 스레드에서 안전하게 복사된 데이터를 사용
+					_buffer->UpdateData(data.data(), data.size());
+				});
+		}
+
+		static void UpdateConstantBuffer(const Shared<ConstantBuffer>& _buffer, const void* _data, UInt32 _size)
+		{
+			UpdateConstantBuffer(_buffer.get(), _data, _size);
+		}
+
 		template <typename DataType>
 		static void UpdateConstantBuffer(ConstantBuffer* _buffer, const DataType& _data)
 		{
@@ -95,8 +112,7 @@ namespace Daydream
 		static void CopyTexture2DToTextureCube(const Texture2D* _srcTexture2D, const TextureCube* _dstCubemap, UInt32 _faceIndex, UInt32 _mipLevel = 0);
 		static void CopyTextureCubeToTexture2D(const TextureCube* _srcCubemap, const Texture2D* _dstTexture2D, UInt32 _faceIndex, UInt32 _mipLevel = 0);
 
-		static void TransitionTextureState(const Texture* _texture,
-			ResourceState _beforeState,
+		static void TransitionTextureState(Texture* _texture,
 			ResourceState _afterState,
 			UInt32 _baseMip = 0,
 			UInt32 _mipLevels = -1,
@@ -104,20 +120,14 @@ namespace Daydream
 			UInt32 _layerCount = -1);
 
 		static void TransitionTextureState(const Shared<Texture>& _texture,
-			ResourceState _beforeState,
 			ResourceState _afterState,
 			UInt32 _baseMip = 0,
 			UInt32 _mipLevels = -1,
 			UInt32 _baseLayer = 0,
 			UInt32 _layerCount = -1);
 
-		static void TransitionBufferState(
-			const GPUBuffer* _buffer,
-			ResourceState _beforeState,
-			ResourceState _afterState
-		);
-
-		static void TransitionBufferState(const Shared<Buffer>& _buffer, ResourceState _beforeState, ResourceState _afterState);
+		static void TransitionBufferState(Buffer * _buffer, ResourceState _afterState);
+		static void TransitionBufferState(const Shared<Buffer>& _buffer, ResourceState _afterState);
 
 		static void GenerateMips(Texture* _texture);
 		inline static void GenerateMips(const Shared<Texture>& _texture) { GenerateMips(_texture.get()); };
@@ -141,7 +151,7 @@ namespace Daydream
 		inline static ConstantBufferPool* GetConstantBufferPool() { return constantBufferPool.get(); }
 	private:
 		Renderer() = default;
-		static void InitRenderDevice(Daydream::RendererAPIType _API);
+		static void InitRenderDevice(RendererAPIType _API);
 
 		inline static RenderContext* GetRenderContext() { return renderContext.get(); }
 
@@ -158,7 +168,7 @@ namespace Daydream
 		////////////////////////////////////////////////////////////////// 
 		// RenderThread
 		////////////////////////////////////////////////////////////////// 
-		inline static bool useRenderThread = 0;
+		inline static bool useRenderThread = 1;
 
 		inline static Queue<RenderCommand> singleTimeCommandQueue;
 		inline static Array<Unique<RenderCommandQueue>> commandQueues;

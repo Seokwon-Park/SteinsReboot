@@ -49,9 +49,9 @@ namespace Daydream
 
 			Renderer::EnqueuePreFrameCommand([=]()
 				{
-					Renderer::TransitionTextureState(texture2D, ResourceState::Undefined, ResourceState::CopyDest, 0, 1);
+					Renderer::TransitionTextureState(texture2D, ResourceState::CopyDest, 0, 1, 0, -1);
 					Renderer::CopyBufferToTexture2D(uploadBuffer.get(), texture2D.get());
-					Renderer::TransitionTextureState(texture2D, ResourceState::CopyDest, ResourceState::ShaderResource, 0, 1);
+					Renderer::TransitionTextureState(texture2D, ResourceState::ShaderResource, 0, 1, 0, -1);
 				});
 
 			Renderer::GetUploadBufferPool()->ReturnResource(totalBytes, std::move(uploadBuffer));

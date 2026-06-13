@@ -259,6 +259,67 @@ namespace Daydream::GraphicsUtility::DirectX12
 		return D3D12_FILL_MODE_SOLID;
 	}
 
+	D3D12_COMPARISON_FUNC ConvertToD3D12ComparisonFunc(const CompareFunction& _compareFunc)
+	{
+		switch (_compareFunc)
+		{
+		case CompareFunction::Never:
+			return D3D12_COMPARISON_FUNC_NEVER;
+		case CompareFunction::Less:
+			return D3D12_COMPARISON_FUNC_LESS;
+		case CompareFunction::Equal:
+			return D3D12_COMPARISON_FUNC_EQUAL;
+		case CompareFunction::LessEqual:
+			return D3D12_COMPARISON_FUNC_LESS_EQUAL;
+		case CompareFunction::Greater:
+			return D3D12_COMPARISON_FUNC_GREATER;
+		case CompareFunction::NotEqual:
+			return D3D12_COMPARISON_FUNC_NOT_EQUAL;
+		case CompareFunction::GreaterEqual:
+			return D3D12_COMPARISON_FUNC_GREATER_EQUAL;
+		case CompareFunction::Always:
+			return D3D12_COMPARISON_FUNC_ALWAYS;
+		default:
+			return D3D12_COMPARISON_FUNC_LESS;
+		}
+	}
+
+	D3D12_STENCIL_OP ConvertToD3D12StencilOperation(const StencilOperation& _stencilOp)
+	{
+		switch (_stencilOp)
+		{
+		case StencilOperation::Keep:
+			return D3D12_STENCIL_OP_KEEP;
+		case StencilOperation::Zero:
+			return D3D12_STENCIL_OP_ZERO;
+		case StencilOperation::Replace:
+			return D3D12_STENCIL_OP_REPLACE;
+		case StencilOperation::IncrementSaturate:
+			return D3D12_STENCIL_OP_INCR_SAT;
+		case StencilOperation::DecrementSaturate:
+			return D3D12_STENCIL_OP_DECR_SAT;
+		case StencilOperation::Invert:
+			return D3D12_STENCIL_OP_INVERT;
+		case StencilOperation::IncrementWrap:
+			return D3D12_STENCIL_OP_INCR;
+		case StencilOperation::DecrementWrap:
+			return D3D12_STENCIL_OP_DECR;
+		default:
+			return D3D12_STENCIL_OP_KEEP;
+		}
+	}
+
+	D3D12_DEPTH_STENCILOP_DESC ConvertToD3D12StencilOperationDesc(const StencilOperationDesc& _opDesc)
+	{
+		D3D12_DEPTH_STENCILOP_DESC desc;
+		desc.StencilFailOp = ConvertToD3D12StencilOperation(_opDesc.failOp);
+		desc.StencilDepthFailOp = ConvertToD3D12StencilOperation(_opDesc.depthFailOp);
+		desc.StencilPassOp = ConvertToD3D12StencilOperation(_opDesc.passOp);
+		desc.StencilFunc = ConvertToD3D12ComparisonFunc(_opDesc.compareFunc);
+
+		return desc;
+	}
+
 	D3D12_SAMPLER_DESC ConvertToD3D12SamplerDesc(const SamplerDesc& _desc)
 	{
 		//D3D12_SAMPLER_DESC samplerDesc;
@@ -300,6 +361,20 @@ namespace Daydream::GraphicsUtility::DirectX12
 		desc.DepthClipEnable = _desc.depthClipEnable;
 		desc.MultisampleEnable = _desc.multisampleEnable;
 		desc.AntialiasedLineEnable = _desc.antialiasedLineEnable;
+		return desc;
+	}
+	D3D12_DEPTH_STENCIL_DESC ConvertToD3D12DepthStencilDesc(const DepthStencilStateDesc& _desc)
+	{
+		D3D12_DEPTH_STENCIL_DESC desc;
+		desc.DepthEnable = _desc.depthEnable;
+		desc.DepthWriteMask = _desc.depthWriteEnable ? D3D12_DEPTH_WRITE_MASK_ALL : D3D12_DEPTH_WRITE_MASK_ZERO;
+		desc.DepthFunc = ConvertToD3D12ComparisonFunc(_desc.depthFunc);
+		desc.StencilEnable = _desc.stencilEnable;
+		desc.StencilReadMask = _desc.stencilReadMask;
+		desc.StencilWriteMask = _desc.stencilWriteMask;
+		desc.FrontFace = ConvertToD3D12StencilOperationDesc(_desc.frontFace);
+		desc.BackFace = ConvertToD3D12StencilOperationDesc(_desc.backFace);
+
 		return desc;
 	}
 }

@@ -55,19 +55,26 @@ namespace Daydream
 		bool IsValid() const { return id != UINT32_MAX; }
 	};
 
+	struct RenderGraphWriteBinding
+	{
+		UInt32 resourceId = UINT32_MAX;
+		AttachmentLoadOp loadOp = AttachmentLoadOp::Clear;
+		AttachmentStoreOp storeOp = AttachmentStoreOp::Store;
+	};
+
 	class RenderGraph
 	{
 	public:
 		RenderGraph();
 		~RenderGraph();
-
 		RenderGraphResourceHandle AddResource(const String& _name, const RenderGraphResourceDesc& _desc);
-		RenderGraphResourceHandle AddExternalWriteResource(const String& _name, const Shared<Texture2D>& _texture);
+		RenderGraphResourceHandle AddExternalWriteResource(const String& _name, const Texture2DAllocation& _texture);
 		RenderGraphPassHandle AddPass(const String& _name, const RenderGraphPassDesc& _desc);
+		void AddPassDependency(RenderGraphPassHandle _beforePass, RenderGraphPassHandle _afterPass);
 
 		void Read(RenderGraphPassHandle _pass, RenderGraphResourceHandle _resource);
-		void Write(RenderGraphPassHandle _pass, RenderGraphResourceHandle _resource);
-		void WriteDepthStencil(RenderGraphPassHandle _pass, RenderGraphResourceHandle _resource);
+		void Write(RenderGraphPassHandle _pass, RenderGraphResourceHandle _resource, AttachmentLoadOp _loadOp = AttachmentLoadOp::Clear, AttachmentStoreOp _storeOp = AttachmentStoreOp::Store);
+		void WriteDepthStencil(RenderGraphPassHandle _pass, RenderGraphResourceHandle _resource, AttachmentLoadOp _loadOp = AttachmentLoadOp::Clear, AttachmentStoreOp _storeOp = AttachmentStoreOp::Store);
 
 		bool Compile();
 		void Execute();
@@ -86,8 +93,6 @@ namespace Daydream
 
 			Texture2DAllocation allocation;
 
-			ResourceState currentState = ResourceState::Undefined;
-
 			Bool isExternal = false;
 		};
 
@@ -99,9 +104,11 @@ namespace Daydream
 			RenderGraphDrawList drawList;
 			PassDrawType drawType;
 
+			// There's nothing to read from the previous pass, but if the order matters
+			Array<UInt32> passDependency;
 			Array<UInt32> reads;
-			Array<UInt32> colorWrites;
-			UInt32 depthStencilWrite = UINT32_MAX;
+			Array<RenderGraphWriteBinding> colorWrites;
+			RenderGraphWriteBinding depthStencilWrite{};
 
 			Array<ExternalConstantBufferData> constantBufferData;
 			Array<ExternalShaderResourceView> shaderResourceViews;

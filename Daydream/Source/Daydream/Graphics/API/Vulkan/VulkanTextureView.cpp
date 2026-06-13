@@ -9,7 +9,9 @@ namespace Daydream
 	VulkanTextureView::VulkanTextureView(VulkanRenderDevice* _device, VulkanGPUTexture* _texture, const TextureViewDesc& _desc)
 		:TextureView(_texture, _desc)
 	{
-		device = _device;
+		vk::Device device = _device->GetDevice();
+		RenderFormat format = (_desc.format == RenderFormat::UNKNOWN) ? _texture->GetDesc().format : _desc.format;
+
 
 		bool isArray = (
 			(_texture->GetType() == TextureType::TextureCube ||
@@ -27,7 +29,7 @@ namespace Daydream
 		}
 
 		vk::ImageAspectFlags aspectMask = vk::ImageAspectFlagBits::eColor;
-		if (GraphicsUtility::IsDepthFormat(_desc.format))
+		if (GraphicsUtility::IsDepthFormat(format))
 		{
 			if (_desc.type == TextureViewType::DepthStencil)
 			{
@@ -48,7 +50,7 @@ namespace Daydream
 		viewInfo.subresourceRange.baseArrayLayer = _desc.baseLayer;
 		viewInfo.subresourceRange.layerCount = _desc.layerCount;
 
-		imageView = device->GetDevice().createImageViewUnique(viewInfo);
+		imageView = device.createImageViewUnique(viewInfo);
 	}
 }
 

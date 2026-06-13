@@ -56,6 +56,9 @@ namespace Daydream
 		virtual void SetViewport(UInt32 _x, UInt32 _y, UInt32 _width, UInt32 _height) = 0;
 		virtual void DrawIndexed(UInt32 _indexCount, UInt32 _startIndex = 0, UInt32 _baseVertex = 0) = 0;
 
+		virtual void EnableThreadedRendering() {};
+		virtual void DisableThreadedRendering() {};
+
 		virtual void BeginRendering(const RenderingInfo& _renderingInfo) {};
 		virtual void EndRendering(const RenderingInfo& _renderingInfo) {};
 
@@ -79,8 +82,7 @@ namespace Daydream
 
 		virtual void GenerateMips(GPUTexture* _texture) {};
 
-		virtual void TransitionTextureState(const GPUTexture* _texture,
-			ResourceState _beforeState,
+		virtual void TransitionTextureState(GPUTexture* _texture,
 			ResourceState _afterState,
 			UInt32 _baseMip = 0,
 			UInt32 _mipLevels = -1,
@@ -88,9 +90,9 @@ namespace Daydream
 			UInt32 _layerCount = -1) {
 		};
 
-		virtual void TransitionBufferState(const GPUBuffer* _buffer,
-			ResourceState _beforeState,
-			ResourceState _afterState) {};
+		virtual void TransitionBufferState(GPUBuffer* _buffer,
+			ResourceState _afterState) {
+		};
 
 		virtual void SetActiveCommandList(RenderCommandList * _commandList) {};
 		RenderCommandList* GetActiveCommandList() const { return activeCommandList; }

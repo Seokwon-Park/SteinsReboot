@@ -256,7 +256,7 @@
     <ClInclude Include="Source\Daydream\Graphics\Resources\SkeletalModel.h" />
     <ClInclude Include="Source\Daydream\Graphics\Resources\Skybox.h" />
     <ClInclude Include="Source\Daydream\Graphics\Resources\Sprite.h" />
-    <ClInclude Include="Source\Daydream\Graphics\Resources\Struct\RenderDataTypes.h" />
+    <ClInclude Include="Source\Daydream\Graphics\Resources\Struct\RenderDataStruct.h" />
     <ClInclude Include="Source\Daydream\Graphics\Resources\Struct\ViewProjectionData.h">
       <SubType>
       </SubType>

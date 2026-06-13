@@ -105,6 +105,7 @@ namespace Daydream
 	}
 	void D3D12RenderContext::EndRendering(const RenderingInfo& _renderingInfo)
 	{
+		GetD3D12ActiveCommandList()->OMSetRenderTargets(0, nullptr, 0, nullptr);
 	}
 	void D3D12RenderContext::BindPipelineState(const GraphicsPipelineState* _pipelineState)
 	{
@@ -372,7 +373,7 @@ namespace Daydream
 
 
 		auto generateMipPSO = ResourceManager::GetResource<GraphicsPipelineState>("GenerateMipsPSO");
-		auto quadMesh = AssetManager::GetAsset<Mesh>(AssetDefaults::DefaultQuadMeshHandle);
+		auto quadMesh = AssetManager::GetAsset<Mesh>(AssetDefaults::QuadMeshHandle);
 
 		BindPipelineState(generateMipPSO);
 		D3D12GraphicsPipelineState* d3d12PipelineState = Cast<D3D12GraphicsPipelineState*>(generateMipPSO);
@@ -431,16 +432,18 @@ namespace Daydream
 			}
 		}
 	}
-	void D3D12RenderContext::TransitionTextureState(const GPUTexture* _texture, ResourceState _beforeState, ResourceState _afterState, UInt32 _baseMip, UInt32 _mipLevels, UInt32 _baseLayer, UInt32 _layerCount)
+	void D3D12RenderContext::TransitionTextureState(GPUTexture* _texture, ResourceState _afterState, UInt32 _baseMip, UInt32 _mipLevels, UInt32 _baseLayer, UInt32 _layerCount)
 	{
-		if (_beforeState == _afterState)
+		ResourceState beforeState = _texture->GetState();
+		if (beforeState == _afterState)
 		{
 			DAYDREAM_RENDERER_WARN("Before State == After State");
 			return;
 		}
 
-		const D3D12GPUTexture* d3d12Texture = Cast<const D3D12GPUTexture*>(_texture);
+		D3D12GPUTexture* d3d12Texture = Cast<D3D12GPUTexture*>(_texture);
 		ID3D12Resource* resource = d3d12Texture->GetID3D12Resource();
+		
 
 		_mipLevels = (_mipLevels == -1 ? _texture->GetMipLevels() : _mipLevels);
 		_layerCount = (_layerCount == -1 ? _texture->GetLayerCount() : _layerCount);
@@ -448,6 +451,7 @@ namespace Daydream
 		UInt32 totalMipLevels = d3d12Texture->GetMipLevels();
 		UInt32 totalLayers = d3d12Texture->GetLayerCount();
 
+		std::vector<D3D12_RESOURCE_BARRIER> barriers;
 		if (_baseLayer == 0 && _baseMip == 0 && _layerCount == totalLayers && _mipLevels == totalMipLevels)
 		{
 			D3D12_RESOURCE_BARRIER barrier = {};
@@ -455,59 +459,62 @@ namespace Daydream
 			barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 			barrier.Transition.pResource = resource;
 			barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES; // 전체 통째로!
-			barrier.Transition.StateBefore = GraphicsUtility::DirectX12::ConvertToD3D12ResourceStates(_beforeState);
+			barrier.Transition.StateBefore = GraphicsUtility::DirectX12::ConvertToD3D12ResourceStates(beforeState);
 			barrier.Transition.StateAfter = GraphicsUtility::DirectX12::ConvertToD3D12ResourceStates(_afterState);
 
-			GetD3D12ActiveCommandList()->ResourceBarrier(1, &barrier);
-			return;
+			barriers.push_back(barrier);
 		}
-
-		std::vector<D3D12_RESOURCE_BARRIER> barriers;
-		barriers.reserve(_layerCount * _mipLevels);
-		for (UInt32 layer = 0; layer < _layerCount; ++layer)
+		else
 		{
-			for (UInt32 mip = 0; mip < _mipLevels; ++mip)
+			barriers.reserve(_layerCount * _mipLevels);
+			for (UInt32 layer = 0; layer < _layerCount; ++layer)
 			{
-				UInt32 targetLayer = _baseLayer + layer;
-				UInt32 targetMip = _baseMip + mip;
+				for (UInt32 mip = 0; mip < _mipLevels; ++mip)
+				{
+					UInt32 targetLayer = _baseLayer + layer;
+					UInt32 targetMip = _baseMip + mip;
 
-				UInt32 subresourceIndex = targetMip + (targetLayer * totalMipLevels);
+					UInt32 subresourceIndex = targetMip + (targetLayer * totalMipLevels);
 
-				D3D12_RESOURCE_BARRIER barrier = {};
-				barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-				barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-				barrier.Transition.pResource = resource;
-				barrier.Transition.Subresource = subresourceIndex;
-				barrier.Transition.StateBefore = GraphicsUtility::DirectX12::ConvertToD3D12ResourceStates(_beforeState);
-				barrier.Transition.StateAfter = GraphicsUtility::DirectX12::ConvertToD3D12ResourceStates(_afterState);
+					D3D12_RESOURCE_BARRIER barrier = {};
+					barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+					barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+					barrier.Transition.pResource = resource;
+					barrier.Transition.Subresource = subresourceIndex;
+					barrier.Transition.StateBefore = GraphicsUtility::DirectX12::ConvertToD3D12ResourceStates(beforeState);
+					barrier.Transition.StateAfter = GraphicsUtility::DirectX12::ConvertToD3D12ResourceStates(_afterState);
 
-				barriers.push_back(barrier);
+					barriers.push_back(barrier);
+				}
 			}
 		}
 
 		if (!barriers.empty())
 		{
+			_texture->SetState(_afterState);
 			GetD3D12ActiveCommandList()->ResourceBarrier(static_cast<UINT>(barriers.size()), barriers.data());
 		}
 	}
-	void D3D12RenderContext::TransitionBufferState(const GPUBuffer* _buffer, ResourceState _beforeState, ResourceState _afterState)
+	void D3D12RenderContext::TransitionBufferState(GPUBuffer* _buffer, ResourceState _afterState)
 	{
-		if (_beforeState == _afterState)
+		ResourceState beforeState = _buffer->GetState();
+		if (beforeState == _afterState)
 		{
 			DAYDREAM_RENDERER_WARN("Before State == After State");
 			return;
 		}
 
-		const D3D12GPUBuffer* d3d12Buffer = Cast<const D3D12GPUBuffer*>(_buffer);
+		D3D12GPUBuffer* d3d12Buffer = Cast<D3D12GPUBuffer*>(_buffer);
 
 		D3D12_RESOURCE_BARRIER barrier = {};
 		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 		barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 		barrier.Transition.pResource = d3d12Buffer->GetID3D12Resource();
 		barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-		barrier.Transition.StateBefore = GraphicsUtility::DirectX12::ConvertToD3D12ResourceStates(_beforeState);
+		barrier.Transition.StateBefore = GraphicsUtility::DirectX12::ConvertToD3D12ResourceStates(beforeState);
 		barrier.Transition.StateAfter = GraphicsUtility::DirectX12::ConvertToD3D12ResourceStates(_afterState);
 
+		_buffer->SetState(_afterState);
 		GetD3D12ActiveCommandList()->ResourceBarrier(1, &barrier);
 	}
 

@@ -10,6 +10,7 @@
 #include "Daydream/Graphics/Resources/Texture/Texture.h"
 #include "Daydream/Graphics/Resources/Sampler.h"
 #include "Daydream/Graphics/States/RasterizerState.h"
+#include "Daydream/Graphics/States/DepthStencilState.h"
 
 
 namespace Daydream::GraphicsUtility::Vulkan
@@ -36,10 +37,15 @@ namespace Daydream::GraphicsUtility::Vulkan
 	vk::SamplerMipmapMode ConvertToVkMipmapMode(FilterMode _mipMapFilter);
 	vk::CompareOp ConvertToVkCompareOp(ComparisonFunc _func);
 
-	vk::CullModeFlags ConvertToVulkanCullMode(const CullMode& _cullMode);
-	vk::PolygonMode ConvertToVulkanFillMode(const FillMode& _fillMode);
+	vk::CullModeFlags ConvertToVkCullMode(const CullMode& _cullMode);
+	vk::PolygonMode ConvertToVkFillMode(const FillMode& _fillMode);
 
-	vk::SamplerCreateInfo TranslateToVulkanSamplerCreateInfo(const SamplerDesc& _desc);
-	vk::PipelineRasterizationStateCreateInfo TranslateToVulkanRasterizerCreateInfo(const RasterizerStateDesc& _desc);
+	vk::CompareOp ConvertToVkCompareOp(const CompareFunction& _compareFunc);
+	vk::StencilOp ConvertToVkStencilOp(const StencilOperation& _stencilOp);
+	vk::StencilOpState ConvertToVkStencilOpState(const StencilOperationDesc& _opDesc, UInt8 _readMask, UInt8 _writeMask);
+
+	vk::SamplerCreateInfo TranslateToVkSamplerCreateInfo(const SamplerDesc& _desc);
+	vk::PipelineRasterizationStateCreateInfo TranslateToVkRasterizationStateCreateInfo(const RasterizerStateDesc& _desc);
+	vk::PipelineDepthStencilStateCreateInfo TranslateToVkDepthStencilStateCreateInfo(const DepthStencilStateDesc& _desc);
 
 }

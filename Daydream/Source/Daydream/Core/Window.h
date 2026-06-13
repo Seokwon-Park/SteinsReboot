@@ -8,15 +8,16 @@ namespace Daydream
 {
 	struct WindowDesc
 	{
-		std::string title;
+		String title;
 		UInt32 width;
 		UInt32 height;
-		RendererAPIType rendererAPI;
+		//if use OpenGL, this flag must be true.
+		Bool useDefaultClientAPI = false;
 
 		WindowDesc(const std::string& _title = "Daydream Engine",
 			UInt32 _width = 1280,
 			UInt32 _height = 720)
-			:title(_title), width(_width), height(_height), rendererAPI(RendererAPIType::None)
+			:title(_title), width(_width), height(_height), useDefaultClientAPI(false)
 		{
 
 		}

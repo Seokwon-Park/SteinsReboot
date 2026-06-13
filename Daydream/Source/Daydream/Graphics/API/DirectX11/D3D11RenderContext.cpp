@@ -73,6 +73,38 @@ namespace Daydream
 	void D3D11RenderContext::EndRendering(const RenderingInfo& _renderingInfo)
 	{
 		device->GetContext()->OMSetRenderTargets(0, nullptr, nullptr);
+
+		auto bindingMap = currentGraphicsPipelineState->GetShaderGroup()->GetShaderBindingMap();
+		ID3D11ShaderResourceView* nullSRV = nullptr;
+		for (auto [name, data] : bindingMap)
+		{
+			switch (data.shaderType)
+			{
+			case ShaderType::None:
+				DAYDREAM_CORE_ASSERT(false, "ERROR");
+				break;
+			case ShaderType::Vertex:
+			{
+				device->GetContext()->VSSetShaderResources(data.binding, 1, &nullSRV);
+				break;
+			}
+			case ShaderType::Hull:
+				break;
+			case ShaderType::Domain:
+				break;
+			case ShaderType::Geometry:
+				break;
+			case ShaderType::Pixel:
+			{
+				device->GetContext()->PSSetShaderResources(data.binding, 1, &nullSRV);
+				break;
+			}
+			case ShaderType::Compute:
+				break;
+			default:
+				break;
+			}
+		}
 	}
 
 	void D3D11RenderContext::BindPipelineState(const GraphicsPipelineState* _pipelineState)

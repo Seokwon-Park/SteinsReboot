@@ -2028,7 +2028,7 @@
     <ClInclude Include="Source\Daydream\Graphics\Pools\ResourcePoolBase.h" />
     <ClInclude Include="Source\Daydream\Graphics\Resources\Struct\ViewProjectionData.h" />
     <ClInclude Include="Source\Daydream\Graphics\Pools\TexturePool\Texture2DAllocation.h" />
-    <ClInclude Include="Source\Daydream\Graphics\Resources\Struct\RenderDataTypes.h" />
+    <ClInclude Include="Source\Daydream\Graphics\Resources\Struct\RenderDataStruct.h" />
     <ClInclude Include="Source\Daydream\Graphics\Pools\BufferPool\BufferPoolHandle.h" />
     <ClInclude Include="Source\Daydream\Graphics\Pools\BufferPool\ConstantBufferPool.h" />
     <ClInclude Include="Source\Daydream\Enum\EnumDefines.h" />

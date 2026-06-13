@@ -13,6 +13,8 @@ namespace Daydream
 		Texture2DPool();
 		virtual ~Texture2DPool();
 
+		void ReturnAllocation(Texture2DAllocation& _allocation);
+
 		Texture2DAllocation AllocateTexture2DHandle(UInt32 _width, UInt32 _height, RenderFormat _format);
 		Texture2DAllocation AllocateTexture2DHandle(const Texture2DPoolKey& _key);
 	protected:

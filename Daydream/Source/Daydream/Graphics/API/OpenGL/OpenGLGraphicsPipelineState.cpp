@@ -8,9 +8,6 @@
 
 namespace Daydream
 {
-
-	
-
 	OpenGLGraphicsPipelineState::OpenGLGraphicsPipelineState(GraphicsPipelineStateDesc _desc)
 		:GraphicsPipelineState(_desc)
 	{
@@ -82,11 +79,13 @@ namespace Daydream
 	}
 	void OpenGLGraphicsPipelineState::BindPipelineState() const
 	{
-		const auto& rsDesc = desc.rasterizerState;
+		///////////////////////////////// Rasterizer State //////////////////////////////////////////////////
+		const RasterizerStateDesc& rsDesc = desc.rasterizerState;
 		// Fill Mode (Solid vs Wireframe)
 		GLenum polygonMode = (rsDesc.fillMode == FillMode::Wireframe) ? GL_LINE : GL_FILL;
 		glPolygonMode(GL_FRONT_AND_BACK, polygonMode);
 
+		
 		// Cull Mode
 		if (rsDesc.cullMode == CullMode::None)
 		{
@@ -114,6 +113,53 @@ namespace Daydream
 			glEnable(GL_DEPTH_CLAMP);  // Clipping 비활성화 (Clamping)
 		}
 
+		///////////////////////////////// Depth Stencil State //////////////////////////////////////////////////
+		const DepthStencilStateDesc& dssDesc = desc.depthStencilState;
+
+		if (dssDesc.depthEnable)
+		{
+			glEnable(GL_DEPTH_TEST);
+			glDepthMask(dssDesc.depthWriteEnable ? GL_TRUE : GL_FALSE);
+			glDepthFunc(GraphicsUtility::OpenGL::ConvertToGLCompareFunc(dssDesc.depthFunc));
+		}
+		else
+		{
+			glDisable(GL_DEPTH_TEST);
+		}
+
+		// 2. 스텐실 (Stencil) 설정
+		if (dssDesc.stencilEnable)
+		{
+			glEnable(GL_STENCIL_TEST);
+
+			glStencilMask(dssDesc.stencilWriteMask);
+
+			// Front Face
+			glStencilOpSeparate(GL_FRONT,
+				GraphicsUtility::OpenGL::ConvertToGLStencilOp(dssDesc.frontFace.failOp),
+				GraphicsUtility::OpenGL::ConvertToGLStencilOp(dssDesc.frontFace.depthFailOp),
+				GraphicsUtility::OpenGL::ConvertToGLStencilOp(dssDesc.frontFace.passOp));
+
+			glStencilFuncSeparate(GL_FRONT,
+				GraphicsUtility::OpenGL::ConvertToGLCompareFunc(dssDesc.frontFace.compareFunc),
+				1, 
+				dssDesc.stencilReadMask);
+
+			// Back Face
+			glStencilOpSeparate(GL_BACK,
+				GraphicsUtility::OpenGL::ConvertToGLStencilOp(dssDesc.backFace.failOp),
+				GraphicsUtility::OpenGL::ConvertToGLStencilOp(dssDesc.backFace.depthFailOp),
+				GraphicsUtility::OpenGL::ConvertToGLStencilOp(dssDesc.backFace.passOp));
+
+			glStencilFuncSeparate(GL_BACK,
+				GraphicsUtility::OpenGL::ConvertToGLCompareFunc(dssDesc.backFace.compareFunc),
+				1,
+				dssDesc.stencilReadMask);
+		}
+		else
+		{
+			glDisable(GL_STENCIL_TEST);
+		}
 		//// Scissor Enable
 		//if (rsDesc.scissorEnable)
 		//	glEnable(GL_SCISSOR_TEST);

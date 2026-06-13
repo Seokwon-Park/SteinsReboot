@@ -42,16 +42,14 @@ namespace Daydream
 		//TODO : need to fix
 		virtual void GenerateMips(GPUTexture* _texture) override;
 
-		virtual void TransitionTextureState(const GPUTexture* _texture,
-			ResourceState _beforeState,
+		virtual void TransitionTextureState(GPUTexture* _texture,
 			ResourceState _afterState,
 			UInt32 _baseMip,
 			UInt32 _mipLevels,
 			UInt32 _baseLayer,
 			UInt32 _layerCount) override;
 
-		virtual void TransitionBufferState(const GPUBuffer* _buffer,
-			ResourceState _beforeState,
+		virtual void TransitionBufferState(GPUBuffer* _buffer,
 			ResourceState _afterState) override;
 
 		virtual void SetActiveCommandList(RenderCommandList* _commandList) override;

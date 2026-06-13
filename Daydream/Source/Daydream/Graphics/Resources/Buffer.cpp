@@ -50,9 +50,9 @@ namespace Daydream
 		//참조의 경우 uploadBuffer가 이 함수를 벗어나면서 파괴되기 때문에 mutable
 		Renderer::EnqueuePreFrameCommand([=]()
 			{
+				Renderer::TransitionBufferState(vertexBuffer, ResourceState::CopyDest);
 				Renderer::CopyBuffer(uploadBuffer.get(), vertexBuffer.get(), _size, 0, 0);
-				Renderer::TransitionBufferState(vertexBuffer, ResourceState::CopyDest, ResourceState::VertexBuffer);
-
+				Renderer::TransitionBufferState(vertexBuffer, ResourceState::VertexBuffer);
 			});
 
 		Renderer::GetUploadBufferPool()->ReturnResource(desc.size, std::move(uploadBuffer));
@@ -79,8 +79,9 @@ namespace Daydream
 
 		Renderer::EnqueuePreFrameCommand([=]()
 			{
+				Renderer::TransitionBufferState(indexBuffer, ResourceState::CopyDest);
 				Renderer::CopyBuffer(uploadBuffer.get(), indexBuffer.get(), desc.size, 0, 0);
-				Renderer::TransitionBufferState(indexBuffer, ResourceState::CopyDest, ResourceState::IndexBuffer);
+				Renderer::TransitionBufferState(indexBuffer, ResourceState::IndexBuffer);
 			}
 		);
 
@@ -127,5 +128,27 @@ namespace Daydream
 		Shared<UploadBuffer> uploadBuffer = MakeShared<UploadBuffer>(gpuBuffer);
 		return uploadBuffer;
 	}
+
+	ReadbackBuffer::ReadbackBuffer(Shared<GPUBuffer> _buffer)
+		:Buffer(_buffer)
+	{
+	}
+
+	ReadbackBuffer::~ReadbackBuffer()
+	{
+	}
+
+	Shared<ReadbackBuffer> ReadbackBuffer::Create(UInt32 _size)
+	{
+		BufferDesc desc{};
+		desc.bufferUsage = BufferUsage::None;
+		desc.memoryUsage = MemoryUsage::Dynamic;
+		desc.size = _size;
+
+		Shared<GPUBuffer> gpuBuffer = Renderer::GetRenderDevice()->CreateGPUBuffer(desc);
+		Shared<ReadbackBuffer> constantBuffer = MakeShared<ReadbackBuffer>(gpuBuffer);
+		return constantBuffer;
+	}
 }
+
 

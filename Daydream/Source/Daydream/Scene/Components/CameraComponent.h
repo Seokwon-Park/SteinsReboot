@@ -5,7 +5,6 @@
 
 namespace Daydream
 {
-
 	class CameraComponent : public Component
 	{
 	public:

@@ -12,6 +12,18 @@ namespace Daydream
 	Texture2DPool::~Texture2DPool()
 	{
 	}
+	void Texture2DPool::ReturnAllocation(Texture2DAllocation& _allocation)
+	{
+		if (_allocation.texture == nullptr) return;
+
+		Texture2DPoolKey key{};
+		key.width = _allocation.texture->GetWidth();
+		key.height = _allocation.texture->GetHeight();
+		key.format = _allocation.texture->GetFormat();
+
+		ResourcePoolBase::ReturnResource(key, std::move(_allocation));
+	}
+
 	Texture2DAllocation Texture2DPool::AllocateTexture2DHandle(UInt32 _width, UInt32 _height, RenderFormat _format)
 	{
 		Texture2DPoolKey key;

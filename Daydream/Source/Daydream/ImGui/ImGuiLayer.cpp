@@ -115,6 +115,7 @@ namespace Daydream
 		ImGui::Render();
 		ImDrawData* clonedDrawData = CloneDrawData(ImGui::GetDrawData());
 		Renderer::EnqueueCommand([clonedDrawData]() {
+			std::lock_guard<std::mutex> lock(imguiRenderMutex);
 			Renderer::GetImGuiRenderer()->RenderDrawData(Renderer::GetActiveCommandList(), clonedDrawData);
 			DestroyClonedDrawData(clonedDrawData);
 			});
@@ -122,10 +123,12 @@ namespace Daydream
 
 	void ImGuiLayer::UpdateImGuiWindows()
 	{
-		GLFWwindow* backupCurrentContext = glfwGetCurrentContext();
 		ImGui::UpdatePlatformWindows();
-		ImGui::RenderPlatformWindowsDefault();
-		glfwMakeContextCurrent(backupCurrentContext);
+		{
+			// [메인 스레드] 렌더 스레드가 메인 뷰포트를 다 그릴 때까지 여기서 잠깐 대기!
+			std::lock_guard<std::mutex> lock(imguiRenderMutex);
+			ImGui::RenderPlatformWindowsDefault();
+		}
 	}
 
 	void ImGuiLayer::SetDarkThemeColors()

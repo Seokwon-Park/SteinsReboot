@@ -34,6 +34,8 @@ namespace Daydream
 	private:
 		void SetDarkThemeColors();
 		
+		inline static std::mutex imguiRenderMutex;
+
 		bool isBlockEvents = true;
 	};
 }

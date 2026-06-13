@@ -19,7 +19,7 @@ namespace Daydream::GraphicsUtility::DirectX11
 		}
 		else
 		{
-			bufferDesc.BindFlags = ConvertToD3D11BindFlags(_desc.bufferUsage);
+			bufferDesc.BindFlags = ConvertToD3D11BufferBindFlags(_desc.bufferUsage);
 		}
 
 		bufferDesc.MiscFlags = 0;
@@ -69,7 +69,7 @@ namespace Daydream::GraphicsUtility::DirectX11
 		return d3d11Flags;
 	}
 
-	UInt32 ConvertToD3D11BindFlags(const BufferUsage& _usage)
+	UInt32 ConvertToD3D11BufferBindFlags(const BufferUsage& _usage)
 	{
 		UInt32 d3d11Flags = 0;
 
@@ -81,7 +81,7 @@ namespace Daydream::GraphicsUtility::DirectX11
 		return d3d11Flags;
 	}
 
-	UInt32 ConvertToD3D11BindFlags(const TextureUsage& _flags)
+	UInt32 ConvertToD3D11TextureBindFlags(const TextureUsage& _flags)
 	{
 		UInt32 d3d11Flags = 0;
 
@@ -224,6 +224,67 @@ namespace Daydream::GraphicsUtility::DirectX11
 		return D3D11_FILL_SOLID;
 	}
 
+	D3D11_COMPARISON_FUNC ConvertToD3D11ComparisonFunc(const CompareFunction& _compareFunc)
+	{
+		switch (_compareFunc)
+		{
+		case CompareFunction::Never:
+			return D3D11_COMPARISON_NEVER;
+		case CompareFunction::Less:
+			return D3D11_COMPARISON_LESS;
+		case CompareFunction::Equal:
+			return D3D11_COMPARISON_EQUAL;
+		case CompareFunction::LessEqual:
+			return D3D11_COMPARISON_LESS_EQUAL;
+		case CompareFunction::Greater:
+			return D3D11_COMPARISON_GREATER;
+		case CompareFunction::NotEqual:
+			return D3D11_COMPARISON_NOT_EQUAL;
+		case CompareFunction::GreaterEqual:
+			return D3D11_COMPARISON_GREATER_EQUAL;
+		case CompareFunction::Always:
+			return D3D11_COMPARISON_ALWAYS;
+		default:
+			return D3D11_COMPARISON_LESS;
+		}
+	}
+
+	D3D11_STENCIL_OP ConvertToD3D11StencilOperation(const StencilOperation& _stencilOp)
+	{
+		switch (_stencilOp)
+		{
+		case StencilOperation::Keep:
+			return D3D11_STENCIL_OP_KEEP;
+		case StencilOperation::Zero:
+			return D3D11_STENCIL_OP_ZERO;
+		case StencilOperation::Replace:
+			return D3D11_STENCIL_OP_REPLACE;
+		case StencilOperation::IncrementSaturate:
+			return D3D11_STENCIL_OP_INCR_SAT;
+		case StencilOperation::DecrementSaturate:
+			return D3D11_STENCIL_OP_DECR_SAT;
+		case StencilOperation::Invert:
+			return D3D11_STENCIL_OP_INVERT;
+		case StencilOperation::IncrementWrap:
+			return D3D11_STENCIL_OP_INCR;
+		case StencilOperation::DecrementWrap:
+			return D3D11_STENCIL_OP_DECR;
+		default:
+			return D3D11_STENCIL_OP_KEEP;
+		}
+	}
+
+	D3D11_DEPTH_STENCILOP_DESC ConvertToD3D11StencilOperationDesc(const StencilOperationDesc& _opDesc)
+	{
+		D3D11_DEPTH_STENCILOP_DESC desc;
+		desc.StencilFailOp = ConvertToD3D11StencilOperation(_opDesc.failOp);
+		desc.StencilDepthFailOp = ConvertToD3D11StencilOperation(_opDesc.depthFailOp);
+		desc.StencilPassOp = ConvertToD3D11StencilOperation(_opDesc.passOp);
+		desc.StencilFunc = ConvertToD3D11ComparisonFunc(_opDesc.compareFunc);
+
+		return desc;
+	}
+
 	D3D11_RASTERIZER_DESC ConvertToD3D11RasterizerDesc(const RasterizerStateDesc& _desc)
 	{
 		D3D11_RASTERIZER_DESC desc{};
@@ -237,6 +298,22 @@ namespace Daydream::GraphicsUtility::DirectX11
 		desc.ScissorEnable = _desc.scissorEnable;
 		desc.MultisampleEnable = _desc.multisampleEnable;
 		desc.AntialiasedLineEnable = _desc.antialiasedLineEnable;
+
+		return desc;
+	}
+
+	D3D11_DEPTH_STENCIL_DESC ConvertToD3D11DepthStencilDesc(const DepthStencilStateDesc& _desc)
+	{
+		D3D11_DEPTH_STENCIL_DESC desc{};
+
+		desc.DepthEnable = _desc.depthEnable;
+		desc.DepthWriteMask = _desc.depthWriteEnable ? D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ZERO;
+		desc.DepthFunc = ConvertToD3D11ComparisonFunc(_desc.depthFunc);
+		desc.StencilEnable = _desc.stencilEnable;
+		desc.StencilReadMask = _desc.stencilReadMask;
+		desc.StencilWriteMask = _desc.stencilWriteMask;
+		desc.FrontFace = ConvertToD3D11StencilOperationDesc(_desc.frontFace);
+		desc.BackFace = ConvertToD3D11StencilOperationDesc(_desc.backFace);
 
 		return desc;
 	}

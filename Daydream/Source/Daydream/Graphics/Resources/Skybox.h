@@ -5,6 +5,7 @@
 #include "Daydream/Graphics/Resources/Texture/TextureCube.h"
 #include "Daydream/Graphics/States/PipelineState/GraphicsPipelineState.h"
 #include "Daydream/Graphics/Core/RenderingInfo.h"
+#include "Daydream/Graphics/Resources/Struct/RenderDataStruct.h"
 
 namespace Daydream
 {
@@ -85,8 +86,8 @@ namespace Daydream
         Vector4 roughness = Vector4(0.0f, 0.0f, 0.0f, 0.0f);
 
         Matrix4x4 cubeFaceProjMatrix;
-        Array<Matrix4x4> cubeFaceViewMatrices;
         Array<Matrix4x4> captureViewProjections;
+        ViewProjectionData skyboxCaptureViewProjection[6];
         Array<Shared<ConstantBuffer>> cubeFaceConstantBuffers;
         Array<Shared<ConstantBuffer>> roughnessConstantBuffers;
 

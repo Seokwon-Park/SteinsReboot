@@ -23,6 +23,7 @@ namespace Daydream
 		ID3D11DomainShader* domainShader = nullptr;
 
 		ComPtr<ID3D11RasterizerState> rasterizer;
+		ComPtr<ID3D11DepthStencilState> depthStencil;
 		ComPtr<ID3D11InputLayout> inputLayout;
 
 	};

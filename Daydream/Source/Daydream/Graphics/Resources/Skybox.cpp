@@ -11,26 +11,23 @@ namespace Daydream
 {
 	Skybox::Skybox()
 	{
-		cubeFaceViewMatrices =
-		{
-			Matrix4x4::CreateLookToLH(Vector3(0.0f, 0.0f, 0.0f), Vector3(1.0f,  0.0f,  0.0f), Vector3(0.0f, 1.0f,  0.0f)),
-			Matrix4x4::CreateLookToLH(Vector3(0.0f, 0.0f, 0.0f), Vector3(-1.0f,  0.0f,  0.0f), Vector3(0.0f, 1.0f,  0.0f)),
-			Matrix4x4::CreateLookToLH(Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f,  1.0f,  0.0f), Vector3(0.0f,  0.0f, -1.0f)),
-			Matrix4x4::CreateLookToLH(Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, -1.0f,  0.0f), Vector3(0.0f,  0.0f, 1.0f)),
-			Matrix4x4::CreateLookToLH(Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f,  0.0f,  1.0f), Vector3(0.0f, 1.0f,  0.0f)),
-			Matrix4x4::CreateLookToLH(Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f,  0.0f, -1.0f), Vector3(0.0f, 1.0f,  0.0f))
-		};
-		cubeFaceProjMatrix = Matrix4x4::CreatePerspectiveLH(Math::DegreeToRadian(90.0f), 1.0f, 0.1f, 10.0f);
+		skyboxCaptureViewProjection[0].viewMatrix = Matrix4x4::CreateLookToLH(Vector3(0.0f, 0.0f, 0.0f), Vector3(1.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f));
+		skyboxCaptureViewProjection[1].viewMatrix = Matrix4x4::CreateLookToLH(Vector3(0.0f, 0.0f, 0.0f), Vector3(-1.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f));
+		skyboxCaptureViewProjection[2].viewMatrix = Matrix4x4::CreateLookToLH(Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f), Vector3(0.0f, 0.0f, -1.0f));
+		skyboxCaptureViewProjection[3].viewMatrix = Matrix4x4::CreateLookToLH(Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f), Vector3(0.0f, 0.0f, 1.0f));
+		skyboxCaptureViewProjection[4].viewMatrix = Matrix4x4::CreateLookToLH(Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 0.0f, 1.0f), Vector3(0.0f, 1.0f, 0.0f));
+		skyboxCaptureViewProjection[5].viewMatrix = Matrix4x4::CreateLookToLH(Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 0.0f, -1.0f), Vector3(0.0f, 1.0f, 0.0f));
 
+		Matrix4x4 projection = Matrix4x4::CreatePerspectiveLH(Math::DegreeToRadian(90.0f), 1.0f, 0.1f, 10.0f);
 		cubeFaceConstantBuffers.resize(6);
 		for (int i = 0; i < 6; i++)
 		{
-			cubeFaceConstantBuffers[i] = ConstantBuffer::Create(sizeof(Matrix4x4));
-			Matrix4x4 captureViewProjection = cubeFaceViewMatrices[i] * cubeFaceProjMatrix;
-			captureViewProjection.Transpose();
-
-			captureViewProjections.push_back(cubeFaceViewMatrices[i] * cubeFaceProjMatrix);
-			captureViewProjections[i].Transpose();
+			skyboxCaptureViewProjection[i].projectionMatrix = projection;
+			skyboxCaptureViewProjection[i].viewProjectionMatrix = skyboxCaptureViewProjection[i].viewMatrix * skyboxCaptureViewProjection[i].projectionMatrix;
+			skyboxCaptureViewProjection[i].viewMatrix.Transpose();
+			skyboxCaptureViewProjection[i].projectionMatrix.Transpose();
+			skyboxCaptureViewProjection[i].viewProjectionMatrix.Transpose();
+			cubeFaceConstantBuffers[i] = ConstantBuffer::Create(sizeof(ViewProjectionData));
 		}
 	}
 
@@ -66,8 +63,8 @@ namespace Daydream
 
 		brdfPSO = ResourceManager::GetResource<GraphicsPipelineState>("BRDFPSO");
 
-		quadMesh = AssetManager::GetAsset<Mesh>(AssetDefaults::DefaultQuadMeshHandle);
-		boxMesh = AssetManager::GetAsset<Mesh>(AssetDefaults::DefaultBoxMeshHandle);
+		quadMesh = AssetManager::GetAsset<Mesh>(AssetDefaults::QuadMeshHandle);
+		boxMesh = AssetManager::GetAsset<Mesh>(AssetDefaults::BoxMeshHandle);
 
 		////////////////////////////////////////////////////////////////////////////Create Default Skybox TextureCubes;
 		skyboxMipLevels = (UInt32)std::log2f((Float32)skyboxResolution);
@@ -228,28 +225,28 @@ namespace Daydream
 
 	void Skybox::GenerateDefault()
 	{
-		Renderer::TransitionTextureState(skyboxTextureCube, ResourceState::Undefined, ResourceState::RenderTarget);
-		Renderer::TransitionTextureState(irradianceTextureCube, ResourceState::Undefined, ResourceState::RenderTarget);
-		Renderer::TransitionTextureState(prefilterTextureCube, ResourceState::Undefined, ResourceState::RenderTarget);
-		Renderer::TransitionTextureState(BRDFTexture, ResourceState::Undefined, ResourceState::RenderTarget);
+		Renderer::TransitionTextureState(skyboxTextureCube, ResourceState::RenderTarget);
+		Renderer::TransitionTextureState(irradianceTextureCube, ResourceState::RenderTarget);
+		Renderer::TransitionTextureState(prefilterTextureCube, ResourceState::RenderTarget);
+		Renderer::TransitionTextureState(BRDFTexture, ResourceState::RenderTarget);
 
 		for (int i = 0; i < 6; i++)
 		{
-			Renderer::UpdateConstantBuffer(cubeFaceConstantBuffers[i].get(), captureViewProjections[i]);
+			Renderer::UpdateConstantBuffer(cubeFaceConstantBuffers[i].get(), skyboxCaptureViewProjection[i]);
 		}
 
 		GenerateHDRCubemap(equirectangularTexture);
 
-		Renderer::TransitionTextureState(skyboxTextureCube, ResourceState::RenderTarget, ResourceState::ShaderResource);
+		Renderer::TransitionTextureState(skyboxTextureCube, ResourceState::ShaderResource);
 
 		GenerateBRDF();
 		GenerateIrradianceCubemap();
 		GeneratePrefilterCubemap();
 
 
-		Renderer::TransitionTextureState(irradianceTextureCube, ResourceState::RenderTarget, ResourceState::ShaderResource);
-		Renderer::TransitionTextureState(prefilterTextureCube, ResourceState::RenderTarget, ResourceState::ShaderResource);
-		Renderer::TransitionTextureState(BRDFTexture, ResourceState::RenderTarget, ResourceState::ShaderResource);
+		Renderer::TransitionTextureState(irradianceTextureCube, ResourceState::ShaderResource);
+		Renderer::TransitionTextureState(prefilterTextureCube, ResourceState::ShaderResource);
+		Renderer::TransitionTextureState(BRDFTexture, ResourceState::ShaderResource);
 	}
 
 	void Skybox::Update()
@@ -279,7 +276,7 @@ namespace Daydream
 			attachDesc.view = skyboxFaceRTVs[i].get();
 
 			renderingInfo.colorAttachments.push_back(attachDesc);
-			
+
 			Renderer::BeginRendering(renderingInfo);
 			Renderer::BindPipelineState(equirectangularPSO);
 			Renderer::BindConstantBuffer("Camera", cubeFaceConstantBuffers[i]);

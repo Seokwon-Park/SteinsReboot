@@ -9,6 +9,7 @@
 #include "OpenGLFramebuffer.h"
 #include "OpenGLUtility.h"
 
+#include "GLFW/glfw3.h"
 #include "glad/glad.h"
 
 namespace Daydream
@@ -24,6 +25,17 @@ namespace Daydream
 	void OpenGLRenderContext::DrawIndexed(UInt32 _indexCount, UInt32 _startIndex, UInt32 _baseVertex)
 	{
 		glDrawElementsBaseVertex(GL_TRIANGLES, _indexCount, GL_UNSIGNED_INT, (void*)(_startIndex * sizeof(uint32_t)), _baseVertex);
+	}
+	void OpenGLRenderContext::EnableThreadedRendering()
+	{
+		GLFWwindow* currentContext = glfwGetCurrentContext();
+		glfwMakeContextCurrent(nullptr);
+		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+		GLFWwindow* dummy = glfwCreateWindow(1, 1, "Dummy", nullptr, currentContext);
+		glfwMakeContextCurrent(dummy);
+	}
+	void OpenGLRenderContext::DisableThreadedRendering()
+	{
 	}
 	void OpenGLRenderContext::BeginRendering(const RenderingInfo& _renderingInfo)
 	{
@@ -79,8 +91,8 @@ namespace Daydream
 			ClearValue dsvClearValue = _renderingInfo.depthAttachment.clearValue;
 			OpenGLTextureView* openGLTextureView = Cast<OpenGLTextureView*>(_renderingInfo.depthAttachment.view);
 
-			float depthValue = _renderingInfo.depthAttachment.clearValue.depthClearValue;
-			int stencilValue = _renderingInfo.depthAttachment.clearValue.stencilClearValue;
+			Float32 depthValue = _renderingInfo.depthAttachment.clearValue.depthClearValue;
+			UInt8 stencilValue = _renderingInfo.depthAttachment.clearValue.stencilClearValue;
 			if (_renderingInfo.depthAttachment.loadOp == AttachmentLoadOp::Clear)
 			{
 				glClearNamedFramebufferfi(framebufferID, GL_DEPTH_STENCIL, 0, depthValue, stencilValue);

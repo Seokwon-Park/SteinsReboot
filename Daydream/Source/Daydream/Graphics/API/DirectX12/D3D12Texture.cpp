@@ -41,6 +41,8 @@ namespace Daydream
 			allocation.GetAddressOf(),
 			IID_PPV_ARGS(texture.GetAddressOf()));
 
+		std::wstring tmp = L"Texture2D" + std::to_wstring(_desc.width);
+
 		if (_desc.type == TextureType::TextureCube)
 			texture->SetName(L"TextureCube");
 		else if (_desc.type == TextureType::TextureCubeArray)
@@ -48,7 +50,10 @@ namespace Daydream
 		else if (_desc.type == TextureType::Texture2DArray)
 			texture->SetName(L"Texture2DArray");
 		else
-			texture->SetName(L"Texture2D");
+			texture->SetName(tmp.c_str());
+		
+
+
 	}
 
 	D3D12GPUTexture::D3D12GPUTexture(D3D12RenderDevice* _device, const TextureDesc& _desc, ComPtr<ID3D12Resource> _d3d12BackBuffer)

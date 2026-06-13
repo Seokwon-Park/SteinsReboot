@@ -151,4 +151,91 @@ namespace Daydream::GraphicsUtility::DirectX
 		default:                                                        return DXGI_FORMAT_UNKNOWN;
 		}
 	}
+	DXGI_FORMAT ConvertToDSVFormat(RenderFormat _format)
+	{
+		if (!IsDepthFormat(_format) && !IsStencilFormat(_format))
+		{
+			DAYDREAM_CORE_WARN("Format is not Depth or StencilFormat!");
+			return DXGI_FORMAT_UNKNOWN;
+		}
+		switch (_format)
+		{
+		case RenderFormat::R32_TYPELESS:
+		case RenderFormat::D32_FLOAT:
+			return DXGI_FORMAT_D32_FLOAT;
+
+		case RenderFormat::R16_TYPELESS:
+		case RenderFormat::D16_UNORM:
+			return DXGI_FORMAT_D16_UNORM;
+
+		case RenderFormat::R24G8_TYPELESS:
+		case RenderFormat::R24_UNORM_X8_TYPELESS: 
+		case RenderFormat::D24_UNORM_S8_UINT:
+			return DXGI_FORMAT_D24_UNORM_S8_UINT;
+
+		case RenderFormat::R32G8X24_TYPELESS:
+		case RenderFormat::R32_FLOAT_X8X24_TYPELESS: 
+		case RenderFormat::D32_FLOAT_S8X24_UINT:
+			return DXGI_FORMAT_D32_FLOAT_S8X24_UINT;
+		default:
+			return DXGI_FORMAT_UNKNOWN;
+		}
+	}
+	DXGI_FORMAT ConvertToDepthSRVFormat(RenderFormat _format)
+	{
+		if (!IsDepthFormat(_format))
+		{
+			DAYDREAM_CORE_WARN("Format is not Depth Format!");
+			return DXGI_FORMAT_UNKNOWN;
+		}
+
+		switch (_format)
+		{
+		case RenderFormat::R32_TYPELESS:
+		case RenderFormat::D32_FLOAT:
+			return DXGI_FORMAT_R32_FLOAT; 
+
+		case RenderFormat::R16_TYPELESS:
+		case RenderFormat::D16_UNORM:
+			return DXGI_FORMAT_R16_UNORM;
+
+		case RenderFormat::R24G8_TYPELESS:
+		case RenderFormat::R24_UNORM_X8_TYPELESS:
+		case RenderFormat::D24_UNORM_S8_UINT:
+			return DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+
+		case RenderFormat::R32G8X24_TYPELESS:
+		case RenderFormat::R32_FLOAT_X8X24_TYPELESS:
+		case RenderFormat::D32_FLOAT_S8X24_UINT:
+			return DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS;
+
+		default:
+			DAYDREAM_CORE_WARN("Unsupported Depth/Stencil format for SRV!");
+			return DXGI_FORMAT_UNKNOWN;
+		}
+	}
+
+	DXGI_FORMAT ConvertToStencilSRVFormat(RenderFormat _format)
+	{
+		if (!IsStencilFormat(_format))
+		{
+			DAYDREAM_CORE_WARN("This format does not have a stencil channel!");
+			return DXGI_FORMAT_UNKNOWN;
+		}
+
+		switch (_format)
+		{
+		case RenderFormat::R24G8_TYPELESS:
+		case RenderFormat::D24_UNORM_S8_UINT:
+			return DXGI_FORMAT_X24_TYPELESS_G8_UINT;
+
+		case RenderFormat::R32G8X24_TYPELESS:
+		case RenderFormat::D32_FLOAT_S8X24_UINT:
+			return DXGI_FORMAT_X32_TYPELESS_G8X24_UINT; 
+
+		default:
+			DAYDREAM_CORE_WARN("Unsupported Stencil format for SRV!");
+			return DXGI_FORMAT_UNKNOWN;
+		}
+	}
 }

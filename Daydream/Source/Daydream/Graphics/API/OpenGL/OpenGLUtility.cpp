@@ -333,6 +333,37 @@ namespace Daydream::GraphicsUtility::OpenGL
 		}
 	}
 
+	GLenum ConvertToGLCompareFunc(const CompareFunction& _compareFunc)
+	{
+		switch (_compareFunc)
+		{
+		case CompareFunction::Never:        return GL_NEVER;
+		case CompareFunction::Less:         return GL_LESS;
+		case CompareFunction::Equal:        return GL_EQUAL;
+		case CompareFunction::LessEqual:    return GL_LEQUAL;
+		case CompareFunction::Greater:      return GL_GREATER;
+		case CompareFunction::NotEqual:     return GL_NOTEQUAL;
+		case CompareFunction::GreaterEqual: return GL_GEQUAL;
+		case CompareFunction::Always:       return GL_ALWAYS;
+		default:                            return GL_LESS;
+		}
+	}
+
+	GLenum ConvertToGLStencilOp(const StencilOperation& _stencilOp)
+	{
+		switch (_stencilOp)
+		{
+		case StencilOperation::Keep:              return GL_KEEP;
+		case StencilOperation::Zero:              return GL_ZERO;
+		case StencilOperation::Replace:           return GL_REPLACE;
+		case StencilOperation::IncrementSaturate: return GL_INCR;
+		case StencilOperation::DecrementSaturate: return GL_DECR;
+		case StencilOperation::Invert:            return GL_INVERT;
+		case StencilOperation::IncrementWrap:     return GL_INCR_WRAP;
+		case StencilOperation::DecrementWrap:     return GL_DECR_WRAP;
+		default:                                  return GL_KEEP;
+		}
+	}
 
 }
 

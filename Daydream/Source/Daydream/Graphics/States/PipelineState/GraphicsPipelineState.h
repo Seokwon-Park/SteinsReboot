@@ -28,15 +28,15 @@ namespace Daydream
 
 	struct GraphicsPipelineStateDesc
 	{
-		ShaderGroup* shaderGroup;
+		ShaderGroup* shaderGroup = nullptr;
 		//Shared<Shader> computeShader; //??
 
 		//BufferLayout inputLayout;
 		//InputLayoutDesc inputLayout;
 		//Shared<ResourceBindingLayout> resourceBindingLayout; // RootSignature/PipelineLayout
-		RasterizerStateDesc rasterizerState;
+		RasterizerStateDesc rasterizerState{};
 		//BlendDesc blendState;
-		//DepthStencilDesc depthStencilState;
+		DepthStencilStateDesc depthStencilState{};
 		Array<RenderFormat> renderTargetFormats; // RTV 포맷들
 		RenderFormat depthStencilFormat = RenderFormat::UNKNOWN; // DSV 포맷
 
