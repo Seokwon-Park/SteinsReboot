@@ -15,6 +15,7 @@
 
 #include "Base/IO/FileSystem.h"
 #include "Base/IO/Path.h"
+#include "Base/IO/File.h"
 
 #include "Base/Time/TimeStep.h"
 #include "Base/Container/Array.h"

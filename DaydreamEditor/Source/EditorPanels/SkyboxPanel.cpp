@@ -47,7 +47,7 @@ namespace Daydream
 			{
 				skybox->SetDiffuseResolution(resolutionFactors[skyboxIndex]);
 			}
-			ImGui::Image(equirectangularDropTarget->GetImGuiHandle(), ImVec2{ 400,200 });
+			ImGui::Image(equirectangularDropTarget->GetDefaultSRV()->GetUIHandle(), ImVec2{ 400,200 });
 			if (ImGui::BeginDragDropTarget())
 			{
 				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(AssetManager::AssetTypeToString(AssetType::Texture2D).c_str()))

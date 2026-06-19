@@ -124,7 +124,7 @@ namespace Daydream
 		if (result.texture->GetWidth() != width || result.texture->GetHeight() != height)
 		{
 			//현재의 텍스쳐는 풀에 던진다(어차피 사용안되면 없어짐)
-			Renderer::TransitionTextureState(result.texture, ResourceState::Undefined, 0, -1, 0, -1);
+			//Renderer::TransitionTextureState(result.texture, ResourceState::Undefined);
 			Renderer::GetTexturePool()->ReturnAllocation(result);
 
 			//크기에 맞춰서 새로운 텍스쳐를 생성한다.
@@ -143,13 +143,13 @@ namespace Daydream
 			rtvDesc.layerCount = 1;
 			result.renderTargetView = TextureView::Create(result.texture, rtvDesc);
 
-			TextureViewDesc srvDesc{};
-			srvDesc.type = TextureViewType::ShaderResource;
-			srvDesc.baseMip = 0;
-			srvDesc.mipLevels = 1;
-			srvDesc.baseLayer = 0;
-			srvDesc.layerCount = 1;
-			result.shaderResourceView = TextureView::Create(result.texture, srvDesc);
+			//TextureViewDesc srvDesc{};
+			//srvDesc.type = TextureViewType::ShaderResource;
+			//srvDesc.baseMip = 0;
+			//srvDesc.mipLevels = 1;
+			//srvDesc.baseLayer = 0;
+			//srvDesc.layerCount = 1;
+			//result.shaderResourceView = TextureView::Create(result.texture, srvDesc);
 
 			Renderer::TransitionTextureState(result.texture, ResourceState::RenderTarget);
 		}
@@ -158,6 +158,7 @@ namespace Daydream
 			Renderer::TransitionTextureState(result.texture, ResourceState::RenderTarget);
 		}
 
+		Renderer::TransitionTextureState(shadowMap.texture, ResourceState::DepthWrite);
 	}
 }
 

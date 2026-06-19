@@ -148,7 +148,7 @@ namespace Daydream::UI
 		{
 			ImGui::Text(name.c_str());
 			if (textureBinding.cache != nullptr)
-				ImGui::Image(textureBinding.cache->GetImGuiHandle(), ImVec2{ 100,100 });
+				ImGui::Image(textureBinding.cache->GetDefaultSRV()->GetUIHandle(), ImVec2{100,100});
 			if (ImGui::BeginDragDropTarget())
 			{
 				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(AssetManager::AssetTypeToString(AssetType::Texture2D).c_str()))

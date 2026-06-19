@@ -70,10 +70,10 @@ namespace Daydream
 					Texture2D* thumbnail;
 
 					// 폴더 또는 파일 아이콘 표시
-					if (path.IsDirectory())
+					if (FileSystem::IsDirectory(path))
 					{
 						thumbnail = AssetManager::GetAssetByPath<Texture2D>("Resource/DirectoryIcon.png");
-						ImGui::ImageButton(pathString.c_str(), (ImTextureID)thumbnail->GetImGuiHandle(), { thumbnailSize, thumbnailSize });
+						ImGui::ImageButton(pathString.c_str(), (ImTextureID)thumbnail->GetDefaultSRV()->GetUIHandle(), {thumbnailSize, thumbnailSize});
 					}
 					else // 파일인 경우
 					{
@@ -86,7 +86,7 @@ namespace Daydream
 						case AssetType::None: // is not AssetFile
 						{
 							thumbnail = AssetManager::GetAssetByPath<Texture2D>("Resource\\FileIcon.png");
-							ImGui::ImageButton(filenameString.c_str(), (ImTextureID)thumbnail->GetOrCreateDefaultSRV()->GetUIHandle(), {thumbnailSize, thumbnailSize});
+							ImGui::ImageButton(filenameString.c_str(), (ImTextureID)thumbnail->GetDefaultSRV()->GetUIHandle(), {thumbnailSize, thumbnailSize});
 							break;
 						}
 						case AssetType::Texture2D:
@@ -95,7 +95,7 @@ namespace Daydream
 							asset = thumbnail;
 							if (thumbnail != nullptr)
 							{
-								ImGui::ImageButton(pathString.c_str(), (ImTextureID)thumbnail->GetImGuiHandle(), { thumbnailSize, thumbnailSize });
+								ImGui::ImageButton(pathString.c_str(), (ImTextureID)thumbnail->GetDefaultSRV()->GetUIHandle(), {thumbnailSize, thumbnailSize});
 							}
 
 							if (ImGui::BeginDragDropSource())
@@ -106,7 +106,7 @@ namespace Daydream
 
 								// 드래그 중 미리보기
 								ImGui::Text("%s", filenameString.c_str());
-								ImGui::Image((ImTextureID)thumbnail->GetImGuiHandle(), ImVec2(50, 50));
+								ImGui::Image((ImTextureID)thumbnail->GetDefaultSRV()->GetUIHandle(), ImVec2(50, 50));
 
 								ImGui::EndDragDropSource();
 							}
@@ -122,7 +122,7 @@ namespace Daydream
 						{
 							asset = AssetManager::GetAssetByPath<Model>(pathString);
 
-							ImGui::ImageButton(pathString.c_str(), (ImTextureID)thumbnail->GetImGuiHandle(), { thumbnailSize, thumbnailSize });
+							ImGui::ImageButton(pathString.c_str(), (ImTextureID)thumbnail->GetDefaultSRV()->GetUIHandle(), { thumbnailSize, thumbnailSize });
 							if (ImGui::BeginDragDropSource())
 							{
 								AssetHandle assetHandle = asset->GetAssetHandle();
@@ -131,7 +131,7 @@ namespace Daydream
 
 								// 드래그 중 미리보기
 								ImGui::Text("%s", filenameString.c_str());
-								ImGui::Image((ImTextureID)thumbnail->GetImGuiHandle(), ImVec2(50, 50));
+								ImGui::Image((ImTextureID)thumbnail->GetDefaultSRV()->GetUIHandle(), ImVec2(50, 50));
 
 								ImGui::EndDragDropSource();
 							}
@@ -142,7 +142,7 @@ namespace Daydream
 						default:
 						{
 							thumbnail = AssetManager::GetAssetByPath<Texture2D>("Resource\\FileIcon.png");
-							ImGui::ImageButton(filenameString.c_str(), (ImTextureID)thumbnail->GetImGuiHandle(), { thumbnailSize, thumbnailSize });
+							ImGui::ImageButton(filenameString.c_str(), (ImTextureID)thumbnail->GetDefaultSRV()->GetUIHandle(), { thumbnailSize, thumbnailSize });
 							break;
 						}
 						}
@@ -151,7 +151,7 @@ namespace Daydream
 					// 더블 클릭 이벤트 처리
 					if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
 					{
-						if (path.IsDirectory())
+						if (FileSystem::IsDirectory(path))
 						{
 							currentPath /= path.GetFileName(); // 하위 폴더로 이동
 						}
@@ -174,7 +174,7 @@ namespace Daydream
 	{
 		for (const Path& entryPath : FileSystem::GetDirectoryEntries(path))
 		{
-			if (entryPath.IsDirectory())
+			if (FileSystem::IsDirectory(entryPath))
 			{
 				const String filenameString = entryPath.GetFileName();
 

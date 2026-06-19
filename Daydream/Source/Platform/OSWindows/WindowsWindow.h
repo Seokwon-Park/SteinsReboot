@@ -48,9 +48,6 @@ namespace Daydream
 		inline virtual void SetMouseDown(int _key) override { windowData.mouseDownChecker[_key] = true; }
 		virtual void OnUpdateInputState() override;
 
-		//This functions for only OpenGL
-		virtual void MakeContextCurrent() const override;
-		virtual void ReleaseContext() const override;
 	private:
 		void Init();
 		void Shutdown();

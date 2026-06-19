@@ -5,13 +5,8 @@
 
 namespace Daydream
 {
-	enum class ShaderResourceType
-	{
-		Input,
-		ConstantBuffer,
-		Texture,
-		Sampler,
-	};
+
+
 	struct ShaderReflectionData
 	{
 		UInt32 set; // or location
@@ -19,7 +14,7 @@ namespace Daydream
 		UInt32 count;
 		UInt64 size;
 		ShaderType shaderType;
-		ShaderResourceType shaderResourceType;
+		ShaderReflectionDataType shaderResourceType;
 		String name;
 		RenderFormat format; // only for input layouts
 	};
@@ -28,23 +23,23 @@ namespace Daydream
 	{
 
 	};
-	
+
 	class Shader : public Asset
 	{
 	public:
-		ASSET_CLASS_TYPE(Shader)
+		ASSET_CLASS_TYPE(Shader);
 		virtual ~Shader() = default;
 
-		virtual void Bind() const = 0;
-		virtual void Unbind() const = 0;
-
+		bool LoadCache(const Path& _cachePath);
 		ShaderType GetType() const { return shaderType; }
+
 		const Array<ShaderReflectionData>& GetShaderReflectionData() const { return reflectionDatas; }
 
-		static Shared<Shader> Create(const String& _src, const ShaderType& _type, const ShaderLoadMode& _mode);
+		static Shared<Shader> Create(const ShaderType& _type);
 	protected:
-		ShaderType shaderType;
+		virtual bool CreateNativeShader(const Array<UInt8>& _bytecode) = 0;
 
+		ShaderType shaderType;
 		Array<ShaderReflectionData> reflectionDatas;
 	};
 

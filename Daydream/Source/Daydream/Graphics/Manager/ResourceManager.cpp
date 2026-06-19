@@ -9,7 +9,6 @@
 
 #include "ShaderRegistry.h"
 #include "ShaderGroupRegistry.h"
-#include "MeshRegistry.h"
 #include "PipelineStateRegistry.h"
 #include "SamplerRegistry.h"
 
@@ -34,16 +33,12 @@ namespace Daydream
 		instance->registryList[typeIndex] = MakeUnique<ShaderGroupRegistry>();
 		typeIndex = typeid(Sampler);
 		instance->registryList[typeIndex] = MakeUnique<SamplerRegistry>();
-		typeIndex = typeid(Mesh);
-		instance->registryList[typeIndex] = MakeUnique<MeshRegistry>();
 		typeIndex = typeid(GraphicsPipelineState);
 		instance->registryList[typeIndex] = MakeUnique<PipelineStateRegistry>();
 
 		typeIndex = typeid(ShaderGroup);
 		instance->registryList[typeIndex]->CreateBuiltinResources();
 		typeIndex = typeid(Sampler);
-		instance->registryList[typeIndex]->CreateBuiltinResources();
-		typeIndex = typeid(Mesh);
 		instance->registryList[typeIndex]->CreateBuiltinResources();
 		typeIndex = typeid(GraphicsPipelineState);
 		instance->registryList[typeIndex]->CreateBuiltinResources();

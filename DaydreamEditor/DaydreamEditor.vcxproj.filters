@@ -9,11 +9,15 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\EditorCamera.h" />
     <ClInclude Include="Source\EditorLayer.h" />
     <ClInclude Include="Source\EditorPanels\AssetBrowserPanel.h">
       <Filter>EditorPanels</Filter>
     </ClInclude>
     <ClInclude Include="Source\EditorPanels\PropertyPanel.h">
+      <Filter>EditorPanels</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\EditorPanels\RenderGraphPanel.h">
       <Filter>EditorPanels</Filter>
     </ClInclude>
     <ClInclude Include="Source\EditorPanels\SceneHierarchyPanel.h">
@@ -31,15 +35,18 @@
     <ClInclude Include="Source\EditorPanels\ViewportPanel.h">
       <Filter>EditorPanels</Filter>
     </ClInclude>
-    <ClInclude Include="Source\EditorCamera.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\EditorApp.cpp" />
+    <ClCompile Include="Source\EditorCamera.cpp" />
     <ClCompile Include="Source\EditorLayer.cpp" />
     <ClCompile Include="Source\EditorPanels\AssetBrowserPanel.cpp">
       <Filter>EditorPanels</Filter>
     </ClCompile>
     <ClCompile Include="Source\EditorPanels\PropertyPanel.cpp">
+      <Filter>EditorPanels</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\EditorPanels\RenderGraphPanel.cpp">
       <Filter>EditorPanels</Filter>
     </ClCompile>
     <ClCompile Include="Source\EditorPanels\SceneHierarchyPanel.cpp">
@@ -54,6 +61,5 @@
     <ClCompile Include="Source\EditorPanels\ViewportPanel.cpp">
       <Filter>EditorPanels</Filter>
     </ClCompile>
-    <ClCompile Include="Source\EditorCamera.cpp" />
   </ItemGroup>
 </Project>

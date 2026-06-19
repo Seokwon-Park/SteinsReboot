@@ -60,13 +60,13 @@ namespace Daydream
 				rtvDesc.layerCount = 1;
 				resource.renderTargetView = TextureView::Create(resource.texture, rtvDesc);
 
-				TextureViewDesc srvDesc{};
-				srvDesc.type = TextureViewType::ShaderResource;
-				srvDesc.baseMip = 0;
-				srvDesc.mipLevels = 1;
-				srvDesc.baseLayer = 0;
-				srvDesc.layerCount = 1;
-				resource.shaderResourceView = TextureView::Create(resource.texture, srvDesc);
+				//TextureViewDesc srvDesc{};
+				//srvDesc.type = TextureViewType::ShaderResource;
+				//srvDesc.baseMip = 0;
+				//srvDesc.mipLevels = 1;
+				//srvDesc.baseLayer = 0;
+				//srvDesc.layerCount = 1;
+				//resource.shaderResourceView = TextureView::Create(resource.texture, srvDesc);
 			}
 			else // depth Æ÷¸äÀÎ °æ¿ì
 			{
@@ -82,14 +82,14 @@ namespace Daydream
 				dsvDesc.layerCount = 1;
 				resource.depthStencilView = TextureView::Create(resource.texture, dsvDesc);
 
-				TextureViewDesc srvDesc{};
-				srvDesc.type = TextureViewType::ShaderResource;
-				srvDesc.format = RenderFormat::R24_UNORM_X8_TYPELESS;
-				srvDesc.baseMip = 0;
-				srvDesc.mipLevels = 1;
-				srvDesc.baseLayer = 0;
-				srvDesc.layerCount = 1;
-				resource.shaderResourceView = TextureView::Create(resource.texture, srvDesc);
+				//TextureViewDesc srvDesc{};
+				//srvDesc.type = TextureViewType::ShaderResource;
+				//srvDesc.format = RenderFormat::R24_UNORM_X8_TYPELESS;
+				//srvDesc.baseMip = 0;
+				//srvDesc.mipLevels = 1;
+				//srvDesc.baseLayer = 0;
+				//srvDesc.layerCount = 1;
+				//resource.shaderResourceView = TextureView::Create(resource.texture, srvDesc);
 			}
 		}
 		return resource;

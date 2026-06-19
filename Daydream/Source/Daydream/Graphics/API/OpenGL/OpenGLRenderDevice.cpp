@@ -139,9 +139,9 @@ namespace Daydream
 		return MakeShared<OpenGLGraphicsPipelineState>(_desc);
 	}
 
-	Shared<Shader> OpenGLRenderDevice::CreateShader(const std::string& _src, const ShaderType& _type, ShaderLoadMode _mode)
+	Shared<Shader> OpenGLRenderDevice::CreateShader(const ShaderType& _type)
 	{
-		return MakeShared<OpenGLShader>(_src, _type, _mode);
+		return MakeShared<OpenGLShader>(_type);
 	}
 
 

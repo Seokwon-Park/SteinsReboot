@@ -110,14 +110,14 @@ namespace Daydream
 			timeStep.UpdateTime();
 			float deltaTime = timeStep.GetDeltaTime();
 
-			Renderer::BeginFrame(mainWindow->GetSwapchain());
+			Renderer::BeginFrame(GetMainWindowPtr());
 			Renderer::ExecutePreFrameCommands(); // if ExecutePreFrameCommandQueue is not empty
 
 			for (Layer* layer : layerStack)
 			{
 				layer->OnUpdate(deltaTime);
 			}
-			Renderer::BeginRendering(mainWindow->GetSwapchain(), Color::Blue);
+			Renderer::BeginRendering(GetMainWindowPtr(), Color::Blue);
 			imGuiLayer->BeginImGui();
 			for (Layer* layer : layerStack)
 				layer->OnImGuiRender();
@@ -151,7 +151,7 @@ namespace Daydream
 			//{
 			//	DAYDREAM_CORE_TRACE("KEY UP TEST");
 			//}
-			Renderer::EndFrame(mainWindow->GetSwapchain());
+			Renderer::EndFrame(GetMainWindowPtr());
 			imGuiLayer->UpdateImGuiWindows();
 			Renderer::Submit();
 
@@ -164,7 +164,6 @@ namespace Daydream
 	}
 	bool Application::Exit()
 	{
-		mainWindow->SetSwapchain(nullptr);
 		ComponentRegistry::Shutdown();
 		layerStack.Release();
 		AssetManager::Shutdown();
@@ -202,7 +201,7 @@ namespace Daydream
 		//렌더러 초기화
 		Renderer::Init(appSpec.rendererAPI);
 		//렌더러에서 윈도우에 대한 스왑체인 생성
-		if (!Renderer::CreateSwapchainForWindow(*mainWindow))
+		if (!Renderer::CreateSwapchain(*mainWindow))
 		{
 			return false;
 		}
@@ -249,7 +248,7 @@ namespace Daydream
 			DAYDREAM_CORE_ASSERT(false, "Window Resize Error!");
 			return true;
 		}
-		Renderer::OnSwapchainResize(window->GetSwapchain(), _event.GetWidth(), _event.GetHeight());
+		Renderer::OnSwapchainResize(window, _event.GetWidth(), _event.GetHeight());
 
 		return false;
 	}

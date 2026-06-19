@@ -15,7 +15,7 @@ namespace Daydream
 
 		for (const auto& info : shaderGroup->GetInputData())
 		{
-			if (info.shaderResourceType != ShaderResourceType::Input) continue;
+			if (info.shaderResourceType != ShaderReflectionDataType::Input) continue;
 			D3D12_INPUT_ELEMENT_DESC elementDesc;
 			elementDesc.SemanticName = info.name.c_str();
 			elementDesc.SemanticIndex = info.binding;
@@ -37,7 +37,7 @@ namespace Daydream
 		{
 			switch (data.shaderResourceType)
 			{
-			case ShaderResourceType::ConstantBuffer:
+			case ShaderReflectionDataType::ConstantBuffer:
 			{
 				D3D12_ROOT_PARAMETER rootParam = {};
 				rootParam.ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
@@ -48,7 +48,7 @@ namespace Daydream
 				break;
 			}
 
-			case ShaderResourceType::Texture:
+			case ShaderReflectionDataType::Texture:
 			{
 				D3D12_DESCRIPTOR_RANGE srvRange{};
 				srvRange.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
@@ -66,7 +66,7 @@ namespace Daydream
 				rootParameters.push_back(rootParam);
 				break;
 			}
-			case ShaderResourceType::Sampler:
+			case ShaderReflectionDataType::Sampler:
 			{
 				D3D12_DESCRIPTOR_RANGE samplerRange{};
 				samplerRange.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER;

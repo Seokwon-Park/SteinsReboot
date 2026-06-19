@@ -163,6 +163,9 @@
     <Filter Include="Vendor\glm\glm\gtx">
       <UniqueIdentifier>{9362E3A8-7F46-A4FE-E8A6-9E51D4A98E80}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Vendor\imgui-node-editor">
+      <UniqueIdentifier>{04850263-F0A9-51E3-19F5-367305795001}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Vendor\stb">
       <UniqueIdentifier>{6BAF7327-5767-B574-C06E-8ED0AC455065}</UniqueIdentifier>
     </Filter>
@@ -293,6 +296,9 @@
     </ClInclude>
     <ClInclude Include="Source\Daydream\Core\WindowManager.h">
       <Filter>Source\Daydream\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Daydream\Enum\EnumDefines.h">
+      <Filter>Source\Daydream\Enum</Filter>
     </ClInclude>
     <ClInclude Include="Source\Daydream\Enum\RendererEnums.h">
       <Filter>Source\Daydream\Enum</Filter>
@@ -528,9 +534,6 @@
     <ClInclude Include="Source\Daydream\Graphics\Core\Swapchain.h">
       <Filter>Source\Daydream\Graphics\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Daydream\Graphics\Manager\MeshRegistry.h">
-      <Filter>Source\Daydream\Graphics\Manager</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Daydream\Graphics\Manager\PipelineStateRegistry.h">
       <Filter>Source\Daydream\Graphics\Manager</Filter>
     </ClInclude>
@@ -549,8 +552,20 @@
     <ClInclude Include="Source\Daydream\Graphics\Manager\ShaderRegistry.h">
       <Filter>Source\Daydream\Graphics\Manager</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Daydream\Graphics\Pools\BufferPool\BufferPoolHandle.h">
+      <Filter>Source\Daydream\Graphics\Pools\BufferPool</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Daydream\Graphics\Pools\BufferPool\ConstantBufferPool.h">
+      <Filter>Source\Daydream\Graphics\Pools\BufferPool</Filter>
+    </ClInclude>
     <ClInclude Include="Source\Daydream\Graphics\Pools\BufferPool\UploadBufferPool.h">
       <Filter>Source\Daydream\Graphics\Pools\BufferPool</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Daydream\Graphics\Pools\ResourcePoolBase.h">
+      <Filter>Source\Daydream\Graphics\Pools</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Daydream\Graphics\Pools\TexturePool\Texture2DAllocation.h">
+      <Filter>Source\Daydream\Graphics\Pools\TexturePool</Filter>
     </ClInclude>
     <ClInclude Include="Source\Daydream\Graphics\Pools\TexturePool\Texture2DPool.h">
       <Filter>Source\Daydream\Graphics\Pools\TexturePool</Filter>
@@ -600,7 +615,13 @@
     <ClInclude Include="Source\Daydream\Graphics\Resources\Sprite.h">
       <Filter>Source\Daydream\Graphics\Resources</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Daydream\Graphics\Resources\Struct\RenderDataStruct.h">
+      <Filter>Source\Daydream\Graphics\Resources\Struct</Filter>
+    </ClInclude>
     <ClInclude Include="Source\Daydream\Graphics\Resources\Struct\TransformData.h">
+      <Filter>Source\Daydream\Graphics\Resources\Struct</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Daydream\Graphics\Resources\Struct\ViewProjectionData.h">
       <Filter>Source\Daydream\Graphics\Resources\Struct</Filter>
     </ClInclude>
     <ClInclude Include="Source\Daydream\Graphics\Resources\Texture\Texture.h">
@@ -2022,16 +2043,36 @@
     <ClInclude Include="Vendor\glm\glm\vector_relational.hpp">
       <Filter>Vendor\glm\glm</Filter>
     </ClInclude>
+    <ClInclude Include="Vendor\imgui-node-editor\crude_json.h">
+      <Filter>Vendor\imgui-node-editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Vendor\imgui-node-editor\imgui_bezier_math.h">
+      <Filter>Vendor\imgui-node-editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Vendor\imgui-node-editor\imgui_bezier_math.inl">
+      <Filter>Vendor\imgui-node-editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Vendor\imgui-node-editor\imgui_canvas.h">
+      <Filter>Vendor\imgui-node-editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Vendor\imgui-node-editor\imgui_extra_math.h">
+      <Filter>Vendor\imgui-node-editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Vendor\imgui-node-editor\imgui_extra_math.inl">
+      <Filter>Vendor\imgui-node-editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Vendor\imgui-node-editor\imgui_node_editor.h">
+      <Filter>Vendor\imgui-node-editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Vendor\imgui-node-editor\imgui_node_editor_internal.h">
+      <Filter>Vendor\imgui-node-editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Vendor\imgui-node-editor\imgui_node_editor_internal.inl">
+      <Filter>Vendor\imgui-node-editor</Filter>
+    </ClInclude>
     <ClInclude Include="Vendor\stb\stb_image.h">
       <Filter>Vendor\stb</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Daydream\Graphics\Pools\ResourcePoolBase.h" />
-    <ClInclude Include="Source\Daydream\Graphics\Resources\Struct\ViewProjectionData.h" />
-    <ClInclude Include="Source\Daydream\Graphics\Pools\TexturePool\Texture2DAllocation.h" />
-    <ClInclude Include="Source\Daydream\Graphics\Resources\Struct\RenderDataStruct.h" />
-    <ClInclude Include="Source\Daydream\Graphics\Pools\BufferPool\BufferPoolHandle.h" />
-    <ClInclude Include="Source\Daydream\Graphics\Pools\BufferPool\ConstantBufferPool.h" />
-    <ClInclude Include="Source\Daydream\Enum\EnumDefines.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Base\IO\File.cpp">
@@ -2328,9 +2369,6 @@
     <ClCompile Include="Source\Daydream\Graphics\Core\Swapchain.cpp">
       <Filter>Source\Daydream\Graphics\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Daydream\Graphics\Manager\MeshRegistry.cpp">
-      <Filter>Source\Daydream\Graphics\Manager</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Daydream\Graphics\Manager\PipelineStateRegistry.cpp">
       <Filter>Source\Daydream\Graphics\Manager</Filter>
     </ClCompile>
@@ -2348,6 +2386,12 @@
     </ClCompile>
     <ClCompile Include="Source\Daydream\Graphics\Manager\ShaderRegistry.cpp">
       <Filter>Source\Daydream\Graphics\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Daydream\Graphics\Pools\BufferPool\BufferPoolHandle.cpp">
+      <Filter>Source\Daydream\Graphics\Pools\BufferPool</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Daydream\Graphics\Pools\BufferPool\ConstantBufferPool.cpp">
+      <Filter>Source\Daydream\Graphics\Pools\BufferPool</Filter>
     </ClCompile>
     <ClCompile Include="Source\Daydream\Graphics\Pools\BufferPool\UploadBufferPool.cpp">
       <Filter>Source\Daydream\Graphics\Pools\BufferPool</Filter>
@@ -2395,6 +2439,9 @@
       <Filter>Source\Daydream\Graphics\Resources</Filter>
     </ClCompile>
     <ClCompile Include="Source\Daydream\Graphics\Resources\Struct\TransformData.cpp">
+      <Filter>Source\Daydream\Graphics\Resources\Struct</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Daydream\Graphics\Resources\Struct\ViewProjectionData.cpp">
       <Filter>Source\Daydream\Graphics\Resources\Struct</Filter>
     </ClCompile>
     <ClCompile Include="Source\Daydream\Graphics\Resources\Texture\Texture.cpp">
@@ -2445,6 +2492,9 @@
     <ClCompile Include="Source\Daydream\Project\Project.cpp">
       <Filter>Source\Daydream\Project</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Daydream\Scene\Components\CameraComponent.cpp">
+      <Filter>Source\Daydream\Scene\Components</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Daydream\Scene\Components\Component.cpp">
       <Filter>Source\Daydream\Scene\Components</Filter>
     </ClCompile>
@@ -2493,12 +2543,20 @@
     <ClCompile Include="Vendor\VulkanMemoryAllocator\vk_mem_alloc.cpp">
       <Filter>Vendor\VulkanMemoryAllocator</Filter>
     </ClCompile>
+    <ClCompile Include="Vendor\imgui-node-editor\crude_json.cpp">
+      <Filter>Vendor\imgui-node-editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Vendor\imgui-node-editor\imgui_canvas.cpp">
+      <Filter>Vendor\imgui-node-editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Vendor\imgui-node-editor\imgui_node_editor.cpp">
+      <Filter>Vendor\imgui-node-editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Vendor\imgui-node-editor\imgui_node_editor_api.cpp">
+      <Filter>Vendor\imgui-node-editor</Filter>
+    </ClCompile>
     <ClCompile Include="Vendor\stb\stb_image.cpp">
       <Filter>Vendor\stb</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Daydream\Graphics\Pools\BufferPool\BufferPoolHandle.cpp" />
-    <ClCompile Include="Source\Daydream\Graphics\Resources\Struct\ViewProjectionData.cpp" />
-    <ClCompile Include="Source\Daydream\Scene\Components\CameraComponent.cpp" />
-    <ClCompile Include="Source\Daydream\Graphics\Pools\BufferPool\ConstantBufferPool.cpp" />
   </ItemGroup>
 </Project>

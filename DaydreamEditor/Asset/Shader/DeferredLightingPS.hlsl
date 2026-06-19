@@ -78,24 +78,24 @@ cbuffer LightViewProjection : register(b4)
 //SamplerState g_PointSampler : register(s8);
 
 [[vk::combinedImageSampler]][[vk::binding(5, 0)]]
-Texture2D PositionTexture : register(t0);
+Texture2D rg_PositionTexture : register(t0);
 [[vk::combinedImageSampler]][[vk::binding(5, 0)]]
-SamplerState PositionTextureSampler : register(s0);
+SamplerState rg_PositionTextureSampler : register(s0);
 
 [[vk::combinedImageSampler]][[vk::binding(6, 0)]]
-Texture2D AlbedoTexture : register(t1);
+Texture2D rg_AlbedoTexture : register(t1);
 [[vk::combinedImageSampler]][[vk::binding(6, 0)]]
-SamplerState AlbedoTextureSampler : register(s1);
+SamplerState rg_AlbedoTextureSampler : register(s1);
 
 [[vk::combinedImageSampler]][[vk::binding(7, 0)]]
-Texture2D NormalTexture : register(t2);
+Texture2D rg_NormalTexture : register(t2);
 [[vk::combinedImageSampler]][[vk::binding(7, 0)]]
-SamplerState NormalTextureSampler : register(s2);
+SamplerState rg_NormalTextureSampler : register(s2);
 
 [[vk::combinedImageSampler]][[vk::binding(8, 0)]]
-Texture2D RMAOTexture : register(t3);
+Texture2D rg_RMAOTexture : register(t3);
 [[vk::combinedImageSampler]][[vk::binding(8, 0)]]
-SamplerState RMAOTextureSampler : register(s3);
+SamplerState rg_RMAOTextureSampler : register(s3);
 
 [[vk::combinedImageSampler]][[vk::binding(9, 0)]]
 TextureCube IrradianceTexture : register(t4);
@@ -123,9 +123,9 @@ SamplerState BRDFLUTSampler : register(s6);
 //SamplerState OutlineTextureSampler : register(s8);
 
 [[vk::combinedImageSampler]][[vk::binding(14, 0)]]
-Texture2D DepthTexture : register(t9);
+Texture2D rg_DepthTexture : register(t9);
 [[vk::combinedImageSampler]][[vk::binding(14, 0)]]
-SamplerState DepthTextureSampler : register(s9);
+SamplerState rg_DepthTextureSampler : register(s9);
 
 //================================================================================
 // PBR 함수들 (PBR 셰이더에서 가져옴)
@@ -281,7 +281,7 @@ PSOutput PSMain(PSInput input)
     //    }
     //}
 
-    float4 posData = PositionTexture.Sample(PositionTextureSampler, uv);
+    float4 posData = rg_PositionTexture.Sample(rg_PositionTextureSampler, uv);
     float3 worldPosition = posData.xyz;
     
     // G-Buffer가 비어있는 픽셀(배경)은 스킵
@@ -291,9 +291,9 @@ PSOutput PSMain(PSInput input)
         discard; // 또는 배경색(스카이박스) 출력
     }
 
-    float3 N = NormalTexture.Sample(NormalTextureSampler, uv).xyz;
-    float3 albedo = AlbedoTexture.Sample(AlbedoTextureSampler, uv).rgb;
-    float4 matData = RMAOTexture.Sample(RMAOTextureSampler, uv);
+    float3 N = rg_NormalTexture.Sample(rg_NormalTextureSampler, uv).xyz;
+    float3 albedo = rg_AlbedoTexture.Sample(rg_AlbedoTextureSampler, uv).rgb;
+    float4 matData = rg_RMAOTexture.Sample(rg_RMAOTextureSampler, uv);
     float metallic = matData.b;
     float roughness = matData.g;
     float ao = matData.r;
@@ -329,7 +329,7 @@ PSOutput PSMain(PSInput input)
             lightTexcoord *= 0.5;
         
             uint width, height;
-            DepthTexture.GetDimensions(width, height);
+            rg_DepthTexture.GetDimensions(width, height);
             float2 texelSize = 1.0 / float2(width, height);
 
             float currentDepth = lightScreen.z;
@@ -348,7 +348,7 @@ PSOutput PSMain(PSInput input)
                     float2 pcfUV = lightTexcoord + float2(x, y) * texelSize;
                 
                 // 뎁스 샘플링
-                    float pcfDepth = DepthTexture.Sample(DepthTextureSampler, pcfUV).r;
+                    float pcfDepth = rg_DepthTexture.Sample(rg_DepthTextureSampler, pcfUV).r;
                 
                 // 비교 로직:
                 // 내 깊이(current - bias)가 맵에 기록된 깊이(pcfDepth)보다 크면(뒤에 있으면) 그림자

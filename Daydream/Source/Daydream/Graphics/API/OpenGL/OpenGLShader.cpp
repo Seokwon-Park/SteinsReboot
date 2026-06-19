@@ -85,29 +85,14 @@ namespace Daydream
 			}
 		}
 	}
-	OpenGLShader::OpenGLShader(const std::string& _src, const ShaderType& _type, const ShaderLoadMode& _mode)
+	OpenGLShader::OpenGLShader(const ShaderType& _type)
 	{
 		shaderType = _type;
-		//std::string src = _src;
-		//if (_mode == ShaderLoadMode::File)
-		//{
-		//	src = "";
-		//	std::ifstream file(_src);
-		//	DAYDREAM_CORE_ASSERT(file.is_open() == true, "Failed to open file!");
-		//	std::string readline;
-		//	std::stringstream stringStream;
 
-		//	ShaderType currentType = _type;
-
-		//	while (std::getline(file, readline))
-		//	{
-		//		src += readline + "\n";
-		//	}
-		//}
-		Path path(_src);
+		/*Path path(_src);
 		String src;
 		Array<UInt32> spirvData;
-		ShaderCompileHelper::ConvertHLSLtoSPIRV(path, _type, spirvData);
+		ShaderCompileHelper::CompileHLSLToSPIRV(path, _type);
 		spirv_cross::Compiler compiler(spirvData);
 		spirv_cross::ShaderResources res = compiler.get_shader_resources();
 		if (shaderType == ShaderType::Vertex)
@@ -119,7 +104,7 @@ namespace Daydream
 				ShaderReflectionData sr{};
 				sr.name = compiler.get_name(resource.id);
 				sr.binding = compiler.get_decoration(resource.id, spv::DecorationLocation);
-				sr.shaderResourceType = ShaderResourceType::Input;
+				sr.shaderResourceType = ShaderReflectionDataType::Input;
 
 				UInt32 componentCount = spirType.vecsize;
 				spirv_cross::SPIRType::BaseType baseType = spirType.basetype;
@@ -136,7 +121,7 @@ namespace Daydream
 		{
 			ShaderReflectionData sr{};
 			sr.name = compiler.get_name(resource.id);
-			sr.shaderResourceType = ShaderResourceType::ConstantBuffer;
+			sr.shaderResourceType = ShaderReflectionDataType::ConstantBuffer;
 			sr.set = compiler.get_decoration(resource.id, spv::DecorationDescriptorSet);
 			sr.binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
 			sr.size = compiler.get_declared_struct_size(compiler.get_type(resource.type_id));
@@ -148,7 +133,7 @@ namespace Daydream
 		{
 			ShaderReflectionData sr{};
 			sr.name = compiler.get_name(resource.id);
-			sr.shaderResourceType = ShaderResourceType::Texture;
+			sr.shaderResourceType = ShaderReflectionDataType::Texture;
 			sr.set = compiler.get_decoration(resource.id, spv::DecorationDescriptorSet);
 			sr.binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
 
@@ -163,40 +148,8 @@ namespace Daydream
 		}
 
 		src = ShaderCompileHelper::ConvertSPIRVtoGLSL(spirvData, _type);
-		Compile(src);
+		Compile(src);*/
 
-		//if (shaderType == ShaderType::Vertex)
-		//{
-		//	GLint numInputs;
-		//	glGetProgramInterfaceiv(shaderProgramID, GL_PROGRAM_INPUT, GL_ACTIVE_RESOURCES, &numInputs);
-
-		//	for (int i = 0; i < numInputs; ++i)
-		//	{
-		//		// 쿼리할 속성들
-		//		GLenum properties[] = { GL_NAME_LENGTH, GL_TYPE, GL_LOCATION };
-		//		GLint values[3];
-
-		//		// 속성 정보 가져오기
-		//		glGetProgramResourceiv(shaderProgramID, GL_PROGRAM_INPUT, i, 3, properties, 3, nullptr, values);
-
-		//		// 이름 가져오기
-		//		GLchar inputName[256];
-		//		glGetProgramResourceName(shaderProgramID, GL_PROGRAM_INPUT, i, values[0], nullptr, inputName);
-
-		//		ShaderReflectionInfo sr{};
-		//		sr.name = inputName;
-		//		sr.binding = values[2];
-		//		sr.format = ConvertToRenderFormat(values[1]);
-		//		sr.shaderResourceType = ShaderResourceType::Input;
-		//		sr.size = GraphicsUtil::GetRenderFormatSize(sr.format);
-		//		sr.count = GetComponentCount(values[1]);
-
-		//		reflectionInfo.push_back(sr);
-		//	}
-		//}
-
-		//ReflectUniformBlocks();
-		//ReflectTextures();
 	}
 
 	void OpenGLShader::ReflectTextures()
@@ -220,7 +173,7 @@ namespace Daydream
 			if (type == GL_SAMPLER_2D) {
 				ShaderReflectionData desc{};
 				desc.name = name;
-				desc.shaderResourceType = ShaderResourceType::Texture;
+				desc.shaderResourceType = ShaderReflectionDataType::Texture;
 				desc.set = 0;
 				desc.binding = location;
 				desc.count = size;
@@ -248,7 +201,7 @@ namespace Daydream
 
 			ShaderReflectionData desc{};
 			desc.name = name;
-			desc.shaderResourceType = ShaderResourceType::ConstantBuffer;
+			desc.shaderResourceType = ShaderReflectionDataType::ConstantBuffer;
 			desc.set = 0;
 			desc.binding = binding;
 			desc.count = 1;
@@ -282,12 +235,6 @@ namespace Daydream
 	OpenGLShader::~OpenGLShader()
 	{
 		glDeleteProgram(shaderProgramID);
-	}
-	void OpenGLShader::Bind() const
-	{
-	}
-	void OpenGLShader::Unbind() const
-	{
 	}
 
 	void OpenGLShader::Compile(const std::string& _src)

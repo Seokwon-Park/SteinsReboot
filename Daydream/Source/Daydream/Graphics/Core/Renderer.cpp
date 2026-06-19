@@ -98,12 +98,13 @@ namespace Daydream
 		skybox = nullptr;
 		imguiRenderer->Shutdown();
 		renderContext.reset();
+		windowSwapchainMap.clear();
 		renderDevice.reset();
 		//delete instance;
 		//instance = nullptr;
 	}
 
-	bool Renderer::CreateSwapchainForWindow(DaydreamWindow& _window)
+	bool Renderer::CreateSwapchain(DaydreamWindow& _window)
 	{
 		SwapchainDesc desc;
 		desc.width = _window.GetWidth();
@@ -115,14 +116,15 @@ namespace Daydream
 
 		Shared<Swapchain> swapchain = renderDevice->CreateSwapchain(_window, desc);
 		if (swapchain == nullptr) return false;
-		_window.SetSwapchain(swapchain);
+		windowSwapchainMap.insert({ &_window, std::move(swapchain) });
 		return true;
 	}
 
-	void Renderer::OnSwapchainResize(Swapchain* _swapchain, UInt32 _width, UInt32 _height)
+	void Renderer::OnSwapchainResize(DaydreamWindow* _window, UInt32 _width, UInt32 _height)
 	{
 		//renderContext->SetViewport(0, 0, _width, _height);
-		_swapchain->ResizeSwapchain(_width, _height);
+		Swapchain* swapchain = windowSwapchainMap[_window].get();
+		swapchain->ResizeSwapchain(_width, _height);
 	}
 
 	void Renderer::SetRenderThreadEnabled(bool _enabled)
@@ -143,23 +145,25 @@ namespace Daydream
 		}
 	}
 
-	void Renderer::BeginFrame(Swapchain* _swapchain)
+	void Renderer::BeginFrame(DaydreamWindow* _window)
 	{
-		EnqueueCommand([_swapchain]()
+		Swapchain* swapchain = windowSwapchainMap[_window].get();
+		EnqueueCommand([swapchain]()
 			{
-				_swapchain->BeginFrame();
-				renderContext->SetActiveCommandList(_swapchain->GetCurrentCommandList());
+				swapchain->BeginFrame();
+				renderContext->SetActiveCommandList(swapchain->GetCurrentCommandList());
 				//clear CapturedBuffer Safe
 				//renderContext->ReleaseCapturedBuffer();
 			});
 	}
 
-	void Renderer::EndFrame(Swapchain* _swapchain)
+	void Renderer::EndFrame(DaydreamWindow* _window)
 	{
-		EnqueueCommand([_swapchain]()
+		Swapchain* swapchain = windowSwapchainMap[_window].get();
+		EnqueueCommand([swapchain]()
 			{
-				_swapchain->EndFrame();
-				_swapchain->Present();
+				swapchain->EndFrame();
+				swapchain->Present();
 			});
 	}
 
@@ -179,16 +183,17 @@ namespace Daydream
 			});
 	}
 
-	void Renderer::BeginRendering(Swapchain* _swapchain, Color _clearColor)
+	void Renderer::BeginRendering(DaydreamWindow* _window, Color _clearColor)
 	{
-		EnqueueCommand([_swapchain, _clearColor]()
+		Swapchain* swapchain = windowSwapchainMap[_window].get();
+		EnqueueCommand([swapchain, _clearColor]()
 			{
 				RenderingInfo renderingInfo{};
-				renderingInfo.renderArea.width = _swapchain->GetWidth();
-				renderingInfo.renderArea.height = _swapchain->GetHeight();
+				renderingInfo.renderArea.width = swapchain->GetWidth();
+				renderingInfo.renderArea.height = swapchain->GetHeight();
 
 				AttachmentDesc desc;
-				desc.view = _swapchain->GetCurrentRenderTargetView();
+				desc.view = swapchain->GetCurrentRenderTargetView();
 				desc.clearValue.colorClearValue = _clearColor;
 				renderingInfo.colorAttachments.push_back(desc);
 
@@ -288,7 +293,7 @@ namespace Daydream
 				const auto& textureInfo = _material->GetTextureBindings();
 				for (const auto& [name, texture] : textureInfo)
 				{
-					renderContext->BindShaderResourceView(name, texture.cache->GetOrCreateDefaultSRV(), BuiltIn::Samplers::LinearRepeat());
+					renderContext->BindShaderResourceView(name, texture.cache->GetDefaultSRV(), BuiltIn::Samplers::LinearRepeat());
 				}
 			});
 	}

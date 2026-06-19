@@ -280,7 +280,7 @@ namespace Daydream
 			Renderer::BeginRendering(renderingInfo);
 			Renderer::BindPipelineState(equirectangularPSO);
 			Renderer::BindConstantBuffer("Camera", cubeFaceConstantBuffers[i]);
-			Renderer::BindShaderResourceView("Texture", equirectangularTexture->GetOrCreateDefaultSRV(), BuiltIn::Samplers::LinearClampToEdge());
+			Renderer::BindShaderResourceView("Texture", equirectangularTexture->GetDefaultSRV(), BuiltIn::Samplers::LinearClampToEdge());
 			Renderer::BindMesh(boxMesh);
 			Renderer::DrawIndexed(boxMesh->GetIndexCount());
 			Renderer::EndRendering(renderingInfo);
@@ -307,7 +307,7 @@ namespace Daydream
 			Renderer::BeginRendering(renderingInfo);
 			Renderer::BindPipelineState(irradiancePSO);
 			Renderer::BindConstantBuffer("Camera", cubeFaceConstantBuffers[i]);
-			Renderer::BindShaderResourceView("TextureCubemap", skyboxTextureCube->GetOrCreateDefaultSRV(), BuiltIn::Samplers::LinearClampToEdge());
+			Renderer::BindShaderResourceView("TextureCubemap", skyboxTextureCube->GetDefaultSRV(), BuiltIn::Samplers::LinearClampToEdge());
 			Renderer::BindMesh(boxMesh);
 			Renderer::DrawIndexed(boxMesh->GetIndexCount());
 			Renderer::EndRendering(renderingInfo);
@@ -344,7 +344,7 @@ namespace Daydream
 				Renderer::BindPipelineState(prefilterPSO);
 				Renderer::BindConstantBuffer("Camera", cubeFaceConstantBuffers[face]);
 				Renderer::BindConstantBuffer("Roughness", roughnessConstantBuffers[mip]);
-				Renderer::BindShaderResourceView("TextureCubemap", skyboxTextureCube->GetOrCreateDefaultSRV(), BuiltIn::Samplers::LinearClampToEdge());
+				Renderer::BindShaderResourceView("TextureCubemap", skyboxTextureCube->GetDefaultSRV(), BuiltIn::Samplers::LinearClampToEdge());
 				Renderer::BindMesh(boxMesh);
 				Renderer::DrawIndexed(boxMesh->GetIndexCount());
 				Renderer::EndRendering(renderingInfo);

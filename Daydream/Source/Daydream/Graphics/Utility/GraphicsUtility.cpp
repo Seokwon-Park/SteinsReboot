@@ -388,6 +388,25 @@ namespace Daydream
 			return "";
 		}
 
+		String GetAPIString(RendererAPIType _API)
+		{
+			switch (_API)
+			{
+			case RendererAPIType::OpenGL:
+				return "GL";
+			case RendererAPIType::DirectX11:
+				return "DX11";
+			case RendererAPIType::DirectX12:
+				return "DX12";
+			case RendererAPIType::Vulkan:
+				return "VK";
+			case RendererAPIType::Metal:
+				return "MTL";
+			default:
+				return "";
+			}
+		}
+
 		bool IsDepthFormat(RenderFormat _format)
 		{
 			switch (_format)

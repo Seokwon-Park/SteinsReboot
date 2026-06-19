@@ -1,3 +1,20 @@
+require('vstudio')
+
+local vs = premake.vstudio.vc2010
+
+local function vcpkg(prj)
+    premake.w('<VcpkgTriplet>x64-windows-static</VcpkgTriplet>')
+    premake.w('<VcpkgEnabled>false</VcpkgEnabled>')
+    premake.w('<VcpkgManifestInstall>false</VcpkgManifestInstall>')
+    premake.w('<VcpkgAutoLink>false</VcpkgAutoLink>')  
+end
+
+premake.override(premake.vstudio.vc2010.elements, "globals", function(base, prj)
+    local calls = base(prj)
+    table.insertafter(calls, vs.globals, vcpkg)
+    return calls
+end)
+
 workspace "Daydream"
 	architecture "x64"
 	startproject "Sandbox"
@@ -20,6 +37,7 @@ workspace "Daydream"
 	IncludeDir["VulkanMemoryAllocator"] = "Daydream/Vendor/VulkanMemoryAllocator"
 	IncludeDir["D3D12MemoryAllocator"] = "Daydream/Vendor/D3D12MemoryAllocator"
 	IncludeDir["ImGuizmo"] = "Daydream/Vendor/ImGuizmo"
+	IncludeDir["ImGuiNodeEditor"] = "Daydream/Vendor/imgui-node-editor"
 	IncludeDir["stduuid"] = "Daydream/Vendor/stduuid/include"
 	IncludeDir["yaml"] = "Daydream/Vendor/yaml-cpp/include"
 	IncludeDir["nfd"] = "Daydream/Vendor/nfd-extended/src/include"
@@ -56,6 +74,9 @@ project "Daydream"
  		"%{prj.name}/Vendor/D3D12MemoryAllocator/**.cpp",
  		"%{prj.name}/Vendor/ImGuizmo/ImGuizmo.h",
  		"%{prj.name}/Vendor/ImGuizmo/ImGuizmo.cpp",
+ 		"%{prj.name}/Vendor/imgui-node-editor/*.h",
+ 		"%{prj.name}/Vendor/imgui-node-editor/*.cpp",
+ 		"%{prj.name}/Vendor/imgui-node-editor/*.inl",
 	}
 	includedirs
 	{
@@ -72,6 +93,7 @@ project "Daydream"
 		"%{IncludeDir.VulkanMemoryAllocator}",
 		"%{IncludeDir.D3D12MemoryAllocator}",
 		"%{IncludeDir.ImGuizmo}",
+		"%{IncludeDir.ImGuiNodeEditor}",
 		"%{IncludeDir.stduuid}",
 		"%{IncludeDir.yaml}",
 		"%{IncludeDir.nfd}",
@@ -104,6 +126,9 @@ project "Daydream"
 	}
 
 	filter "files:Daydream/Vendor/ImGuizmo/**.cpp"
+		flags {"NoPCH"}
+
+	filter "files:Daydream/Vendor/imgui-node-editor/*.cpp"
 		flags {"NoPCH"}
 
 	filter "system:windows"
@@ -171,7 +196,9 @@ project "Sandbox"
 		"Daydream/Source",
 		"Daydream/Vendor",
 		"%{IncludeDir.DaydreamMath}",
+		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.ImGuizmo}",
+		"%{IncludeDir.ImGuiNodeEditor}",
 		"%{IncludeDir.stduuid}",
 	}
 	links
@@ -217,7 +244,9 @@ project "DaydreamEditor"
 		"Daydream/Source",
 		"Daydream/Vendor",
 		"%{IncludeDir.DaydreamMath}",
+		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.ImGuizmo}",
+		"%{IncludeDir.ImGuiNodeEditor}",
 		"%{IncludeDir.stduuid}",
 	}
 	links

@@ -49,18 +49,18 @@ namespace Daydream
 		static void PostInit();
 		static void Shutdown();
 
-		static bool CreateSwapchainForWindow(DaydreamWindow& _window);
-		static void OnSwapchainResize(Swapchain* _swapchain, UInt32 _width, UInt32 _height);
+		static bool CreateSwapchain(DaydreamWindow& _window);
+		static void OnSwapchainResize(DaydreamWindow* _window, UInt32 _width, UInt32 _height);
+
+		static void BeginFrame(DaydreamWindow* _window);
+		static void EndFrame(DaydreamWindow* _window);
+		static void BeginRendering(DaydreamWindow* _window, Color _clearColor);
 
 		static void SetRenderThreadEnabled(bool _enabled);
 		static bool IsRenderThreadEnabled() { return useRenderThread; }
 
-		static void BeginFrame(Swapchain* _swapchain);
-		static void EndFrame(Swapchain* _swapchain);
-
 		static void BeginRendering(const RenderingInfo& _renderingInfo);
 		static void EndRendering(const RenderingInfo& _renderingInfo);
-		static void BeginRendering(Swapchain* _swapchain, Color _clearColor);
 
 		static void BindPipelineState(const GraphicsPipelineState* _pipelineState);
 
@@ -168,7 +168,7 @@ namespace Daydream
 		////////////////////////////////////////////////////////////////// 
 		// RenderThread
 		////////////////////////////////////////////////////////////////// 
-		inline static bool useRenderThread = 1;
+		inline static bool useRenderThread = 0;
 
 		inline static Queue<RenderCommand> singleTimeCommandQueue;
 		inline static Array<Unique<RenderCommandQueue>> commandQueues;
@@ -183,6 +183,8 @@ namespace Daydream
 		//////////////////////////////////////////////////////////////////////////////////
 
 		inline static UInt32 currentLoop = 0;
+
+		inline static HashMap<DaydreamWindow*, Shared<Swapchain>> windowSwapchainMap;
 
 
 	};

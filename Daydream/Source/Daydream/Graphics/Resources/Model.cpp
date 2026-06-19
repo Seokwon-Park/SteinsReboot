@@ -24,9 +24,9 @@ namespace Daydream
 	{
 		meshes.clear();
 
-		//Path filepath(_path);
+		//Path filePath(_path);
 
-		//ModelData modelData = ModelLoader::LoadFromFile(filepath);
+		//ModelData modelData = ModelLoader::LoadFromFile(filePath);
 
 		//Vector3 vmin(1000, 1000, 1000);
 		//Vector3 vmax(-1000, -1000, -1000);

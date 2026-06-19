@@ -13,6 +13,11 @@ namespace Daydream
 		textureBindingMap = _shaderGroup->GetMaterialMap();
 	}
 
+	Material::Material(const GraphicsPipelineState* _pipelineState)
+		:Material(_pipelineState->GetShaderGroup())
+	{
+	}
+
 	Material::~Material()
 	{
 		textures.clear();

@@ -10,18 +10,11 @@ namespace Daydream
 	class D3D11Shader : public Shader
 	{
 	public:
-		D3D11Shader(D3D11RenderDevice* _device, const std::string& _src, const ShaderType& _type, const ShaderLoadMode& _mode);
+		D3D11Shader(D3D11RenderDevice* _device, const ShaderType& _type);
 		virtual ~D3D11Shader() override ;
-
-		virtual void Bind() const override;
-		virtual void Unbind() const override;
-		
-		ID3DBlob* GetShaderBlob() const { return shaderBlob.Get(); }
 	protected:
+		virtual bool CreateNativeShader(const Array<UInt8>& _bytecode) override { return false;  };
 		D3D11RenderDevice* device;
-		ComPtr<ID3DBlob> shaderBlob;
-		ComPtr<ID3DBlob> errorBlob;
-		ComPtr<ID3D11ShaderReflection> reflection;
 	private:
 	};
 	
@@ -29,10 +22,9 @@ namespace Daydream
 	class D3D11PixelShader : public D3D11Shader
 	{
 	public:
-		D3D11PixelShader(D3D11RenderDevice* _device, const std::string& _src, const ShaderLoadMode& _mode);
+		D3D11PixelShader(D3D11RenderDevice* _device);
 
-		virtual void Bind() const override;
-		virtual void Unbind() const override;
+		virtual bool CreateNativeShader(const Array<UInt8>& _bytecode) override;
 
 		ID3D11PixelShader* GetID3D11PixelShader() const { return pixelShader.Get(); }
 
@@ -43,11 +35,9 @@ namespace Daydream
 	class D3D11HullShader : public D3D11Shader
 	{
 	public:
-		D3D11HullShader(const Path& _filepath);
-		D3D11HullShader(const std::string& _src);
+		D3D11HullShader(D3D11RenderDevice* _device);
 
-		virtual void Bind() const override;
-		virtual void Unbind() const override;
+
 
 		//virtual void SetMat4(const std::string& _name, const Matrix4x4& _value) override;
 
@@ -58,11 +48,8 @@ namespace Daydream
 	class D3D11DomainShader : public D3D11Shader
 	{
 	public:
-		D3D11DomainShader(const Path& _filepath);
-		D3D11DomainShader(const std::string& _src);
+		D3D11DomainShader(D3D11RenderDevice* _device);
 
-		virtual void Bind() const override;
-		virtual void Unbind() const override;
 
 		//virtual void SetMat4(const std::string& _name, const Matrix4x4& _value) override;
 
@@ -73,11 +60,9 @@ namespace Daydream
 	class D3D11GeometryShader : public D3D11Shader
 	{
 	public:
-		D3D11GeometryShader(const Path& _filepath);
-		D3D11GeometryShader(const std::string& _src);
+		D3D11GeometryShader(D3D11RenderDevice* _device);
 
-		virtual void Bind() const override;
-		virtual void Unbind() const override;
+
 
 		//virtual void SetMat4(const std::string& _name, const Matrix4x4& _value) override;
 

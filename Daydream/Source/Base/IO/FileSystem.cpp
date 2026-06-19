@@ -14,7 +14,7 @@ namespace Daydream
 	{
 		Array<Path> entries;
 
-		if (!_dirPath.IsDirectory())
+		if (!IsDirectory(_dirPath))
 		{
 			DAYDREAM_CORE_WARN("GetDirectoryEntries failed: {0} is not a valid directory.", _dirPath.ToString());
 			return entries; 
@@ -31,7 +31,7 @@ namespace Daydream
 	{
 		Array<Path> entries;
 
-		if (!_dirPath.IsDirectory())
+		if (!IsDirectory(_dirPath))
 		{
 			DAYDREAM_CORE_WARN("GetDirectoryEntriesRecursive failed: {0} is not a valid directory.", _dirPath.ToString());
 			return entries;
@@ -46,7 +46,7 @@ namespace Daydream
 	}
 	bool FileSystem::MakeDirectory(const Path& _dirPath)
 	{
-		return std::filesystem::create_directory(_dirPath);
+		return std::filesystem::create_directories(_dirPath);
 	}
 	bool FileSystem::MakeTextFile(const Path& _filePath, StringView _text)
 	{
@@ -61,10 +61,21 @@ namespace Daydream
 
 		fout.write(_text.data(), _text.length());
 		fout.close();
-
+		
 		return true;
 	}
-	//bool FileSystem::MakeYamlFile(const Path& _filePath, const YAML::Node& _node)
+
+	UInt64 FileSystem::GetFileLastWriteTime(const Path& _path)
+	{
+		if (!IsFile(_path))
+		{
+			DAYDREAM_CORE_WARN("Path is not File!");
+			return 0;
+		}
+		auto lastTime = std::filesystem::last_write_time(_path);
+		return static_cast<UInt64>(lastTime.time_since_epoch().count());
+	}
+
 	//{
 	//	std::string yamlString = YAML::Dump(_node);
 

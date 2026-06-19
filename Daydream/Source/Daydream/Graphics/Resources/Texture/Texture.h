@@ -63,7 +63,7 @@ namespace Daydream
 		inline UInt32 GetLayerCount() const { return gpuTexture->GetDesc().layerCount; }
 
 		inline GPUTexture* GetGPUTexture() const { return gpuTexture.get(); }
-		TextureView* GetOrCreateDefaultSRV();
+		inline TextureView* GetDefaultSRV() const { return defaultSRV.get(); }
 
 		inline TextureDesc GetDesc() const { return gpuTexture->GetDesc(); }
 		inline TextureType GetType() const { return gpuTexture->GetDesc().type; }

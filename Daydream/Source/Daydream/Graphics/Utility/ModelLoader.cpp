@@ -32,12 +32,12 @@ namespace Daydream
 		}
 	}
 
-	Shared<ModelData> ModelLoader::LoadFromFile(const Path& _filepath)
+	Shared<ModelData> ModelLoader::LoadFromFile(const Path& _filePath)
 	{
 		Assimp::Importer importer;
 
 		Path baseDirectory;
-		baseDirectory = _filepath.GetParentPath();
+		baseDirectory = _filePath.GetParentPath();
 
 		UInt32 flags = aiProcess_Triangulate |   // 모든 면을 삼각형으로 변환
 			//aiProcess_PreTransformVertices |
@@ -51,9 +51,9 @@ namespace Daydream
 	//aiProcess_OptimizeMeshes |		// 메시 최적화
 	//aiProcess_ValidateDataStructure;  // 데이터 유효성 검사
 
-		DAYDREAM_INFO("Load File {}", _filepath.ToGenericString());
+		DAYDREAM_INFO("Load File {}", _filePath.ToGenericString());
 
-		const aiScene* scene = importer.ReadFile(_filepath.ToString(), flags);
+		const aiScene* scene = importer.ReadFile(_filePath.ToString(), flags);
 		bool result = scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode;
 		DAYDREAM_CORE_ASSERT(!result && scene != nullptr, "{0}", importer.GetErrorString());
 

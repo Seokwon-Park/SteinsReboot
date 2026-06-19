@@ -10,7 +10,7 @@ namespace Daydream
 		Shared<Texture2D> texture;
 		Shared<TextureView> renderTargetView;
 		Shared<TextureView> depthStencilView;
-		Shared<TextureView> shaderResourceView; // Color or Depth
+		//Shared<TextureView> shaderResourceView; // Color or Depth
 		Shared<TextureView> stencilShaderResourceView;
 	};
 }

@@ -114,6 +114,8 @@ namespace Daydream
 
         Mesh* boxMesh;
         Mesh* quadMesh;
+
+        Shared<Material> skyboxMaterial;
         
         Texture2D* equirectangularTexture; // 2D->Cube 원본 텍스쳐
         Texture2D* equirectangularDropTarget; // dummy(No Texture)

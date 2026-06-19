@@ -105,7 +105,7 @@ namespace Daydream
 			attachmentInfo.resolveImageLayout = vk::ImageLayout::eUndefined;
 			attachmentInfo.loadOp = GraphicsUtility::Vulkan::ConvertToLoadOp(renderingDesc.loadOp);
 			attachmentInfo.storeOp = GraphicsUtility::Vulkan::ConvertToStoreOp(renderingDesc.storeOp);
-			// Clear Value ¸ÅÇÎ (std::array·Î º¯È¯)
+			// Clear Value ë§¤í•‘ (std::arrayë¡œ ë³€í™˜)
 			vk::ClearColorValue clearColor;
 			clearColor.setFloat32({
 				renderingDesc.clearValue.colorClearValue.r,
@@ -118,7 +118,7 @@ namespace Daydream
 			colorAttachmentInfos.push_back(attachmentInfo);
 		}
 
-		// 2. Depth/Stencil Attachment ¼³Á¤ (»ç¿ëÇÏ´Â °æ¿ì)
+		// 2. Depth/Stencil Attachment ì„¤ì • (ì‚¬ìš©í•˜ëŠ” ê²½ìš°)
 		vk::RenderingAttachmentInfo depthAttachmentInfo{};
 		bool useDepth = _renderingInfo.depthAttachment.view != nullptr;
 
@@ -127,7 +127,7 @@ namespace Daydream
 			VulkanTextureView* depthView = Cast<VulkanTextureView*>(_renderingInfo.depthAttachment.view);
 			depthAttachmentInfo.imageView = depthView->GetVkImageView();
 
-			// ±íÀÌ ¹öÆÛ ·»´õ¸µ¿ë ·¹ÀÌ¾Æ¿ô
+			// ê¹Šì´ ë²„í¼ ë Œë”ë§ìš© ë ˆì´ì•„ì›ƒ
 			depthAttachmentInfo.imageLayout = vk::ImageLayout::eDepthStencilAttachmentOptimal;
 
 			depthAttachmentInfo.resolveMode = vk::ResolveModeFlagBits::eNone;
@@ -194,8 +194,8 @@ namespace Daydream
 	//	if (currentFramebuffer->HasDepthAttachment())
 	//	{
 	//		vk::ClearValue vulkanClearDepthStencil;
-	//		vulkanClearDepthStencil.depthStencil.depth = 1.0f; // ¶Ç´Â 0.0f
-	//		vulkanClearDepthStencil.depthStencil.stencil = 0;   // ½ºÅÙ½Ç °ªµµ ÇÔ²² ÃÊ±âÈ­
+	//		vulkanClearDepthStencil.depthStencil.depth = 1.0f; // ë˜ëŠ” 0.0f
+	//		vulkanClearDepthStencil.depthStencil.stencil = 0;   // ìŠ¤í…ì‹¤ ê°’ë„ í•¨ê»˜ ì´ˆê¸°í™”
 	//		colors.push_back(vulkanClearDepthStencil);
 	//	}
 
@@ -248,7 +248,7 @@ namespace Daydream
 
 	//	vk::WriteDescriptorSet writeSet = {};
 	//	//writeSet.dstSet = sets[resourceInfo.set].get();
-	//	writeSet.dstBinding = resourceInfo->binding;  // Æ¯Á¤ binding¸¸ ¾÷µ¥ÀÌÆ®
+	//	writeSet.dstBinding = resourceInfo->binding;  // íŠ¹ì • bindingë§Œ ì—…ë°ì´íŠ¸
 	//	writeSet.descriptorCount = 1;
 	//	writeSet.descriptorType = vk::DescriptorType::eCombinedImageSampler;
 	//	writeSet.pImageInfo = &imageInfo;
@@ -277,7 +277,7 @@ namespace Daydream
 
 	//	vk::WriteDescriptorSet writeSet = {};
 	//	//writeSet.dstSet = sets[resourceInfo.set].get();
-	//	writeSet.dstBinding = resourceInfo->binding;  // Æ¯Á¤ binding¸¸ ¾÷µ¥ÀÌÆ®
+	//	writeSet.dstBinding = resourceInfo->binding;  // íŠ¹ì • bindingë§Œ ì—…ë°ì´íŠ¸
 	//	writeSet.descriptorCount = 1;
 	//	writeSet.descriptorType = vk::DescriptorType::eCombinedImageSampler;
 	//	writeSet.pImageInfo = &imageInfo;
@@ -298,7 +298,7 @@ namespace Daydream
 
 		vk::WriteDescriptorSet writeSet = {};
 		//writeSet.dstSet = sets[resourceInfo.set].get();
-		writeSet.dstBinding = resourceInfo->binding;  // Æ¯Á¤ binding¸¸ ¾÷µ¥ÀÌÆ®
+		writeSet.dstBinding = resourceInfo->binding;  // íŠ¹ì • bindingë§Œ ì—…ë°ì´íŠ¸
 		writeSet.descriptorCount = 1;
 		writeSet.descriptorType = vk::DescriptorType::eCombinedImageSampler;
 		writeSet.pImageInfo = &imageInfo;
@@ -328,7 +328,7 @@ namespace Daydream
 
 		vk::WriteDescriptorSet writeSet = {};
 		//writeSet.dstSet = sets[resourceInfo.set].get();
-		writeSet.dstBinding = resourceInfo->binding;  // Æ¯Á¤ binding¸¸ ¾÷µ¥ÀÌÆ®
+		writeSet.dstBinding = resourceInfo->binding;  // íŠ¹ì • bindingë§Œ ì—…ë°ì´íŠ¸
 		writeSet.descriptorCount = 1;
 		writeSet.descriptorType = vk::DescriptorType::eUniformBuffer;
 		writeSet.pBufferInfo = &bufferInfo;
@@ -409,7 +409,7 @@ namespace Daydream
 
 	void Daydream::VulkanRenderContext::GenerateMips(GPUTexture* _texture)
 	{
-		//vk::CommandBuffer commandBuffer = device->BeginSingleTimeCommands(); // ÀÌ ÇÔ¼ö´Â vk::CommandBuffer¸¦ ¹İÈ¯ÇÑ´Ù°í °¡Á¤
+		//vk::CommandBuffer commandBuffer = device->BeginSingleTimeCommands(); // ì´ í•¨ìˆ˜ëŠ” vk::CommandBufferë¥¼ ë°˜í™˜í•œë‹¤ê³  ê°€ì •
 
 		Int32 mipWidth = _texture->GetWidth();
 		Int32 mipHeight = _texture->GetHeight();
@@ -435,7 +435,7 @@ namespace Daydream
 		barrier.srcAccessMask = vk::AccessFlagBits::eColorAttachmentWrite;
 		barrier.dstAccessMask = vk::AccessFlagBits::eTransferWrite;
 
-		// commandBufferÀÇ ¸â¹ö ÇÔ¼ö pipelineBarrier È£Ãâ
+		// commandBufferì˜ ë©¤ë²„ í•¨ìˆ˜ pipelineBarrier í˜¸ì¶œ
 		GetActiveCommandBuffer().pipelineBarrier(
 			vk::PipelineStageFlagBits::eColorAttachmentOutput,
 			vk::PipelineStageFlagBits::eTransfer,
@@ -454,7 +454,7 @@ namespace Daydream
 			barrier.srcAccessMask = vk::AccessFlagBits::eTransferWrite;
 			barrier.dstAccessMask = vk::AccessFlagBits::eTransferRead;
 
-			// commandBufferÀÇ ¸â¹ö ÇÔ¼ö pipelineBarrier È£Ãâ
+			// commandBufferì˜ ë©¤ë²„ í•¨ìˆ˜ pipelineBarrier í˜¸ì¶œ
 			GetActiveCommandBuffer().pipelineBarrier(
 				vk::PipelineStageFlagBits::eTransfer,
 				vk::PipelineStageFlagBits::eTransfer,
@@ -478,7 +478,7 @@ namespace Daydream
 			blit.dstSubresource.baseArrayLayer = 0;
 			blit.dstSubresource.layerCount = layerCount;
 
-			// commandBufferÀÇ ¸â¹ö ÇÔ¼ö blitImage È£Ãâ
+			// commandBufferì˜ ë©¤ë²„ í•¨ìˆ˜ blitImage í˜¸ì¶œ
 			GetActiveCommandBuffer().blitImage(
 				image, vk::ImageLayout::eTransferSrcOptimal,
 				image, vk::ImageLayout::eTransferDstOptimal,
@@ -568,7 +568,7 @@ namespace Daydream
 			srcStage,               // srcStageMask
 			dstStage,               // dstStageMask
 			{}, // dependencyFlags
-			0, nullptr,             // memoryBarriers (Àü¿ª)
+			0, nullptr,             // memoryBarriers (ì „ì—­)
 			0, nullptr,            // bufferMemoryBarriers
 			1, &barrier              // imageMemoryBarriers
 		);
@@ -610,7 +610,7 @@ namespace Daydream
 			srcStage,               // srcStageMask
 			dstStage,               // dstStageMask
 			{}, // dependencyFlags
-			0, nullptr,             // memoryBarriers (Àü¿ª)
+			0, nullptr,             // memoryBarriers (ì „ì—­)
 			1, &barrier,            // bufferMemoryBarriers
 			0, nullptr              // imageMemoryBarriers
 		);

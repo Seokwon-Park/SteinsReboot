@@ -246,9 +246,9 @@ namespace Daydream
 		return MakeShared<VulkanGraphicsPipelineState>(this, _desc);
 	}
 
-	Shared<Shader> VulkanRenderDevice::CreateShader(const std::string& _src, const ShaderType& _type, ShaderLoadMode _mode)
+	Shared<Shader> VulkanRenderDevice::CreateShader(const ShaderType& _type)
 	{
-		return MakeShared<VulkanShader>(this, _src, _type, _mode);
+		return MakeShared<VulkanShader>(this, _type);
 	}
 
 	Shared<Swapchain> VulkanRenderDevice::CreateSwapchain(const DaydreamWindow& _window, const SwapchainDesc& _desc)

@@ -23,7 +23,7 @@ namespace Daydream
 	class ModelLoader
 	{
 	public:
-		static Shared<ModelData> LoadFromFile(const Path& _filepath);
+		static Shared<ModelData> LoadFromFile(const Path& _filePath);
 	private:
 		ModelLoader() = default;
 		static void ProcessScene(const aiScene* _scene);

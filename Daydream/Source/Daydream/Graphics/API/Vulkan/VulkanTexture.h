@@ -25,7 +25,7 @@ namespace Daydream
 	//{
 	//public:
 	//	VulkanTexture2D(VulkanRenderDevice* _device, const TextureDesc& _desc); // Dynamic(RenderTarget, ShaderResource...)
-	//	//VulkanTexture2D(VulkanRenderDevice* _device, const FilePath& _path, const TextureDesc& _desc); // FileLoad
+	//	//VulkanTexture2D(VulkanRenderDevice* _device, const filePath& _path, const TextureDesc& _desc); // FileLoad
 	//	//VulkanTexture2D(VulkanRenderDevice* _device, VkImage _image, VkFormat _format); // ForSwapchain
 	//	virtual ~VulkanTexture2D();
 

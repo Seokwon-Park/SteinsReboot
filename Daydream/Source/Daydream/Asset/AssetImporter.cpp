@@ -3,7 +3,10 @@
 #include "AssetDefaults.h"
 #include "Daydream/Graphics/Utility/ImageLoader.h"
 #include "Daydream/Graphics/Utility/ModelLoader.h"
+#include "Daydream/Graphics/Utility/ShaderCompileHelper.h"
+
 #include "Daydream/Graphics/Manager/ResourceManager.h"
+
 #include "Daydream/Graphics/States/PipelineState/GraphicsPipelineState.h"
 #include "Daydream/Graphics/Resources/Texture/Texture2D.h"
 #include "yaml-cpp/yaml.h"
@@ -62,12 +65,12 @@ namespace Daydream
 
 		String pathString = modelPath.ToGenericString();
 		String extension = modelPath.GetExtensionString();
-		String metaFilePathString = pathString + ".ddmeta";
+		String metafilePathString = pathString + ".ddmeta";
 
 		Shared<ModelData> modelData = ModelLoader::LoadFromFile(modelPath);
 		Shared<Model> newModel = Model::Create(modelData);
 
-		YAML::Node metaNode = YAML::LoadFile(metaFilePathString);
+		YAML::Node metaNode = YAML::LoadFile(metafilePathString);
 		bool isGeneratingNewMeta = _metaData.subAssets.empty();
 
 		if (!metaNode["SubAssets"])
@@ -143,14 +146,14 @@ namespace Daydream
 
 		if (isMetaDirty)
 		{
-			std::ofstream fout(metaFilePathString);
+			std::ofstream fout(metafilePathString);
 			fout << metaNode;
 			fout.close();
 		}
 
-		Path materialDir = modelPath.GetParentPath() / "Materials";
-		if (!materialDir.IsExist())
-			FileSystem::MakeDirectory(materialDir);
+		Path matDir = modelPath.GetParentPath() / "Materials";
+		if (FileSystem::IsExist(matDir))
+			FileSystem::MakeDirectory(matDir);
 
 		for (UInt32 i = 0; i < modelData->materials.size(); i++)
 		{
@@ -162,11 +165,11 @@ namespace Daydream
 				materialName = "Unnamed_" + std::to_string(i);
 			}
 
-			Path materialPath = materialDir / (materialName + ".ddmat");
-			String materialPathString = materialPath.ToGenericString();
+			Path matFilePath = matDir / (materialName + ".ddmat");
+			String materialPathString = matFilePath.ToGenericString();
 
 			AssetHandle materialHandle;
-			if (materialPath.IsExist())
+			if (FileSystem::IsExist(matFilePath))
 			{
 				Material* existingMaterial = AssetManager::GetAssetByPath<Material>(materialPathString);
 				if (existingMaterial)
@@ -255,7 +258,7 @@ namespace Daydream
 				out << YAML::EndMap;
 				out << YAML::EndMap;
 
-				std::ofstream fout(materialPath.ToString());
+				std::ofstream fout(matFilePath.ToString());
 				fout << out.c_str();
 				fout.close();
 			}
@@ -266,13 +269,21 @@ namespace Daydream
 
 		return newModel;
 	}
+
 	Shared<Shader> AssetImporter::LoadShader(const AssetMetadata& _metaData)
 	{
 		// 지원하는 확장자인지 확인
-		Path entryPath = _metaData.filePath;
-		String pathString = entryPath.ToString();
-		String shaderName = entryPath.GetFileNameWithoutExtension();
-		String extension = entryPath.GetExtensionString();
+		Path shaderPath = _metaData.filePath;
+		String pathString = shaderPath.ToString();
+		String shaderName = shaderPath.GetFileNameWithoutExt();
+		String extension = shaderPath.GetExtensionString();
+
+		Path shaderCacheDir = shaderPath.GetParentPath() / "Cache";
+		if (FileSystem::IsExist(shaderCacheDir))
+		{
+			FileSystem::MakeDirectory(shaderCacheDir);
+		}
+
 		ShaderType shaderType;
 		if (pathString.find("VS.") != std::string::npos)
 		{
@@ -297,7 +308,37 @@ namespace Daydream
 		{
 			shaderType = ShaderType::Geometry;
 		}
-		Shared<Shader> newShader = Shader::Create(pathString, shaderType, ShaderLoadMode::File);
+
+		String shaderCacheName = ShaderCompileHelper::GenerateShaderCacheFileName(shaderName);
+		Path shaderCachePath = shaderCacheDir / shaderCacheName;
+		Shared<Shader> newShader = Shader::Create(shaderType);
+
+		bool needsCompile = false;
+		if (!FileSystem::IsExist(shaderCachePath))
+		{
+			needsCompile = true;
+		}
+		else
+		{
+			UInt64 shaderModified = FileSystem::GetFileLastWriteTime(shaderPath);
+			UInt64 shaderCacheModified = FileSystem::GetFileLastWriteTime(shaderCachePath);
+			if (shaderModified > shaderCacheModified)
+				needsCompile = true;
+		}
+		if (needsCompile)
+		{
+			ShaderCompileResult result = ShaderCompileHelper::CompileAndReflect(shaderPath, shaderType);
+
+			if (!result.bytecode.empty())
+			{
+				ShaderCompileHelper::SaveShaderCompileResult(shaderCachePath, result);
+			}
+			else
+			{
+				return nullptr;
+			}
+		}
+		newShader->LoadCache(shaderCachePath);
 
 		return newShader;
 	}
@@ -308,7 +349,7 @@ namespace Daydream
 
 		String pathString = materialPath.ToGenericString();
 		String extension = materialPath.GetExtensionString();
-		String metaFilePathString = pathString + ".ddmeta";
+		String metafilePathString = pathString + ".ddmeta";
 
 		YAML::Node metaNode = YAML::LoadFile(pathString);
 		if (!metaNode["Material"])

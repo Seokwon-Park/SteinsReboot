@@ -29,13 +29,13 @@ namespace Daydream
 		rtvDesc.layerCount = 1;
 		result.renderTargetView = TextureView::Create(result.texture, rtvDesc);
 
-		TextureViewDesc srvDesc{};
-		srvDesc.type = TextureViewType::ShaderResource;
-		srvDesc.baseMip = 0;
-		srvDesc.mipLevels = 1;
-		srvDesc.baseLayer = 0;
-		srvDesc.layerCount = 1;
-		result.shaderResourceView = TextureView::Create(result.texture, srvDesc);
+		//TextureViewDesc srvDesc{};
+		//srvDesc.type = TextureViewType::ShaderResource;
+		//srvDesc.baseMip = 0;
+		//srvDesc.mipLevels = 1;
+		//srvDesc.baseLayer = 0;
+		//srvDesc.layerCount = 1;
+		//result.shaderResourceView = TextureView::Create(result.texture, srvDesc);
 
 		desc.width = 2048;
 		desc.height = 2048;
@@ -51,13 +51,13 @@ namespace Daydream
 		dsvDesc.layerCount = 1;
   		shadowMap.depthStencilView = TextureView::Create(shadowMap.texture, dsvDesc);
 
-		srvDesc.type = TextureViewType::ShaderResource;
-		srvDesc.format = RenderFormat::R24_UNORM_X8_TYPELESS;
-		srvDesc.baseMip = 0;
-		srvDesc.mipLevels = 1;
-		srvDesc.baseLayer = 0;
-		srvDesc.layerCount = 1;
-		shadowMap.shaderResourceView = TextureView::Create(shadowMap.texture, srvDesc);
+		//srvDesc.type = TextureViewType::ShaderResource;
+		//srvDesc.format = RenderFormat::R24_UNORM_X8_TYPELESS;
+		//srvDesc.baseMip = 0;
+		//srvDesc.mipLevels = 1;
+		//srvDesc.baseLayer = 0;
+		//srvDesc.layerCount = 1;
+		//shadowMap.shaderResourceView = TextureView::Create(shadowMap.texture, srvDesc);
 	}
 
 	DeferredSceneRenderer::~DeferredSceneRenderer()
@@ -87,12 +87,12 @@ namespace Daydream
 
 		RenderGraphResourceDesc resourceDesc{};
 
-		RenderGraphResourceHandle positionHandle = renderGraph->AddResource("PositionTexture", { RenderFormat::R16G16B16A16_FLOAT, width, height });
-		RenderGraphResourceHandle albedoHandle = renderGraph->AddResource("AlbedoTexture", { RenderFormat::R8G8B8A8_UNORM, width, height });
-		RenderGraphResourceHandle normalHandle = renderGraph->AddResource("NormalTexture", { RenderFormat::R16G16B16A16_FLOAT, width, height });
-		RenderGraphResourceHandle rmaoHandle = renderGraph->AddResource("RMAOTexture", { RenderFormat::R8G8B8A8_UNORM, width, height });
-		RenderGraphResourceHandle gbufferDepthHandle = renderGraph->AddResource("GBufferDepth", { RenderFormat::R24G8_TYPELESS, width, height });
-		RenderGraphResourceHandle shadowDepthHandle = renderGraph->AddExternalWriteResource("DepthTexture", shadowMap);
+		RenderGraphResourceHandle positionHandle = renderGraph->AddResource("rg_PositionTexture", { RenderFormat::R16G16B16A16_FLOAT, width, height });
+		RenderGraphResourceHandle albedoHandle = renderGraph->AddResource("rg_AlbedoTexture", { RenderFormat::R8G8B8A8_UNORM, width, height });
+		RenderGraphResourceHandle normalHandle = renderGraph->AddResource("rg_NormalTexture", { RenderFormat::R16G16B16A16_FLOAT, width, height });
+		RenderGraphResourceHandle rmaoHandle = renderGraph->AddResource("rg_RMAOTexture", { RenderFormat::R8G8B8A8_UNORM, width, height });
+		RenderGraphResourceHandle gbufferDepthHandle = renderGraph->AddResource("rg_GBufferDepth", { RenderFormat::R24G8_TYPELESS, width, height });
+		RenderGraphResourceHandle shadowDepthHandle = renderGraph->AddExternalWriteResource("rg_DepthTexture", shadowMap);
 		RenderGraphResourceHandle resultHandle = renderGraph->AddExternalWriteResource("Result", result);
 
 		RenderGraphPassDesc shadowPassDesc{};
@@ -169,9 +169,9 @@ namespace Daydream
 		deferredLightingPassDesc.drawType = PassDrawType::FullScreenQuad;
 		deferredLightingPassDesc.constantBufferData.push_back({ "LightViewProjection", &lightViewProj, sizeof(ViewProjectionData) });
 		deferredLightingPassDesc.constantBufferData.push_back({ "Lights", &lightData, sizeof(SceneLightingData) });
-		deferredLightingPassDesc.shaderResourceViews.push_back({ "IrradianceTexture",scene->GetSkybox()->GetIrradianceTexture()->GetOrCreateDefaultSRV() });
-		deferredLightingPassDesc.shaderResourceViews.push_back({ "Prefilter",scene->GetSkybox()->GetPrefilterTexture()->GetOrCreateDefaultSRV() });
-		deferredLightingPassDesc.shaderResourceViews.push_back({ "BRDFLUT", scene->GetSkybox()->GetBRDFTexture()->GetOrCreateDefaultSRV() });
+		deferredLightingPassDesc.shaderResourceViews.push_back({ "IrradianceTexture",scene->GetSkybox()->GetIrradianceTexture()->GetDefaultSRV() });
+		deferredLightingPassDesc.shaderResourceViews.push_back({ "Prefilter",scene->GetSkybox()->GetPrefilterTexture()->GetDefaultSRV() });
+		deferredLightingPassDesc.shaderResourceViews.push_back({ "BRDFLUT", scene->GetSkybox()->GetBRDFTexture()->GetDefaultSRV() });
 		RenderGraphPassHandle lightingPass = renderGraph->AddPass("DeferredLightingPass", deferredLightingPassDesc);
 		//	//{
 		//	//	//Renderer::BeginRenderPass(renderPass, viewportFramebuffer);
@@ -231,7 +231,7 @@ namespace Daydream
 		skyboxPassDesc.drawType = PassDrawType::DrawMesh;
 		skyboxPassDesc.drawList.AddDrawObject(skyboxMesh);
 		skyboxPassDesc.constantBufferData.push_back({ "Camera", &skyboxViewProjection, sizeof(ViewProjectionData) });
-		skyboxPassDesc.shaderResourceViews.push_back({ "TextureCubemap", scene->GetSkybox()->GetSkyboxTexture()->GetOrCreateDefaultSRV() });
+		skyboxPassDesc.shaderResourceViews.push_back({ "TextureCubemap", scene->GetSkybox()->GetSkyboxTexture()->GetDefaultSRV() });
 		RenderGraphPassHandle skyboxPass = renderGraph->AddPass("SkyboxCubemapPass", skyboxPassDesc);
 		renderGraph->AddPassDependency(lightingPass, skyboxPass);
 		renderGraph->Write(skyboxPass, resultHandle, AttachmentLoadOp::Load);
@@ -241,7 +241,7 @@ namespace Daydream
 		renderGraph->Execute();
 
 		Renderer::TransitionTextureState(result.texture, ResourceState::ShaderResource);
-		Renderer::TransitionTextureState(shadowMap.texture, ResourceState::DepthWrite);
+		Renderer::TransitionTextureState(shadowMap.texture, ResourceState::ShaderResource);
 	}
 
 }

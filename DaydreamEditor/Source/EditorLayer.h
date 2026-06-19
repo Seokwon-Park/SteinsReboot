@@ -6,6 +6,7 @@
 #include "EditorPanels/PropertyPanel.h"
 #include "EditorPanels/AssetBrowserPanel.h"
 #include "EditorPanels/SkyboxPanel.h"
+#include "EditorPanels/RenderGraphPanel.h"
 #include "EditorCamera.h"
 
 
@@ -100,6 +101,7 @@ namespace Daydream
 		Unique<SceneHierarchyPanel> sceneHierarchyPanel;
 		Unique<AssetBrowserPanel> assetBrowserPanel;
 		Unique<SkyboxPanel> skyboxPanel;
+		Unique<RenderGraphPanel> renderGraphPanel;
 
 		UInt32 guizmoType = -1;
 	};

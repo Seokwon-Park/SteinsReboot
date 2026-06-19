@@ -55,6 +55,7 @@ namespace Daydream
 		ASSET_CLASS_TYPE(Material)
 		Material() = default;
 		Material(const ShaderGroup* _shaderGroup);
+		Material(const GraphicsPipelineState* _pipelineState);
 		~Material();
 		void Bind() {};
 		void Unbind() {};
@@ -69,7 +70,7 @@ namespace Daydream
 
 		static Shared<Material> Create(const GraphicsPipelineState* _pipeline);
 	protected:
-		HashMap<String, ShaderResourceType> textureBindingMap;
+		HashMap<String, ShaderReflectionDataType> textureBindingMap;
 		HashMap<String, TextureBinding> textures;
 	private:
 	};

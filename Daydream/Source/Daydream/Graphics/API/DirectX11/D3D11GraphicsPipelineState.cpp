@@ -37,15 +37,13 @@ namespace Daydream
 			{
 				D3D11VertexShader* vs = Cast<D3D11VertexShader*>(shaderGroup->GetShader(ShaderType::Vertex));
 				DAYDREAM_CORE_ASSERT(vs, "Vertex Shader is nullptr!");
-				ID3DBlob* vsBlob = vs->GetShaderBlob();
-				DAYDREAM_CORE_ASSERT(vsBlob, "Vertex Shader Blob is nullptr!");
 
 				// 입력 레이아웃 생성
 				HRESULT hr = device->GetDevice()->CreateInputLayout(
 					inputLayoutDesc.data(),
 					(UINT)inputLayoutDesc.size(),
-					vsBlob->GetBufferPointer(),
-					vsBlob->GetBufferSize(),
+					vs->GetBytecode().data(),
+					vs->GetBytecode().size(),
 					inputLayout.GetAddressOf()
 				);
 				DAYDREAM_CORE_ASSERT(SUCCEEDED(hr), "Failed to create inputlayout!");

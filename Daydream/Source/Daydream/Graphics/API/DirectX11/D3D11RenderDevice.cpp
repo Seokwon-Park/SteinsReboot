@@ -225,16 +225,16 @@ namespace Daydream
 		return MakeShared<D3D11GraphicsPipelineState>(this, _desc);
 	}
 
-	Shared<Shader> D3D11RenderDevice::CreateShader(const std::string& _src, const ShaderType& _type, ShaderLoadMode _mode)
+	Shared<Shader> D3D11RenderDevice::CreateShader(const ShaderType& _type)
 	{
 		switch (_type)
 		{
 		case ShaderType::None:  return nullptr;
-		case ShaderType::Vertex: return MakeShared<D3D11VertexShader>(this, _src, _mode);
+		case ShaderType::Vertex: return MakeShared<D3D11VertexShader>(this);
 		case ShaderType::Hull: return nullptr;
 		case ShaderType::Domain: return nullptr;
 		case ShaderType::Geometry: return nullptr;
-		case ShaderType::Pixel: return MakeShared<D3D11PixelShader>(this, _src, _mode);
+		case ShaderType::Pixel: return MakeShared<D3D11PixelShader>(this);
 		case ShaderType::Compute: return nullptr;
 		default:
 			break;

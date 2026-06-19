@@ -68,7 +68,7 @@ namespace Daydream
 		//virtual Shared<RenderPass> CreateRenderPass(const RenderPassDesc& _desc) = 0;
 		//virtual Shared<Framebuffer> CreateFramebuffer(Shared<RenderPass> _renderPass, const FramebufferDesc& _desc) = 0;
 		virtual Shared<GraphicsPipelineState> CreatePipelineState(const GraphicsPipelineStateDesc& _desc) = 0;
-		virtual Shared<Shader> CreateShader(const std::string& _src, const ShaderType& _type, ShaderLoadMode _mode) = 0;
+		virtual Shared<Shader> CreateShader(const ShaderType& _type) = 0;
 		virtual Shared<Swapchain> CreateSwapchain(const DaydreamWindow& _window, const SwapchainDesc& _desc) = 0;
 		//virtual Shared<Texture2D> CreateEmptyTexture2D(const TextureDesc& _desc) = 0;
 		//virtual Shared<Texture2D> CreateTexture2D(const void* _imageData, const TextureDesc& _desc)  = 0;

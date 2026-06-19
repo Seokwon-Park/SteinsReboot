@@ -367,9 +367,9 @@ namespace Daydream
 		return MakeShared<D3D12GraphicsPipelineState>(this, _desc);
 	}
 
-	Shared<Shader> D3D12RenderDevice::CreateShader(const std::string& _src, const ShaderType& _type, ShaderLoadMode _mode)
+	Shared<Shader> D3D12RenderDevice::CreateShader(const ShaderType& _type)
 	{
-		return MakeShared<D3D12Shader>(this, _src, _type, _mode);
+		return MakeShared<D3D12Shader>(this, _type);
 	}
 
 	Shared<Swapchain> Daydream::D3D12RenderDevice::CreateSwapchain(const DaydreamWindow& _window, const SwapchainDesc& _desc)

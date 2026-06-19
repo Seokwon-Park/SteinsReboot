@@ -235,9 +235,9 @@ namespace Daydream
 		return itr->second;
 	}
 
-	AssetMetadata AssetManager::LoadMetadata(const Path& _metaFilePath)
+	AssetMetadata AssetManager::LoadMetadata(const Path& _metafilePath)
 	{
-		YAML::Node metaNode = YAML::LoadFile(_metaFilePath.ToString());
+		YAML::Node metaNode = YAML::LoadFile(_metafilePath.ToString());
 		if (!metaNode["Handle"])
 		{
 			return AssetMetadata(); // 유효하지 않음
@@ -254,7 +254,7 @@ namespace Daydream
 		case AssetType::Texture2D:
 			break;
 		case AssetType::TextureCube:
-			//loadedAsset = AssetImporter::LoadTextureCube(metadata.FilePath);
+			//loadedAsset = AssetImporter::LoadTextureCube(metadata.filePath);
 			break;
 		case AssetType::Model:
 		{
@@ -306,7 +306,7 @@ namespace Daydream
 			loadedAsset = AssetImporter::LoadTexture2D(metadata);
 			break;
 		case AssetType::TextureCube:
-			//loadedAsset = AssetImporter::LoadTextureCube(metadata.FilePath);
+			//loadedAsset = AssetImporter::LoadTextureCube(metadata.filePath);
 			break;
 		case AssetType::Model:
 			loadedAsset = AssetImporter::LoadModel(metadata);
@@ -428,7 +428,7 @@ namespace Daydream
 		{
 			String ext = dirPath.GetExtensionString();
 			if (ext == ".ddmeta") continue;
-			if (dirPath.IsDirectory())
+			if (FileSystem::IsDirectory(dirPath))
 			{
 				if (_isRecursive)
 				{
@@ -450,21 +450,21 @@ namespace Daydream
 
 	void AssetManager::ProcessFile(const Path& _filePath, AssetType _assetType)
 	{
-		Path metaFilePath = _filePath;
-		metaFilePath += ".ddmeta";
+		Path metafilePath = _filePath;
+		metafilePath += ".ddmeta";
 		AssetMetadata metadata = AssetMetadata();
-		if (!metaFilePath.IsExist())
+		if (!FileSystem::IsExist(metafilePath))
 		{
 			metadata.handle = AssetHandle::Generate();
 			metadata.filePath = _filePath.ToString(); // TODO: 상대 경로로 변환해야 함
 			metadata.type = _assetType;
-			metadata.name = _filePath.GetFileNameWithoutExtension();
+			metadata.name = _filePath.GetFileNameWithoutExt();
 			//Create metafile
 			CreateMetaDataFileInternal(metadata);
 		}
 
 		//metaFile이 존재한다는 사실이 무조건 보장
-		metadata = LoadMetadata(metaFilePath);
+		metadata = LoadMetadata(metafilePath);
 		RegisterAsset(metadata);
 
 		if (!metadata.IsValid())
@@ -493,8 +493,8 @@ namespace Daydream
 
 	void AssetManager::CreateMetaDataFileInternal(const AssetMetadata& _metadata)
 	{
-		Path metaFilePath = _metadata.filePath;
-		metaFilePath += ".ddmeta";
+		Path metafilePath = _metadata.filePath;
+		metafilePath += ".ddmeta";
 
 		YAML::Emitter out;
 		out << YAML::BeginMap;
@@ -506,7 +506,7 @@ namespace Daydream
 		out << YAML::Key << "Name" << YAML::Value << _metadata.name;
 		out << YAML::EndMap;
 		
-		std::ofstream fout(metaFilePath.ToString());
+		std::ofstream fout(metafilePath.ToString());
 		fout << out.c_str();
 		fout.close();
 	}

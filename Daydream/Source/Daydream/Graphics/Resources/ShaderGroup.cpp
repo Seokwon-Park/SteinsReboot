@@ -75,7 +75,7 @@ namespace Daydream
 	{
 		for (const ShaderReflectionData& data : vertexShader->GetShaderReflectionData())
 		{
-			if (data.shaderResourceType == ShaderResourceType::Input)
+			if (data.shaderResourceType == ShaderReflectionDataType::Input)
 			{
 				inputReflectionData.push_back(data);
 			}
@@ -89,7 +89,7 @@ namespace Daydream
 		{
 			for (ShaderReflectionData data : shader->GetShaderReflectionData())
 			{
-				if (data.shaderResourceType != ShaderResourceType::Input)
+				if (data.shaderResourceType != ShaderReflectionDataType::Input)
 				{
 					shaderBindingMap.insert({ data.name, data });
 					setCount = Math::Max(setCount, data.set+1);

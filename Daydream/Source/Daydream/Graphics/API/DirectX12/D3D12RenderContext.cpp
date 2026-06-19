@@ -372,11 +372,11 @@ namespace Daydream
 		}
 
 
-		auto generateMipPSO = ResourceManager::GetResource<GraphicsPipelineState>("GenerateMipsPSO");
+		auto resizePSO = ResourceManager::GetResource<GraphicsPipelineState>("ResizePSO");
 		auto quadMesh = AssetManager::GetAsset<Mesh>(AssetDefaults::QuadMeshHandle);
 
-		BindPipelineState(generateMipPSO);
-		D3D12GraphicsPipelineState* d3d12PipelineState = Cast<D3D12GraphicsPipelineState*>(generateMipPSO);
+		BindPipelineState(resizePSO);
+		D3D12GraphicsPipelineState* d3d12PipelineState = Cast<D3D12GraphicsPipelineState*>(resizePSO);
 		BindVertexBuffer(quadMesh->GetVertexBuffer()->GetGPUBuffer(), quadMesh->GetVertexBuffer()->GetStride());
 		BindIndexBuffer(quadMesh->GetIndexBuffer()->GetGPUBuffer());
 		GetD3D12ActiveCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);

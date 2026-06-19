@@ -12,10 +12,7 @@
 
 namespace Daydream::GraphicsUtility::DirectX12
 {
-	inline UInt32 CalcSubresource(UInt32 MipSlice, UInt32 ArraySlice, UInt32 PlaneSlice, UInt32 MipLevels, UInt32 ArraySize)
-	{
-		return MipSlice + (ArraySlice * MipLevels) + (PlaneSlice * MipLevels * ArraySize);
-	}
+	UInt32 CalcSubresource(UInt32 _mipSlice, UInt32 _arraySlice, UInt32 _planeSlice, UInt32 _mipLevels, UInt32 _arraySize);
 
 	D3D12_RESOURCE_STATES ConvertToD3D12ResourceStates(const ResourceState& _state);
 

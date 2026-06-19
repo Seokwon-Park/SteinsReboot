@@ -91,20 +91,16 @@ namespace Daydream
 		// Get Path String always use '/'
 		inline String ToGenericString() const { return path.generic_string(); }
 
-		inline String GetFileName() const { return GetLastComponentName(); }
-		inline String GetDirectoryName() const { return GetLastComponentName(); }
+		String GetFileName() const;
+		String GetDirectoryName() const;
 		inline String GetLastComponentName() const { return path.filename().string(); }
-		inline String GetFileNameWithoutExtension() const { return path.stem().string(); }
+		inline String GetFileNameWithoutExt() const { return path.stem().string(); }
 
 		inline Path GetParentPath() const { return path.parent_path(); }
 		inline void MoveToParent() { path = path.parent_path(); }
 
 		inline Path GetExtension() const { return path.extension(); }
 		inline String GetExtensionString() const { return path.extension().string(); }
-		inline String GetAbsolutePathString() const { return std::filesystem::absolute(path).string(); }
-		inline bool IsDirectory() const { return std::filesystem::is_directory(path); }
-		inline bool IsFile() const { return std::filesystem::is_regular_file(path); }
-		inline bool IsExist() const { return std::filesystem::exists(path); }
 		inline bool IsEmpty() const { return path.empty(); }
 
 		operator const std::filesystem::path&() const { return path; }

@@ -213,14 +213,4 @@ namespace Daydream
 			}
 		}
 	}
-	void WindowsWindow::MakeContextCurrent() const
-	{
-		glfwMakeContextCurrent(glfwWindow);
-	}
-	void WindowsWindow::ReleaseContext() const
-	{
-
-
-		glfwMakeContextCurrent(nullptr);
-	}
 }

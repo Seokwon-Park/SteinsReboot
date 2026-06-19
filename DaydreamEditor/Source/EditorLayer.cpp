@@ -80,12 +80,14 @@ namespace Daydream
 		assetBrowserPanel = MakeUnique<AssetBrowserPanel>();
 		skyboxPanel = MakeUnique<SkyboxPanel>();
 		skyboxPanel->SetSkybox(activeScene->GetSkybox());
+		renderGraphPanel = MakeUnique<RenderGraphPanel>();
 
 		editorPanels.push_back(viewportPanel.get());
 		editorPanels.push_back(propertyPanel.get());
 		editorPanels.push_back(sceneHierarchyPanel.get());
 		editorPanels.push_back(assetBrowserPanel.get());
 		editorPanels.push_back(skyboxPanel.get());
+		editorPanels.push_back(renderGraphPanel.get());
 	}
 
 	void EditorLayer::OnUpdate(Float32 _deltaTime)
@@ -267,7 +269,7 @@ namespace Daydream
 
 		//ImGui::Image((ImTextureID)depthFramebuffer->GetDepthAttachmentTexture()->GetImGuiHandle(), ImVec2{ viewportSize.x / 3,viewportSize.y / 3 });
 
-		ImGui::Image((ImTextureID)AssetManager::GetAssetByPath<Texture2D>("Resource/skybox.hdr")->GetOrCreateDefaultSRV()->GetUIHandle(), ImVec2{ viewportSize.x / 3,viewportSize.y / 3 });
+		ImGui::Image((ImTextureID)AssetManager::GetAssetByPath<Texture2D>("Resource/skybox.hdr")->GetDefaultSRV()->GetUIHandle(), ImVec2{ viewportSize.x / 3,viewportSize.y / 3 });
 
 		ImGui::Image((ImTextureID)sceneRenderer->GetShadowMapView()->GetUIHandle(), ImVec2{ viewportSize.x / 3,viewportSize.y / 3 });
 
@@ -322,7 +324,7 @@ namespace Daydream
 
 		Application::GetInstance().GetImGuiLayer()->BlockEvents(!isViewportFocused && !isViewportHovered);
 
-		ImGui::Image((ImTextureID)sceneRenderer->GetResult()->GetOrCreateDefaultSRV()->GetUIHandle(), ImVec2{ viewportSize.x,viewportSize.y });
+		ImGui::Image((ImTextureID)sceneRenderer->GetResult()->GetDefaultSRV()->GetUIHandle(), ImVec2{ viewportSize.x,viewportSize.y });
 
 		//Shared<Texture2D> viewportTexture = nullptr;
 		//switch (viewIndex)

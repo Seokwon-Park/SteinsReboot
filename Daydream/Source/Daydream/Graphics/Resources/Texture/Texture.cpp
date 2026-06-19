@@ -19,26 +19,17 @@ namespace Daydream
 	Texture::Texture(Shared<GPUTexture> _texture)
 		: gpuTexture(_texture)
 	{
+		TextureViewDesc srvDesc{};
+		srvDesc.type = TextureViewType::ShaderResource;
+		srvDesc.baseMip = 0;
+		srvDesc.mipLevels = GetMipLevels();
+		srvDesc.baseLayer = 0;
+		srvDesc.layerCount = GetLayerCount();
 
+		defaultSRV = TextureView::Create(this, srvDesc);
 	}
 	Texture::~Texture()
 	{
 		defaultSRV = nullptr;
-	}
-	TextureView* Texture::GetOrCreateDefaultSRV()
-	{
-		if (defaultSRV == nullptr)
-		{
-			TextureViewDesc srvDesc{};
-			srvDesc.type = TextureViewType::ShaderResource;
-			srvDesc.baseMip = 0;
-			srvDesc.mipLevels = GetMipLevels();
-			srvDesc.baseLayer = 0;
-			srvDesc.layerCount = GetLayerCount();
-
-			defaultSRV = TextureView::Create(this, srvDesc);
-		}
-
-		return defaultSRV.get();
 	}
 }

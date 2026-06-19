@@ -10,14 +10,14 @@
 
 namespace Daydream
 {
-	vk::DescriptorType ToVkDescType(ShaderResourceType _type)
+	vk::DescriptorType ToVkDescType(ShaderReflectionDataType _type)
 	{
 		switch (_type)
 		{
-		case ShaderResourceType::ConstantBuffer:
+		case ShaderReflectionDataType::ConstantBuffer:
 			return vk::DescriptorType::eUniformBuffer;
 			break;
-		case ShaderResourceType::Texture:
+		case ShaderReflectionDataType::Texture:
 			return vk::DescriptorType::eCombinedImageSampler;
 			break;
 		default:

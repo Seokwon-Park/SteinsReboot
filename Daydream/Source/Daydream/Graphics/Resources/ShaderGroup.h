@@ -31,7 +31,7 @@ _pixelShaderPath);
 
 		const Array<ShaderReflectionData>& GetInputData() const { return inputReflectionData; }
 		const HashMap<String, ShaderReflectionData>& GetShaderBindingMap() const { return shaderBindingMap; }
-		const HashMap<String, ShaderResourceType>& GetMaterialMap() const { return materialMap; }
+		const HashMap<String, ShaderReflectionDataType>& GetMaterialMap() const { return materialMap; }
 		const ShaderReflectionData* GetShaderBindingInfo(const String& _name) const;
 
 		UInt32 GetSetCount() const { return setCount; }
@@ -57,6 +57,6 @@ _pixelShaderPath);
 
 		Array<ShaderReflectionData> inputReflectionData;
 		HashMap<String, ShaderReflectionData> shaderBindingMap;
-		HashMap<String, ShaderResourceType> materialMap;
+		HashMap<String, ShaderReflectionDataType> materialMap;
 	};
 }

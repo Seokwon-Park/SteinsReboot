@@ -237,7 +237,7 @@ namespace Daydream
 			{
 				ResourceNode& resource = resources[resId];
 
-				Renderer::BindShaderResourceView(resource.name, resource.allocation.shaderResourceView.get(), BuiltIn::Samplers::LinearClampToEdge());
+				Renderer::BindShaderResourceView(resource.name, resource.allocation.texture->GetDefaultSRV(), BuiltIn::Samplers::LinearClampToEdge());
 			}
 
 			for (auto& cbData : pass.constantBufferData)
@@ -340,7 +340,7 @@ namespace Daydream
 		{
 			if (!resource.isExternal && resource.allocation.texture != nullptr)
 			{
-				Renderer::TransitionTextureState(resource.allocation.texture, ResourceState::Undefined);
+				//Renderer::TransitionTextureState(resource.allocation.texture, ResourceState::Undefined);
 				Renderer::GetTexturePool()->ReturnAllocation(resource.allocation);
 			}
 		}

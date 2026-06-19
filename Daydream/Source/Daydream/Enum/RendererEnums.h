@@ -136,6 +136,14 @@ namespace Daydream
 		ShaderAllBit = DaydreamVertexBit | DaydreamHullBit | DaydreamDomainBit | DaydreamGeometryBit | DaydreamPixelBit | DaydreamComputeBit
 	};
 
+	enum class ShaderReflectionDataType
+	{
+		Input,
+		ConstantBuffer,
+		Texture,
+		Sampler,
+	};
+
 	///////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -306,12 +314,6 @@ namespace Daydream
 		Mat3x3,
 		Mat4x4,
 		Bool
-	};
-
-	enum class ShaderLoadMode
-	{
-		Source,
-		File,
 	};
 
 	enum class FillMode {

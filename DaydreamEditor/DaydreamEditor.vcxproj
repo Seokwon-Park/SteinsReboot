@@ -16,6 +16,10 @@
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>DaydreamEditor</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <VcpkgTriplet>x64-windows-static</VcpkgTriplet>
+    <VcpkgEnabled>false</VcpkgEnabled>
+    <VcpkgManifestInstall>false</VcpkgManifestInstall>
+    <VcpkgAutoLink>false</VcpkgAutoLink>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -54,15 +58,12 @@
     <TargetName>DaydreamEditor</TargetName>
     <TargetExt>.exe</TargetExt>
   </PropertyGroup>
-  <PropertyGroup Label="Vcpkg">
-    <VcpkgEnabled>false</VcpkgEnabled>
-  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>DAYDREAM_PLATFORM_WINDOWS;DAYDREAM_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Daydream\Vendor\spdlog\include;..\Daydream\Source;..\Daydream\Vendor;..\Daydream\Vendor\DaydreamMath;..\Daydream\Vendor\ImGuizmo;..\Daydream\Vendor\stduuid\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Daydream\Vendor\spdlog\include;..\Daydream\Source;..\Daydream\Vendor;..\Daydream\Vendor\DaydreamMath;..\Daydream\Vendor\imgui;..\Daydream\Vendor\ImGuizmo;..\Daydream\Vendor\imgui-node-editor;..\Daydream\Vendor\stduuid\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <MinimalRebuild>false</MinimalRebuild>
@@ -84,7 +85,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>DAYDREAM_PLATFORM_WINDOWS;DAYDREAM_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Daydream\Vendor\spdlog\include;..\Daydream\Source;..\Daydream\Vendor;..\Daydream\Vendor\DaydreamMath;..\Daydream\Vendor\ImGuizmo;..\Daydream\Vendor\stduuid\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Daydream\Vendor\spdlog\include;..\Daydream\Source;..\Daydream\Vendor;..\Daydream\Vendor\DaydreamMath;..\Daydream\Vendor\imgui;..\Daydream\Vendor\ImGuizmo;..\Daydream\Vendor\imgui-node-editor;..\Daydream\Vendor\stduuid\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <MinimalRebuild>false</MinimalRebuild>
@@ -106,6 +107,7 @@
     <ClInclude Include="Source\EditorLayer.h" />
     <ClInclude Include="Source\EditorPanels\AssetBrowserPanel.h" />
     <ClInclude Include="Source\EditorPanels\PropertyPanel.h" />
+    <ClInclude Include="Source\EditorPanels\RenderGraphPanel.h" />
     <ClInclude Include="Source\EditorPanels\SceneHierarchyPanel.h" />
     <ClInclude Include="Source\EditorPanels\SkyboxPanel.h" />
     <ClInclude Include="Source\EditorPanels\UI\ImGuiWidgets.h" />
@@ -118,6 +120,7 @@
     <ClCompile Include="Source\EditorLayer.cpp" />
     <ClCompile Include="Source\EditorPanels\AssetBrowserPanel.cpp" />
     <ClCompile Include="Source\EditorPanels\PropertyPanel.cpp" />
+    <ClCompile Include="Source\EditorPanels\RenderGraphPanel.cpp" />
     <ClCompile Include="Source\EditorPanels\SceneHierarchyPanel.cpp" />
     <ClCompile Include="Source\EditorPanels\SkyboxPanel.cpp" />
     <ClCompile Include="Source\EditorPanels\UI\ImGuiWidgets.cpp" />

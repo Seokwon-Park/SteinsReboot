@@ -17,7 +17,7 @@ namespace Daydream
 		UInt32 inputDataIndex = 0;
 		for(const auto& info : shaderGroup->GetShader(ShaderType::Vertex)->GetShaderReflectionData())
 		{
-			if (info.shaderResourceType != ShaderResourceType::Input) continue;
+			if (info.shaderResourceType != ShaderReflectionDataType::Input) continue;
 			glEnableVertexArrayAttrib(inputLayoutID, inputDataIndex);
 			glVertexArrayAttribFormat(inputLayoutID, inputDataIndex,
 				info.count,
@@ -46,13 +46,13 @@ namespace Daydream
 			{
 				switch (info.shaderResourceType)
 				{
-				case ShaderResourceType::ConstantBuffer:
+				case ShaderReflectionDataType::ConstantBuffer:
 				{
 					//info.set = uboIndex;
 					//glUniformBlockBinding(shaderID, info.binding, uboIndex++);
 					break;
 				}
-				case ShaderResourceType::Texture:
+				case ShaderReflectionDataType::Texture:
 				{
 					break;
 				}

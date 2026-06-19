@@ -113,11 +113,11 @@ namespace Daydream
 		psoDesc.depthStencilState = depthDisableDesc;
 		registry["BRDFPSO"] = GraphicsPipelineState::Create(psoDesc);
 
-		ResetPSODesc();
-		psoDesc.shaderGroup = ResourceManager::GetResource<ShaderGroup>("Mip");
-		psoDesc.renderTargetFormats = { RenderFormat::R16G16B16A16_FLOAT };
-		psoDesc.depthStencilState = depthDisableDesc;
-		registry["GenerateMipsPSO"] = GraphicsPipelineState::Create(psoDesc);
+		//ResetPSODesc();
+		//psoDesc.shaderGroup = ResourceManager::GetResource<ShaderGroup>("Resize");
+		//psoDesc.renderTargetFormats = { RenderFormat::R16G16B16A16_FLOAT };
+		//psoDesc.depthStencilState = depthDisableDesc;
+		//registry["GenerateMipsPSO"] = GraphicsPipelineState::Create(psoDesc);
 
 		ResetPSODesc();
 		psoDesc.shaderGroup = ResourceManager::GetResource<ShaderGroup>("DeferredLighting");
@@ -164,12 +164,22 @@ namespace Daydream
 		// 그림자 전용 렌더링
 		// ==========================================
 		ResetPSODesc();
-		psoDesc.rasterizerState = shadowRastDesc; // 섀도우 그릴 때만 덮어씌움
+		psoDesc.rasterizerState = shadowRastDesc;
 		psoDesc.shaderGroup = ResourceManager::GetResource<ShaderGroup>("Depth");
 		psoDesc.renderTargetFormats = {};
 		psoDesc.depthStencilFormat = RenderFormat::R24G8_TYPELESS;
 		registry["DepthPSO"] = GraphicsPipelineState::Create(psoDesc);
 		internalDepth = registry["DepthPSO"].get();
+
+
+		// ==========================================
+		// 에디터 전용 렌더링
+		// ==========================================
+		//ResetPSODesc();
+		//psoDesc.rasterizerState = shadowRastDesc;
+		//psoDesc.shaderGroup = ResourceManager::GetResource<ShaderGroup>("Depth");
+		//psoDesc.renderTargetFormats = { RenderFormat::R32_FLOAT };
+		//registry["EntityHandle"] = GraphicsPipelineState::Create(psoDesc);
 	}
 }
 

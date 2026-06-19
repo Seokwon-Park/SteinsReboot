@@ -55,16 +55,9 @@ namespace Daydream
 		virtual void SetMouseDown(int _key) = 0;
 		virtual void OnUpdateInputState() = 0;
 
-		virtual void MakeContextCurrent() const = 0;
-		virtual void ReleaseContext() const = 0;
-
-		void SetSwapchain(Shared<Swapchain> _swapchain) { swapchain = _swapchain; }
-		Swapchain* GetSwapchain() const { return swapchain.get(); }
-
 		static Unique<DaydreamWindow> Create(const WindowDesc& _desc = WindowDesc());
 	protected:
 		WindowDesc desc;
-		Shared<Swapchain> swapchain = nullptr;
 	private:
 	};
 

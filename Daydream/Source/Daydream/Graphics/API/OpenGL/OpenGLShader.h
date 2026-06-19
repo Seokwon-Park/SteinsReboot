@@ -8,7 +8,7 @@ namespace Daydream
 	class OpenGLShader :public Shader
 	{
 	public:
-		OpenGLShader(const std::string& _src, const ShaderType& _type, const ShaderLoadMode& _mode);
+		OpenGLShader(const ShaderType& _type);
 
 		void ReflectTextures();
 
@@ -16,8 +16,8 @@ namespace Daydream
 
 		virtual ~OpenGLShader();
 
-		virtual void Bind() const override;
-		virtual void Unbind() const override;
+		virtual bool CreateNativeShader(const Array<UInt8>& _bytecode) override { return false; };
+
 
 		UInt32 GetShaderID() const { return shaderProgramID; }
 

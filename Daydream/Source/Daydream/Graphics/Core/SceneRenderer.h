@@ -42,10 +42,10 @@ namespace Daydream
         virtual void RenderScene(const SceneData& _sceneData) {};
 
         Texture2D* GetResult() const { return result.texture.get(); };
-        TextureView* GetResultView() const { return result.shaderResourceView.get(); };
+        TextureView* GetResultView() const { return result.texture->GetDefaultSRV(); };
 
         Texture2D* GetShadowMap() const { return shadowMap.texture.get(); };
-        TextureView* GetShadowMapView() const { return shadowMap.shaderResourceView.get(); };
+        TextureView* GetShadowMapView() const { return shadowMap.texture->GetDefaultSRV(); };
     protected:
         RenderGraphDrawList CreateDrawListFromScene(Scene* _scene, const CameraData& _cameraData);
         void PrepareLighting(Scene* _scene, const CameraData& _cameraData);
