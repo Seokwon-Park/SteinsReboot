@@ -22,3 +22,6 @@
 [submodule "Daydream/Vendor/DaydreamMath"]
 	path = Daydream/Vendor/DaydreamMath
 	url = https://github.com/Seokwon-Park/DaydreamMath
+[submodule "Daydream/Vendor/imgui-node-editor"]
+	path = Daydream/Vendor/imgui-node-editor
+	url = https://github.com/Seokwon-Park/imgui-node-editor
