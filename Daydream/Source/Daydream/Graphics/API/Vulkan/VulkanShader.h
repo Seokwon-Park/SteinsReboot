@@ -13,7 +13,7 @@ namespace Daydream
 		VulkanShader(VulkanRenderDevice* _device, const ShaderType& _type);
 		virtual ~VulkanShader() override;
 
-		virtual bool CreateNativeShader(const Array<UInt8>& _bytecode) override { return false; };
+		virtual bool CreateNativeShader(const Array<UInt8>& _bytecode) override;
 
 		vk::ShaderModule GetVkShaderModule() const { return shader.get(); }
 	private:

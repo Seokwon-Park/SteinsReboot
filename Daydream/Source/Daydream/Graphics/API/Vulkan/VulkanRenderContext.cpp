@@ -36,8 +36,8 @@ namespace Daydream
 	}
 	VulkanRenderContext::~VulkanRenderContext()
 	{
-		device->GetGraphicsQueue().waitIdle();
 	}
+
 	void VulkanRenderContext::BeginCommandList()
 	{
 		////activeCommandBuffer = commandBuffers[commandBufferIndex].get();

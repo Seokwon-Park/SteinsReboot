@@ -138,7 +138,6 @@ namespace Daydream
 
 	enum class ShaderReflectionDataType
 	{
-		Input,
 		ConstantBuffer,
 		Texture,
 		Sampler,

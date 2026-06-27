@@ -115,6 +115,18 @@ namespace Daydream
 	{
 	}
 
+	bool VulkanShader::CreateNativeShader(const Array<UInt8>& _bytecode)
+	{
+		if (_bytecode.empty()) return false;
+		vk::ShaderModuleCreateInfo createInfo{};
+		createInfo.codeSize = _bytecode.size();
+
+		createInfo.pCode = ReinterpretCast<const UInt32*>(_bytecode.data());
+		shader = device->GetDevice().createShaderModuleUnique(createInfo);
+
+		return static_cast<bool>(shader.get());
+	}
+
 
 
 }

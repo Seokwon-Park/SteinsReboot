@@ -112,14 +112,12 @@ namespace Daydream
 
 	void ShaderCompileHelper::Init()
 	{
-		instance = new ShaderCompileHelper();
-		DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(instance->utils.GetAddressOf()));
-		DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(instance->compiler.GetAddressOf()));
+		DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(utils.GetAddressOf()));
+		DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(compiler.GetAddressOf()));
 	}
 
 	void ShaderCompileHelper::Shutdown()
 	{
-		delete instance;
 		//utils->Release();
 		//utils = nullptr;
 		//compiler->Release();
@@ -128,7 +126,7 @@ namespace Daydream
 	void ShaderCompileHelper::CompileToDXIL(const Path& _filePath, ShaderType _type, ComPtr<IDxcBlob>& _shaderBlob)
 	{
 		ComPtr<IDxcBlobEncoding> sourceBlob;
-		HRESULT hr = instance->utils->LoadFile(_filePath.ToWString().c_str(), nullptr, sourceBlob.GetAddressOf());
+		HRESULT hr = utils->LoadFile(_filePath.ToWString().c_str(), nullptr, sourceBlob.GetAddressOf());
 		DAYDREAM_CORE_ASSERT(SUCCEEDED(hr), "Failed to load File! {0}", _filePath.ToString());
 
 		// 2. DxcBuffer 설정
@@ -150,7 +148,7 @@ namespace Daydream
 		args.push_back(L"-Wno-ignored-attributes");
 
 		ComPtr<IDxcResult> result;
-		hr = instance->compiler->Compile(&sourceBuffer,
+		hr = compiler->Compile(&sourceBuffer,
 			args.data(),
 			static_cast<UINT32>(args.size()),
 			nullptr,  // 인클루드 핸들러 없음
@@ -181,8 +179,8 @@ namespace Daydream
 	{
 		Array<UInt32> output;
 
-		ComPtr<IDxcBlobEncoding> sourceBlob;
-		HRESULT hr = instance->utils->LoadFile(_filePath.ToWString().c_str(), nullptr, sourceBlob.GetAddressOf());
+		DxcComPtr<IDxcBlobEncoding> sourceBlob;
+		HRESULT hr = utils->LoadFile(_filePath.ToWString().c_str(), nullptr, sourceBlob.GetAddressOf());
 		DAYDREAM_CORE_ASSERT(SUCCEEDED(hr), "Failed to load File! {0}", _filePath.ToString());
 
 		// 2. DxcBuffer 설정
@@ -192,7 +190,7 @@ namespace Daydream
 		sourceBuffer.Encoding = DXC_CP_ACP; // LoadFile이 자동으로 인코딩 감지
 
 		// 3. 컴파일 인자 구성
-		std::vector<LPCWSTR> args;
+		Array<const wchar_t*> args;
 
 		WideString target = GraphicsUtility::GetShaderTargetNameW(_type, L"6_0");
 		WideString entryPoint = GraphicsUtility::GetShaderEntryPointNameW(_type);
@@ -204,15 +202,17 @@ namespace Daydream
 		args.push_back(entryPoint.c_str());
 		args.push_back(L"-spirv");
 		args.push_back(L"-fspv-reflect");
+		// vulkan이랑 뷰포트 y축 반대라서 뒤집기
 		if (_type == ShaderType::Vertex)
 		{
 			args.push_back(L"-fvk-invert-y");
 		}
+		// dx layout 사용
 		args.push_back(L"-fvk-use-dx-layout");
 		args.push_back(L"-O0");
 
-		ComPtr<IDxcResult> result;
-		hr = instance->compiler->Compile(&sourceBuffer,
+		DxcComPtr<IDxcResult> result;
+		hr = compiler->Compile(&sourceBuffer,
 			args.data(),
 			static_cast<UINT32>(args.size()),
 			nullptr,  // 인클루드 핸들러 없음
@@ -221,7 +221,7 @@ namespace Daydream
 		if (FAILED(hr)) return output;
 
 		// 에러 확인
-		ComPtr<IDxcBlobUtf8> errors;
+		DxcComPtr<IDxcBlobUtf8> errors;
 		result->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&errors), nullptr);
 		if (errors && errors->GetStringLength() > 0)
 		{
@@ -235,7 +235,7 @@ namespace Daydream
 		}
 
 		// SPIR-V 결과
-		ComPtr<IDxcBlob> spirvBlob;
+		DxcComPtr<IDxcBlob> spirvBlob;
 		result->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&spirvBlob), nullptr);
 		if (!spirvBlob)
 		{
@@ -276,6 +276,8 @@ namespace Daydream
 		}
 		return hlslSource;
 	}
+
+
 	String ShaderCompileHelper::ConvertSPIRVtoGLSL(const Array<UInt32> _spirvData, ShaderType _type)
 	{
 		String glslSource;
@@ -312,32 +314,50 @@ namespace Daydream
 
 		switch (Renderer::GetAPI())
 		{
+		case RendererAPIType::OpenGL:
+		{
+			String glsl = ConvertSPIRVtoGLSL(spirvData, _type);
+
+			// 문자열 nullptr 포함
+			result.bytecode.resize(glsl.length() + 1);
+			std::memcpy(result.bytecode.data(), glsl.c_str(), result.bytecode.size());
+
+			for (const spirv_cross::Resource& resource : res.stage_inputs)
+			{
+				const spirv_cross::SPIRType& spirType = compiler.get_type(resource.type_id);
+
+				ShaderLayoutData sld;
+				sld.name = compiler.get_name(resource.id);
+				sld.location = compiler.get_decoration(resource.id, spv::DecorationLocation);
+				UInt32 componentCount = spirType.vecsize;
+				spirv_cross::SPIRType::BaseType baseType = spirType.basetype;
+				sld.format = GraphicsUtility::ConvertSPIRVTypeToRenderFormat(baseType, componentCount);
+				sld.size = GraphicsUtility::GetRenderFormatSize(sld.format);
+
+				result.input.push_back(sld);
+			}
+			break;
+		}
 		case RendererAPIType::Vulkan:
 		{
 			result.bytecode.resize(spirvData.size() * sizeof(UInt32));
 			std::memcpy(result.bytecode.data(), spirvData.data(), result.bytecode.size());
 
-			if (_type == ShaderType::Vertex)
+			for (const spirv_cross::Resource& resource : res.stage_inputs)
 			{
-				for (const spirv_cross::Resource& resource : res.stage_inputs)
-				{
-					const spirv_cross::SPIRType& spirType = compiler.get_type(resource.type_id);
+				const spirv_cross::SPIRType& spirType = compiler.get_type(resource.type_id);
 
-					ShaderReflectionData sr{};
-					sr.name = compiler.get_name(resource.id);
-					sr.set = compiler.get_decoration(resource.id, spv::DecorationLocation);
-					sr.binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
-					sr.shaderResourceType = ShaderReflectionDataType::Input;
+				ShaderLayoutData sld;
+				sld.name = compiler.get_name(resource.id);
+				sld.location = compiler.get_decoration(resource.id, spv::DecorationLocation);
+				UInt32 componentCount = spirType.vecsize;
+				spirv_cross::SPIRType::BaseType baseType = spirType.basetype;
+				sld.format = GraphicsUtility::ConvertSPIRVTypeToRenderFormat(baseType, componentCount);
+				sld.size = GraphicsUtility::GetRenderFormatSize(sld.format);
 
-					UInt32 componentCount = spirType.vecsize;
-					spirv_cross::SPIRType::BaseType baseType = spirType.basetype;
-					sr.format = GraphicsUtility::ConvertSPIRVTypeToRenderFormat(baseType, componentCount);
-					sr.size = GraphicsUtility::GetRenderFormatSize(sr.format);
-					sr.shaderType = _type;
-
-					result.reflection.push_back(sr);
-				}
+				result.input.push_back(sld);
 			}
+
 			break;
 		}
 #ifdef DAYDREAM_PLATFORM_WINDOWS
@@ -355,7 +375,7 @@ namespace Daydream
 			reflectionBuffer.Ptr = dxilBlob->GetBufferPointer();
 			reflectionBuffer.Size = dxilBlob->GetBufferSize();
 
-			HRESULT hr = instance->utils->CreateReflection(&reflectionBuffer, IID_PPV_ARGS(reflection.GetAddressOf()));
+			HRESULT hr = utils->CreateReflection(&reflectionBuffer, IID_PPV_ARGS(reflection.GetAddressOf()));
 			DAYDREAM_CORE_ASSERT(SUCCEEDED(hr), "Failed to create reflection!");
 
 			D3D12_SHADER_DESC shaderDesc;
@@ -363,23 +383,69 @@ namespace Daydream
 			DAYDREAM_CORE_ASSERT(SUCCEEDED(hr), "Failed to get shader description");
 
 			// 각 입력 파라미터에 대해 순회
-			if (_type == ShaderType::Vertex)
+			for (UInt32 i = 0; i < shaderDesc.InputParameters; i++)
 			{
-				for (UInt32 i = 0; i < shaderDesc.InputParameters; i++)
+				D3D12_SIGNATURE_PARAMETER_DESC paramDesc;
+				reflection->GetInputParameterDesc(i, &paramDesc);
+
+				ShaderLayoutData sld;
+				sld.name = paramDesc.SemanticName;
+				sld.location = paramDesc.SemanticIndex;
+				sld.format = ConvertToRenderFormat(paramDesc);
+				sld.size = GraphicsUtility::GetRenderFormatSize(sld.format);
+
+				result.input.push_back(sld);
+			}
+
+			D3D12_SHADER_INPUT_BIND_DESC bindDesc;
+			for (UInt32 i = 0; i < shaderDesc.BoundResources; i++)
+			{
+				reflection->GetResourceBindingDesc(i, &bindDesc);
+
+				String name = bindDesc.Name;
+
+				D3D_SHADER_INPUT_TYPE type = bindDesc.Type;
+
+				ShaderReflectionData sr{};
+				switch (type)
 				{
-					D3D12_SIGNATURE_PARAMETER_DESC paramDesc;
-					reflection->GetInputParameterDesc(i, &paramDesc);
+				case D3D_SIT_CBUFFER:
+				{
+					ID3D12ShaderReflectionConstantBuffer* cbuffer = reflection->GetConstantBufferByIndex(i);
+					D3D12_SHADER_BUFFER_DESC cbufferDesc;
+					cbuffer->GetDesc(&cbufferDesc);
 
-					ShaderReflectionData sr{};
-					sr.name = paramDesc.SemanticName;
-					sr.set = 0;
-					sr.binding = paramDesc.SemanticIndex;
-					sr.shaderResourceType = ShaderReflectionDataType::Input;
-					sr.format = ConvertToRenderFormat(paramDesc);
-					sr.size = GraphicsUtility::GetRenderFormatSize(sr.format);
+					sr.name = name;
+					sr.shaderResourceType = ShaderReflectionDataType::ConstantBuffer;
+					sr.set = bindDesc.Space;
+					sr.binding = bindDesc.BindPoint;
+					sr.count = bindDesc.BindCount;
+					sr.size = cbufferDesc.Size;
 					sr.shaderType = _type;
-
 					result.reflection.push_back(sr);
+					break;
+				}
+				case D3D_SIT_TEXTURE:
+				{
+					sr.name = name;
+					sr.shaderResourceType = ShaderReflectionDataType::Texture;
+					sr.set = bindDesc.Space;
+					sr.binding = bindDesc.BindPoint;
+					sr.count = bindDesc.BindCount;
+					result.reflection.push_back(sr);
+					break;
+
+				}
+				case D3D_SIT_SAMPLER:
+				{
+					sr.name = name;
+					sr.shaderResourceType = ShaderReflectionDataType::Sampler;
+					sr.set = bindDesc.Space;
+					sr.binding = bindDesc.BindPoint;
+					sr.count = bindDesc.BindCount;
+					result.reflection.push_back(sr);
+					break;
+				}
 				}
 			}
 			break;
@@ -414,94 +480,75 @@ namespace Daydream
 			D3D11_SHADER_DESC shaderDesc;
 			reflection->GetDesc(&shaderDesc);
 
-			if (_type == ShaderType::Vertex)
+			for (UINT i = 0; i < shaderDesc.InputParameters; i++)
 			{
-				// 각 입력 파라미터에 대해 순회
-				for (UINT i = 0; i < shaderDesc.InputParameters; i++)
-				{
-					D3D11_SIGNATURE_PARAMETER_DESC paramDesc;
-					reflection->GetInputParameterDesc(i, &paramDesc);
+				D3D11_SIGNATURE_PARAMETER_DESC paramDesc;
+				reflection->GetInputParameterDesc(i, &paramDesc);
 
-					ShaderReflectionData sr{};
-					sr.name = paramDesc.SemanticName;
-					sr.set = 0;
-					sr.binding = paramDesc.SemanticIndex;
-					sr.shaderResourceType = ShaderReflectionDataType::Input;
-					sr.format = ConvertToRenderFormat(paramDesc);
-					sr.size = GraphicsUtility::GetRenderFormatSize(sr.format);
-					sr.shaderType = _type;
+				ShaderLayoutData sld;
+				sld.name = paramDesc.SemanticName;
+				sld.location = paramDesc.SemanticIndex;
+				sld.format = ConvertToRenderFormat(paramDesc);
+				sld.size = GraphicsUtility::GetRenderFormatSize(sld.format);
 
-					result.reflection.push_back(sr);
-				}
+				result.input.push_back(sld);
 			}
 			break;
 		}
 #endif // DAYDREAM_PLATFORM_WINDOWS
-		case RendererAPIType::OpenGL:
+		}
+
+
+		if (Renderer::GetAPI() != RendererAPIType::DirectX12)
 		{
-			String glsl = ConvertSPIRVtoGLSL(spirvData, _type);
-
-			// 문자열 nullptr 포함
-			result.bytecode.resize(glsl.length() + 1);
-			std::memcpy(result.bytecode.data(), glsl.c_str(), result.bytecode.size());
-
-			if (_type == ShaderType::Vertex)
+			for (const spirv_cross::Resource& resource : res.uniform_buffers)
 			{
-				for (const spirv_cross::Resource& resource : res.stage_inputs)
+				ShaderReflectionData sr{};
+				sr.name = compiler.get_name(resource.id);
+				sr.shaderResourceType = ShaderReflectionDataType::ConstantBuffer;
+				sr.set = compiler.get_decoration(resource.id, spv::DecorationDescriptorSet);
+				
+				sr.binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
+				sr.size = compiler.get_declared_struct_size(compiler.get_type(resource.type_id));
+				sr.shaderType = _type;
+
+				result.reflection.push_back(sr);
+			}
+
+			for (const spirv_cross::Resource& resource : res.sampled_images)
+			{
+				ShaderReflectionData sr{};
+				sr.name = compiler.get_name(resource.id);
+				sr.shaderResourceType = ShaderReflectionDataType::Texture;
+				sr.set = compiler.get_decoration(resource.id, spv::DecorationDescriptorSet);
+				sr.binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
+				sr.shaderType = _type;
+
+				const auto& type = compiler.get_type(resource.type_id);
+				UInt32 count = 1;
+				if (!type.array.empty())
 				{
-					const spirv_cross::SPIRType& spirType = compiler.get_type(resource.type_id);
-
-					ShaderReflectionData sr{};
-					sr.name = compiler.get_name(resource.id);
-					sr.set = compiler.get_decoration(resource.id, spv::DecorationLocation);
-					sr.binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
-					sr.shaderResourceType = ShaderReflectionDataType::Input;
-
-					UInt32 componentCount = spirType.vecsize;
-					spirv_cross::SPIRType::BaseType baseType = spirType.basetype;
-					sr.format = GraphicsUtility::ConvertSPIRVTypeToRenderFormat(baseType, componentCount);
-					sr.size = GraphicsUtility::GetRenderFormatSize(sr.format);
-					sr.shaderType = _type;
-
-					result.reflection.push_back(sr);
+					count = type.array[0];
 				}
+				sr.count = count;
+
+				result.reflection.push_back(sr);
 			}
-			break;
-		}
 		}
 
-		for (const spirv_cross::Resource& resource : res.uniform_buffers)
+		for (const spirv_cross::Resource& resource : res.stage_outputs)
 		{
-			ShaderReflectionData sr{};
-			sr.name = compiler.get_name(resource.id);
-			sr.shaderResourceType = ShaderReflectionDataType::ConstantBuffer;
-			sr.set = compiler.get_decoration(resource.id, spv::DecorationDescriptorSet);
-			sr.binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
-			sr.size = compiler.get_declared_struct_size(compiler.get_type(resource.type_id));
-			sr.shaderType = _type;
+			const spirv_cross::SPIRType& spirType = compiler.get_type(resource.type_id);
 
+			ShaderLayoutData sld;
+			sld.name = compiler.get_name(resource.id);
+			sld.location = compiler.get_decoration(resource.id, spv::DecorationLocation);
+			UInt32 componentCount = spirType.vecsize;
+			spirv_cross::SPIRType::BaseType baseType = spirType.basetype;
+			sld.format = GraphicsUtility::ConvertSPIRVTypeToRenderFormat(baseType, componentCount);
+			sld.size = GraphicsUtility::GetRenderFormatSize(sld.format);
 
-			result.reflection.push_back(sr);
-		}
-
-		for (const spirv_cross::Resource& resource : res.sampled_images)
-		{
-			ShaderReflectionData sr{};
-			sr.name = compiler.get_name(resource.id);
-			sr.shaderResourceType = ShaderReflectionDataType::Texture;
-			sr.set = compiler.get_decoration(resource.id, spv::DecorationDescriptorSet);
-			sr.binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
-			sr.shaderType = _type;
-
-			const auto& type = compiler.get_type(resource.type_id);
-			UInt32 count = 1;
-			if (!type.array.empty())
-			{
-				count = type.array[0];
-			}
-			sr.count = count;
-
-			result.reflection.push_back(sr);
+			result.output.push_back(sld);
 		}
 
 		return result;
@@ -509,32 +556,10 @@ namespace Daydream
 
 	void ShaderCompileHelper::SaveShaderCompileResult(const Path& _cachePath, const ShaderCompileResult& _result)
 	{
-		File file(_cachePath);
+		FileWriter writer(_cachePath);
 
-		file.OpenForWrite();
-
-		UInt32 reflectionCount = (UInt32)_result.reflection.size();
-		file.Write(reflectionCount); // 배열에 몇 개 들어있는지 갯수 저장
-		for (const auto& data : _result.reflection)
-		{
-			file.Write(data.set);
-			file.Write(data.binding);
-			file.Write(data.count);
-			file.Write(data.size);
-			file.Write(data.shaderType);
-			file.Write(data.shaderResourceType);
-			file.Write(data.format);
-			UInt32 nameLen = (UInt32)data.name.length();
-			file.Write(nameLen);
-			file.Write(data.name);
-		}
-
-		UInt32 bytecodeSize = (UInt32)_result.bytecode.size();
-		file.Write(bytecodeSize);
-		file.Write(_result.bytecode);
-
-		file.Close();
-
+		_result.Save(writer);
+		writer.Close();
 	}
 
 	String ShaderCompileHelper::GenerateShaderCacheFileName(const Path& _hlslPath)

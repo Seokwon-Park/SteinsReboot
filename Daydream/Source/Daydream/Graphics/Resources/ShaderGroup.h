@@ -29,7 +29,8 @@ _pixelShaderPath);
 			Shader* _geometryShader,
 			Shader* _pixelShader);
 
-		const Array<ShaderReflectionData>& GetInputData() const { return inputReflectionData; }
+		const Array<ShaderLayoutData>& GetInputLayoutData() const { return pipelineInputData; }
+		const Array<ShaderLayoutData>& GetOutputLayoutData() const { return pipelineOutputData; }
 		const HashMap<String, ShaderReflectionData>& GetShaderBindingMap() const { return shaderBindingMap; }
 		const HashMap<String, ShaderReflectionDataType>& GetMaterialMap() const { return materialMap; }
 		const ShaderReflectionData* GetShaderBindingInfo(const String& _name) const;
@@ -38,7 +39,7 @@ _pixelShaderPath);
 	private:
 		ShaderGroup(Shader* _vertexShader, Shader* _hullShader, Shader* _domainShader, Shader* _geometryShader, Shader* _pixelShader);
 
-		void CreateInputReflectionData();
+		void SetIOLayoutData();
 		void CreateShaderBindingMap();
 		void CreateMaterialMap();
 
@@ -55,7 +56,8 @@ _pixelShaderPath);
 
 		Array<Shader*> shaders;
 
-		Array<ShaderReflectionData> inputReflectionData;
+		Array<ShaderLayoutData> pipelineInputData;
+		Array<ShaderLayoutData> pipelineOutputData;
 		HashMap<String, ShaderReflectionData> shaderBindingMap;
 		HashMap<String, ShaderReflectionDataType> materialMap;
 	};

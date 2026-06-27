@@ -19,6 +19,7 @@ namespace Daydream::GraphicsUtility
 	}
 
 	UInt32 GetRenderFormatSize(RenderFormat _format);
+	UInt32 GetRenderFormatCount(RenderFormat _format);
 	
 	//VkFormat ConvertRenderFormatToVkFormat(RenderFormat _format);
 

@@ -15,11 +15,11 @@ namespace Daydream
 		// 입력 파라미터 정보를 저장할 벡터
 		Array<D3D11_INPUT_ELEMENT_DESC> inputLayoutDesc;
 
-		for (const auto& info : shaderGroup->GetInputData())
+		for (const auto& info : shaderGroup->GetInputLayoutData())
 		{
 			D3D11_INPUT_ELEMENT_DESC elementDesc;
 			elementDesc.SemanticName = info.name.c_str();
-			elementDesc.SemanticIndex = info.binding;
+			elementDesc.SemanticIndex = info.location;
 			elementDesc.InputSlot = 0;
 			elementDesc.Format = GraphicsUtility::DirectX::ConvertToDXGIFormat(info.format);
 			elementDesc.AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;

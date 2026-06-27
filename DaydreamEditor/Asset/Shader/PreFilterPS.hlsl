@@ -57,7 +57,7 @@ float3 ImportanceSampleGGX(float2 Xi, float3 N, float roughness)
     H.z = cosTheta;
 	
 	// from tangent-space H floattor to world-space sample floattor
-    float3 up = abs(N.z) < 0.999 ? float3(1.0, 0.0, 0.0) : float3(0.0, 0.0, 1.0);
+    float3 up = abs(N.z) < 0.999 ? float3(0.0, 0.0, 1.0) : float3(1.0, 0.0, 0.0);
     float3 T = normalize(cross(up, N));
     float3 B = normalize(cross(N, T));
 	

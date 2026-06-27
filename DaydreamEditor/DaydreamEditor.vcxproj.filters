@@ -7,6 +7,9 @@
     <Filter Include="EditorPanels\UI">
       <UniqueIdentifier>{3C0D7B0F-A898-E8D3-B1A9-6BC81DB444D4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="EditorPanels\UI\Node">
+      <UniqueIdentifier>{71DDDFD6-5D6C-69A0-068B-7D9BF2F87946}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\EditorCamera.h" />
@@ -28,6 +31,12 @@
     </ClInclude>
     <ClInclude Include="Source\EditorPanels\UI\ImGuiWidgets.h">
       <Filter>EditorPanels\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\EditorPanels\UI\Node\ImGuiNodeEditor.h">
+      <Filter>EditorPanels\UI\Node</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\EditorPanels\UI\Node\ImGuiNodeUtility.h">
+      <Filter>EditorPanels\UI\Node</Filter>
     </ClInclude>
     <ClInclude Include="Source\EditorPanels\UIPanel.h">
       <Filter>EditorPanels</Filter>
@@ -57,6 +66,12 @@
     </ClCompile>
     <ClCompile Include="Source\EditorPanels\UI\ImGuiWidgets.cpp">
       <Filter>EditorPanels\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\EditorPanels\UI\Node\ImGuiNodeEditor.cpp">
+      <Filter>EditorPanels\UI\Node</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\EditorPanels\UI\Node\ImGuiNodeUtility.cpp">
+      <Filter>EditorPanels\UI\Node</Filter>
     </ClCompile>
     <ClCompile Include="Source\EditorPanels\ViewportPanel.cpp">
       <Filter>EditorPanels</Filter>

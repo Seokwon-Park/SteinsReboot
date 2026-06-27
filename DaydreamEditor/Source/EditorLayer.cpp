@@ -475,6 +475,12 @@ namespace Daydream
 				if (ImGui::MenuItem("Redo", "Ctrl+Y", false, false)) {} // 비활성화 예시
 				ImGui::EndMenu();
 			}
+			if (ImGui::BeginMenu("View"))
+			{
+				if (ImGui::MenuItem("RenderGraphEditor")) {}
+				ImGui::EndMenu();
+			}
+
 			// 다른 메뉴들 (View, Tools, Help 등)
 			ImGui::EndMainMenuBar();
 		}

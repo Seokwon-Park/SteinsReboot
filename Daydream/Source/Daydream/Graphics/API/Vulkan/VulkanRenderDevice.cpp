@@ -142,6 +142,11 @@ namespace Daydream
 	{
 	}
 
+	void VulkanRenderDevice::WaitIdle()
+	{
+		graphicsQueue.waitIdle();
+	}
+
 
 	Unique<RenderContext> VulkanRenderDevice::CreateContext()
 	{
@@ -158,7 +163,7 @@ namespace Daydream
 		return MakeShared<VulkanGPUBuffer>(this, _desc);
 	}
 
-	Shared<GPUTexture> VulkanRenderDevice::CreateGPUTexture(const TextureDesc & _desc)
+	Shared<GPUTexture> VulkanRenderDevice::CreateGPUTexture(const TextureDesc& _desc)
 	{
 		return MakeShared<VulkanGPUTexture>(this, _desc);
 	}

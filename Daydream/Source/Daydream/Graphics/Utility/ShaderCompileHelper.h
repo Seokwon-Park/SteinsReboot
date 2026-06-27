@@ -1,16 +1,21 @@
 #pragma once
 #include "dxc/dxcapi.h"
-#include "Daydream/Graphics/Resources//Shader.h"
+#include "Daydream/Graphics/Resources/Shader.h"
+
+#ifdef DAYDREAM_PLATFORM_WINDOWS
+#include <wrl/client.h>
+template<typename T>
+using DxcComPtr = Microsoft::WRL::ComPtr<T>;
+#else
+// 리눅스/맥 빌드 시에는 DXC가 흉내 내서 제공하는 호환용 스마트 포인터 사용
+#include <dxc/Support/WinAdapter.h> // (또는 microcom.h 등 DXC 제공 헤더)
+template<typename T>
+using DxcComPtr = CComPtr<T>;
+#endif
 
 namespace Daydream
 {
 	enum class ShaderType;
-
-	struct ShaderCompileResult
-	{
-		Array<ShaderReflectionData> reflection;
-		Array<UInt8> bytecode; 
-	};
 
 	class ShaderCompileHelper
 	{
@@ -26,9 +31,7 @@ namespace Daydream
 
 		static String GenerateShaderCacheFileName(const Path& _hlslPath);
 	private:
-		inline static ShaderCompileHelper* instance;
-
-		ComPtr<IDxcUtils> utils;
-		ComPtr<IDxcCompiler3> compiler;
+		inline static DxcComPtr<IDxcUtils> utils = nullptr;
+		inline static DxcComPtr<IDxcCompiler3> compiler = nullptr;
 	};
 }

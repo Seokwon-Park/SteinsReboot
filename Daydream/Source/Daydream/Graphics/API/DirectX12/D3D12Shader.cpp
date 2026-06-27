@@ -106,9 +106,14 @@ namespace Daydream
 
 	}
 
-	bool D3D12Shader::CreateNativeShader(const Array<UInt8>& _bytecode) 
+	bool D3D12Shader::CreateNativeShader(const Array<UInt8>& _bytecode)
 	{
+		bytecode = _bytecode;
 
+		shaderBytecode.BytecodeLength = bytecode.size();
+		shaderBytecode.pShaderBytecode = bytecode.data();
+
+		return !bytecode.empty();
 	}
 
 }

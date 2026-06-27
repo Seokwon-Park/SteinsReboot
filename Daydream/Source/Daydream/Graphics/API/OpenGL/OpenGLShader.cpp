@@ -179,7 +179,7 @@ namespace Daydream
 				desc.count = size;
 				desc.size = 0;
 
-				reflectionDatas.push_back(desc);
+				reflection.push_back(desc);
 			}
 		}
 	}
@@ -207,7 +207,7 @@ namespace Daydream
 			desc.count = 1;
 			desc.size = size;
 
-			reflectionDatas.push_back(desc);
+			reflection.push_back(desc);
 			//// Block 내 uniform들 리플렉션
 			//GLint activeUniforms;
 			//glGetActiveUniformBlockiv(shaderProgramID, i, GL_UNIFORM_BLOCK_ACTIVE_UNIFORMS, &activeUniforms);
@@ -237,11 +237,11 @@ namespace Daydream
 		glDeleteProgram(shaderProgramID);
 	}
 
-	void OpenGLShader::Compile(const std::string& _src)
+	bool OpenGLShader::CreateNativeShader(const Array<UInt8>& _bytecode)
 	{
 		GLenum GLShaderType = GraphicsUtility::OpenGL::ConvertToGLShaderType(shaderType);
 		GLuint shaderID = glCreateShader(GLShaderType);
-		const GLchar* source = _src.c_str();
+		const GLchar* source = reinterpret_cast<const GLchar*>(_bytecode.data());
 
 		glShaderSource(shaderID, 1, &source, nullptr);
 		glCompileShader(shaderID);
@@ -259,7 +259,7 @@ namespace Daydream
 
 			DAYDREAM_CORE_ERROR("{0}", infoLog.data());
 			DAYDREAM_CORE_ASSERT(false, "Shader compilation failure!");
-			return;
+			return false;
 		}
 
 		shaderProgramID = glCreateShaderProgramv(GLShaderType, 1, &source);
@@ -282,9 +282,11 @@ namespace Daydream
 
 			DAYDREAM_CORE_ERROR("{0}", infoLog.data());
 			DAYDREAM_CORE_ASSERT(false, "Shader link failure!");
-			return;
+			return false;
 		}
 
 		glDeleteShader(shaderID);
+
+		return true;
 	}
 }

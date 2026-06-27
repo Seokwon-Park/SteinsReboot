@@ -49,6 +49,8 @@ namespace Daydream
 		static void PostInit();
 		static void Shutdown();
 
+		static void WaitGPUIdle();
+
 		static bool CreateSwapchain(DaydreamWindow& _window);
 		static void OnSwapchainResize(DaydreamWindow* _window, UInt32 _width, UInt32 _height);
 
@@ -56,7 +58,7 @@ namespace Daydream
 		static void EndFrame(DaydreamWindow* _window);
 		static void BeginRendering(DaydreamWindow* _window, Color _clearColor);
 
-		static void SetRenderThreadEnabled(bool _enabled);
+		static void EnableRenderThread(bool _enabled);
 		static bool IsRenderThreadEnabled() { return useRenderThread; }
 
 		static void BeginRendering(const RenderingInfo& _renderingInfo);

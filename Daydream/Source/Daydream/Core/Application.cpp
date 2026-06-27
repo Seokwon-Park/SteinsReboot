@@ -166,8 +166,9 @@ namespace Daydream
 	{
 		ComponentRegistry::Shutdown();
 		layerStack.Release();
-		AssetManager::Shutdown();
+		Renderer::WaitGPUIdle();
 		ResourceManager::Shutdown();
+		AssetManager::Shutdown();
 		Renderer::Shutdown();
 		WindowManager::Shutdown();
 		mainWindow = nullptr;

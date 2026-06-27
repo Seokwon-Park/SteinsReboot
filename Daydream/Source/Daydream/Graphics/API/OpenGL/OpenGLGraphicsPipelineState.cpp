@@ -15,12 +15,11 @@ namespace Daydream
 		//for (const BufferElement& element : layout)
 		UInt32 offset = 0;
 		UInt32 inputDataIndex = 0;
-		for(const auto& info : shaderGroup->GetShader(ShaderType::Vertex)->GetShaderReflectionData())
+		for(const auto& info : shaderGroup->GetInputLayoutData())
 		{
-			if (info.shaderResourceType != ShaderReflectionDataType::Input) continue;
 			glEnableVertexArrayAttrib(inputLayoutID, inputDataIndex);
 			glVertexArrayAttribFormat(inputLayoutID, inputDataIndex,
-				info.count,
+				GraphicsUtility::GetRenderFormatCount(info.format),
 				GraphicsUtility::OpenGL::ConvertRenderFormatToGLDataType(info.format),
 				GL_FALSE,
 				offset);

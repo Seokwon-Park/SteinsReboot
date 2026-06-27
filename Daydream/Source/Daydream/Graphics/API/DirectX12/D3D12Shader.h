@@ -13,9 +13,10 @@ namespace Daydream
 				
 		virtual bool CreateNativeShader(const Array<UInt8>& _bytecode) override;
 
-		D3D12_SHADER_BYTECODE GetShaderBytecode() const { return shaderByteCode; }
+		D3D12_SHADER_BYTECODE GetShaderBytecode() const { return shaderBytecode; }
 	private:
 		D3D12RenderDevice* device;
-		D3D12_SHADER_BYTECODE shaderByteCode;
+		D3D12_SHADER_BYTECODE shaderBytecode;
+		Array<UInt8> bytecode;
 	};
 }

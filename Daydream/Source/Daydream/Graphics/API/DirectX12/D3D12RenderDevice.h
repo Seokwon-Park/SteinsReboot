@@ -15,6 +15,8 @@ namespace Daydream
 		virtual void Init() override;
 		virtual void Shutdown() override;
 
+		virtual void WaitIdle() override;
+
 		virtual Unique<RenderContext> CreateContext() override;
 		virtual Shared<RenderCommandList> CreateRenderCommandList() override;
 		virtual Shared<GPUBuffer> CreateGPUBuffer(const BufferDesc& _desc) override;
@@ -80,11 +82,9 @@ namespace Daydream
 
 		ComPtr<D3D12MA::Allocator> memoryAllocator;
 
-		ComPtr<ID3D12CommandAllocator> uploadCommandAllocator;
-		ComPtr<ID3D12GraphicsCommandList> uploadCommandList;
-		ComPtr<ID3D12Fence> uploadFence;
-		UInt64 uploadFenceValue;
-		HANDLE uploadFenceEvent;
+		ComPtr<ID3D12Fence> deviceFence;
+		UInt64 deviceFenceValue;
+		HANDLE deviceFenceEvent;
 
 
 	};

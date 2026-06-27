@@ -111,6 +111,8 @@
     <ClInclude Include="Source\EditorPanels\SceneHierarchyPanel.h" />
     <ClInclude Include="Source\EditorPanels\SkyboxPanel.h" />
     <ClInclude Include="Source\EditorPanels\UI\ImGuiWidgets.h" />
+    <ClInclude Include="Source\EditorPanels\UI\Node\ImGuiNodeEditor.h" />
+    <ClInclude Include="Source\EditorPanels\UI\Node\ImGuiNodeUtility.h" />
     <ClInclude Include="Source\EditorPanels\UIPanel.h" />
     <ClInclude Include="Source\EditorPanels\ViewportPanel.h" />
   </ItemGroup>
@@ -124,6 +126,8 @@
     <ClCompile Include="Source\EditorPanels\SceneHierarchyPanel.cpp" />
     <ClCompile Include="Source\EditorPanels\SkyboxPanel.cpp" />
     <ClCompile Include="Source\EditorPanels\UI\ImGuiWidgets.cpp" />
+    <ClCompile Include="Source\EditorPanels\UI\Node\ImGuiNodeEditor.cpp" />
+    <ClCompile Include="Source\EditorPanels\UI\Node\ImGuiNodeUtility.cpp" />
     <ClCompile Include="Source\EditorPanels\ViewportPanel.cpp" />
   </ItemGroup>
   <ItemGroup>

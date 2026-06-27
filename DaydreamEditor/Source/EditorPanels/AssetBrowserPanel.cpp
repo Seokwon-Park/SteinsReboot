@@ -38,7 +38,7 @@ namespace Daydream
 					currentPath = rootPath;
 				}
 				RenderFolderTree(rootPath, currentPath);
-				ImGui::TreePop();
+				ImGui::TreePop(); 
 			}
 		}
 		ImGui::EndChild();

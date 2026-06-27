@@ -187,10 +187,10 @@ namespace Daydream
 	void D3D12Swapchain::WaitForGPU()
 	{
 		currentFenceValue++;
-		//currentFenceValue 시그널해
+		//현재 gpu에 있는 작업들 끝나면 currentFenceValue로 fence값 설정해
 		device->GetCommandQueue()->Signal(fence.Get(), currentFenceValue);
 
-		//currentFenceValue 받을때까지 기다려
+		//currentFenceValue값 받을때까지 기다려
 		fence->SetEventOnCompletion(currentFenceValue, fenceEvent.Get());
 		WaitForSingleObjectEx(fenceEvent.Get(), INFINITE, FALSE);
 	}
@@ -198,23 +198,23 @@ namespace Daydream
 	// GPU가 이전 프레임 작업을 끝낼 때까지 기다림
 	void D3D12Swapchain::MoveToNextFrame()
 	{
-		// 1. 현재 프레임의 커맨드 제출 완료를 위한 펜스 값 기록 요청
-		const UINT64 currentFenceValue = fenceValues[frameIndex]; // 현재 프레임의 '고유한' 펜스 값
+		// 현재 프레임의 커맨드 제출이 완료되면 fenceValues[frameIndex]를 펜스에 signal 해라
+		const UINT64 currentFenceValue = fenceValues[frameIndex]; // 현재 프레임의 고유 펜스 값
 		HRESULT hr = device->GetCommandQueue()->Signal(fence.Get(), currentFenceValue);
-		// fence값 1로 만들어
 		DAYDREAM_CORE_ASSERT(SUCCEEDED(hr), "Failed to signal!");
 
-		// 2. 다음 백 버퍼 인덱스 획득 (GPU가 렌더링을 마친 버퍼를 가져옴) Present이후 호출이므로 바뀜
+		// 다음 백 버퍼 인덱스 획득 (GPU가 렌더링을 마친 버퍼) Present이후 호출이므로 바뀜
 		frameIndex = swapchain->GetCurrentBackBufferIndex();
 
-		// 3. 다음 프레임에 사용될 백 버퍼의 펜스 값 확인 및 대기
-		 //    GPU가 이전에 (이 'frameIndex'에 해당하는 백 버퍼를 사용했던) 작업을 완료했는지 확인
-		if (fence->GetCompletedValue() < fenceValues[frameIndex]) // 현재 프레임 인덱스(새로 갱신된)의 펜스 값과 비교
+		// 다음 프레임에 사용될 백 버퍼의 펜스 값 확인 및 대기
+		// 새 프레임의 fenceValue보다 완료된 value가 높으면 넘어감
+		if (fence->GetCompletedValue() < fenceValues[frameIndex])
 		{
 			// 완료되지 않았다면, 해당 펜스 값이 시그널될 때까지 CPU 대기
 			fence->SetEventOnCompletion(fenceValues[frameIndex], fenceEvent.Get());
 			WaitForSingleObjectEx(fenceEvent.Get(), INFINITE, FALSE);
 		}
+		// 현재 프레임이 다음에 signal 할 값 = 이전 프레임의 펜스값 + 1
 		fenceValues[frameIndex] = currentFenceValue + 1;
 	}
 

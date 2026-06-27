@@ -31,7 +31,7 @@ namespace Daydream
 		:GraphicsPipelineState(_desc)
 	{
 		device = _device;
-		
+
 		vk::VertexInputBindingDescription vertexInputdesc;
 		vertexInputdesc.binding = 0;
 		vertexInputdesc.stride = 0;
@@ -39,11 +39,11 @@ namespace Daydream
 
 		UInt32 offset = 0;
 		Array<vk::VertexInputAttributeDescription> attribDescArray;
-		for (const auto& info : shaderGroup->GetInputData())
+		for (const auto& info : shaderGroup->GetInputLayoutData())
 		{
 			vk::VertexInputAttributeDescription attribDesc{};
-			attribDesc.location = info.set;
-			attribDesc.binding = info.binding;
+			attribDesc.location = info.location;
+			attribDesc.binding = 0;
 			attribDesc.format = GraphicsUtility::Vulkan::ConvertToVkFormat(info.format);
 			attribDesc.offset = offset;
 
@@ -94,7 +94,7 @@ namespace Daydream
 			//layoutCreateInfo.pNext = &extendedInfo; // 확장 정보 연결!
 			layoutCreateInfo.bindingCount = Cast<UInt32>(bindings.size());
 			layoutCreateInfo.pBindings = bindings.data();
-			layoutCreateInfo.flags = /*vk::DescriptorSetLayoutCreateFlagBits::eUpdateAfterBindPool |*/ 
+			layoutCreateInfo.flags = /*vk::DescriptorSetLayoutCreateFlagBits::eUpdateAfterBindPool |*/
 				vk::DescriptorSetLayoutCreateFlagBits::ePushDescriptor;
 
 			descriptorSetLayouts.push_back(device->GetDevice().createDescriptorSetLayoutUnique(layoutCreateInfo));
@@ -129,7 +129,7 @@ namespace Daydream
 		vk::PipelineInputAssemblyStateCreateInfo inputAssembly{};
 		inputAssembly.topology = vk::PrimitiveTopology::eTriangleList;
 		inputAssembly.primitiveRestartEnable = VK_FALSE;
-		
+
 
 		vk::PipelineRasterizationStateCreateInfo rasterizer = GraphicsUtility::Vulkan::TranslateToVkRasterizationStateCreateInfo(_desc.rasterizerState);
 		//vk::PipelineRasterizationStateCreateInfo rasterizer{};
@@ -193,7 +193,7 @@ namespace Daydream
 
 		vk::PipelineRenderingCreateInfo renderingInfo{};
 		Array<vk::Format> colorFormats(colorAttachmentCount);
-		
+
 		for (UInt64 i = 0; i < colorFormats.size(); i++)
 		{
 			colorFormats[i] = GraphicsUtility::Vulkan::ConvertToVkFormat(desc.renderTargetFormats[i]);
@@ -202,7 +202,7 @@ namespace Daydream
 		renderingInfo.pColorAttachmentFormats = colorFormats.data();
 		renderingInfo.depthAttachmentFormat = GraphicsUtility::IsDepthFormat(desc.depthStencilFormat) ?
 			GraphicsUtility::Vulkan::ConvertToVkFormat(desc.depthStencilFormat) : vk::Format::eUndefined;
-			
+
 		renderingInfo.stencilAttachmentFormat = GraphicsUtility::IsStencilFormat(desc.depthStencilFormat) ?
 			GraphicsUtility::Vulkan::ConvertToVkFormat(desc.depthStencilFormat) : vk::Format::eUndefined;
 

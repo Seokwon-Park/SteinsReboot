@@ -104,6 +104,11 @@ namespace Daydream
 		//instance = nullptr;
 	}
 
+	void Renderer::WaitGPUIdle()
+	{
+		renderDevice->WaitIdle();
+	}
+
 	bool Renderer::CreateSwapchain(DaydreamWindow& _window)
 	{
 		SwapchainDesc desc;
@@ -127,7 +132,7 @@ namespace Daydream
 		swapchain->ResizeSwapchain(_width, _height);
 	}
 
-	void Renderer::SetRenderThreadEnabled(bool _enabled)
+	void Renderer::EnableRenderThread(bool _enabled)
 	{
 		useRenderThread = _enabled;
 		if (!renderThread)

@@ -15,7 +15,7 @@ namespace Daydream
 
 	void RenderThread::Start()
 	{
-		//실행 안하고 있으면 이 분기를 건너뜀
+		//1로 덮어쓰기 전의 값이 1이었으면 함수 종료
 		if (isRunning.exchange(1))
 		{
 			return;
@@ -29,7 +29,7 @@ namespace Daydream
 	}
 	void RenderThread::Stop()
 	{
-		// 만약에 아직 실행중이면 분기 건너뜀
+		//0으로 덮어쓰기 전의 값이 0 이었으면 함수 종료
 		if (!isRunning.exchange(0))
 		{
 			return;

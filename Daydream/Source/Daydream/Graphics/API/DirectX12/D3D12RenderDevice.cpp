@@ -183,18 +183,12 @@ namespace Daydream
 			dynamicCbvSrvUavHeapAlloc.Create(device.Get(), dynamicCbvSrvUavHeap.Get());
 		}
 
-		hr = device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(uploadCommandAllocator.GetAddressOf()));
 		DAYDREAM_CORE_ASSERT(SUCCEEDED(hr), "Failed to create command allocator");
 
-		hr = device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, uploadCommandAllocator.Get(), nullptr, IID_PPV_ARGS(uploadCommandList.GetAddressOf()));
-		DAYDREAM_CORE_ASSERT(SUCCEEDED(hr), "Failed to create commandlist");
 
-		uploadCommandList->Close();
-
-		hr = device->CreateFence(uploadFenceValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(uploadFence.GetAddressOf()));
-		//다음 펜스값은 1을 보내야함
-		uploadFenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-		if (uploadFenceEvent == nullptr)
+		hr = device->CreateFence(deviceFenceValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(deviceFence.GetAddressOf()));
+		deviceFenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+		if (deviceFenceEvent == nullptr)
 		{
 			DAYDREAM_CORE_ERROR("Failed to Create FenceEvent!");
 		}
@@ -241,6 +235,20 @@ namespace Daydream
 
 	void D3D12RenderDevice::Shutdown()
 	{
+	}
+
+	void D3D12RenderDevice::WaitIdle()
+	{
+		deviceFenceValue++;
+
+		// 메인 커맨드 큐에 "여기까지 완료하면 신호 줘!" 하고 깃발(Fence) 꽂기
+		commandQueue->Signal(deviceFence.Get(), deviceFenceValue);
+		// 큐가 내 깃발을 처리할 때까지 현재 스레드 강제 정지(Block)
+		if (deviceFence->GetCompletedValue() < deviceFenceValue)
+		{
+			deviceFence->SetEventOnCompletion(deviceFenceValue, deviceFenceEvent);
+			WaitForSingleObjectEx(deviceFenceEvent, INFINITE, FALSE);
+		}
 	}
 
 

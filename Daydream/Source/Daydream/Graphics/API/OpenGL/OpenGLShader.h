@@ -16,8 +16,7 @@ namespace Daydream
 
 		virtual ~OpenGLShader();
 
-		virtual bool CreateNativeShader(const Array<UInt8>& _bytecode) override { return false; };
-
+		virtual bool CreateNativeShader(const Array<UInt8>& _bytecode) override;
 
 		UInt32 GetShaderID() const { return shaderProgramID; }
 

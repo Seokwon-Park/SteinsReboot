@@ -62,6 +62,8 @@ namespace Daydream
 
 	DeferredSceneRenderer::~DeferredSceneRenderer()
 	{
+		Renderer::GetTexturePool()->ReturnAllocation(result);
+		Renderer::GetTexturePool()->ReturnAllocation(shadowMap);
 	}
 
 	void DeferredSceneRenderer::RenderScene(const SceneData& _sceneData)
@@ -87,12 +89,12 @@ namespace Daydream
 
 		RenderGraphResourceDesc resourceDesc{};
 
-		RenderGraphResourceHandle positionHandle = renderGraph->AddResource("rg_PositionTexture", { RenderFormat::R16G16B16A16_FLOAT, width, height });
-		RenderGraphResourceHandle albedoHandle = renderGraph->AddResource("rg_AlbedoTexture", { RenderFormat::R8G8B8A8_UNORM, width, height });
-		RenderGraphResourceHandle normalHandle = renderGraph->AddResource("rg_NormalTexture", { RenderFormat::R16G16B16A16_FLOAT, width, height });
-		RenderGraphResourceHandle rmaoHandle = renderGraph->AddResource("rg_RMAOTexture", { RenderFormat::R8G8B8A8_UNORM, width, height });
-		RenderGraphResourceHandle gbufferDepthHandle = renderGraph->AddResource("rg_GBufferDepth", { RenderFormat::R24G8_TYPELESS, width, height });
-		RenderGraphResourceHandle shadowDepthHandle = renderGraph->AddExternalWriteResource("rg_DepthTexture", shadowMap);
+		RenderGraphResourceHandle positionHandle = renderGraph->AddResource("PositionTexture", { RenderFormat::R16G16B16A16_FLOAT, width, height });
+		RenderGraphResourceHandle albedoHandle = renderGraph->AddResource("AlbedoTexture", { RenderFormat::R8G8B8A8_UNORM, width, height });
+		RenderGraphResourceHandle normalHandle = renderGraph->AddResource("NormalTexture", { RenderFormat::R16G16B16A16_FLOAT, width, height });
+		RenderGraphResourceHandle rmaoHandle = renderGraph->AddResource("RMAOTexture", { RenderFormat::R8G8B8A8_UNORM, width, height });
+		RenderGraphResourceHandle gbufferDepthHandle = renderGraph->AddResource("GBufferDepth", { RenderFormat::R24G8_TYPELESS, width, height });
+		RenderGraphResourceHandle shadowDepthHandle = renderGraph->AddExternalWriteResource("DepthTexture", shadowMap);
 		RenderGraphResourceHandle resultHandle = renderGraph->AddExternalWriteResource("Result", result);
 
 		RenderGraphPassDesc shadowPassDesc{};

@@ -118,6 +118,86 @@ namespace Daydream
 			}
 		}
 
+		UInt32 GetRenderFormatCount(RenderFormat _format)
+		{
+			switch (_format)
+			{
+			case RenderFormat::R32G32B32A32_FLOAT:
+			case RenderFormat::R32G32B32A32_UINT:
+			case RenderFormat::R32G32B32A32_SINT:
+			case RenderFormat::R16G16B16A16_FLOAT:
+			case RenderFormat::R16G16B16A16_UNORM:
+			case RenderFormat::R16G16B16A16_UINT:
+			case RenderFormat::R16G16B16A16_SINT:
+			case RenderFormat::R10G10B10A2_UNORM:
+			case RenderFormat::R10G10B10A2_UINT:
+			case RenderFormat::R8G8B8A8_UNORM:
+			case RenderFormat::R8G8B8A8_UNORM_SRGB:
+			case RenderFormat::R8G8B8A8_UINT:
+			case RenderFormat::R8G8B8A8_SINT:
+			case RenderFormat::B8G8R8A8_UNORM:
+			case RenderFormat::B8G8R8A8_UNORM_SRGB:
+			case RenderFormat::B8G8R8X8_UNORM:
+			case RenderFormat::B5G5R5A1_UNORM:
+			case RenderFormat::B4G4R4A4_UNORM:
+			case RenderFormat::A4B4G4R4_UNORM:
+				return 4;
+			case RenderFormat::R32G32B32_FLOAT:
+			case RenderFormat::R32G32B32_UINT:
+			case RenderFormat::R32G32B32_SINT:
+			case RenderFormat::R11G11B10_FLOAT:
+			case RenderFormat::R9G9B9E5_SHAREDEXP:
+			case RenderFormat::B5G6R5_UNORM:
+				return 3;
+			case RenderFormat::R32G32_FLOAT:
+			case RenderFormat::R32G32_UINT:
+			case RenderFormat::R32G32_SINT:
+			case RenderFormat::R16G16_FLOAT:
+			case RenderFormat::R16G16_UNORM:
+			case RenderFormat::R16G16_UINT:
+			case RenderFormat::R16G16_SINT:
+			case RenderFormat::R8G8_UNORM:
+			case RenderFormat::R8G8_UINT:
+			case RenderFormat::R8G8_SINT:
+			case RenderFormat::D32_FLOAT_S8X24_UINT:
+			case RenderFormat::D24_UNORM_S8_UINT:
+				return 2;
+			case RenderFormat::R32_FLOAT:
+			case RenderFormat::R32_UINT:
+			case RenderFormat::R32_SINT:
+			case RenderFormat::D32_FLOAT:
+			case RenderFormat::R16_FLOAT:
+			case RenderFormat::R16_UNORM:
+			case RenderFormat::R16_UINT:
+			case RenderFormat::R16_SINT:
+			case RenderFormat::D16_UNORM:
+			case RenderFormat::R8_UNORM:
+			case RenderFormat::R8_UINT:
+			case RenderFormat::R8_SINT:
+			case RenderFormat::A8_UNORM:
+				return 1;
+			case RenderFormat::BC1_UNORM:
+			case RenderFormat::BC1_UNORM_SRGB:
+			case RenderFormat::BC4_UNORM:
+			case RenderFormat::BC4_SNORM:
+			case RenderFormat::BC2_UNORM:
+			case RenderFormat::BC2_UNORM_SRGB:
+			case RenderFormat::BC3_UNORM:
+			case RenderFormat::BC3_UNORM_SRGB:
+			case RenderFormat::BC5_UNORM:
+			case RenderFormat::BC5_SNORM:
+			case RenderFormat::BC6H_UF16:
+			case RenderFormat::BC6H_SF16:
+			case RenderFormat::BC7_UNORM:
+			case RenderFormat::BC7_UNORM_SRGB:
+			case RenderFormat::NV12:
+			case RenderFormat::YUY2:
+			case RenderFormat::UNKNOWN:
+			default:
+				return 0;
+			}
+		}
+
 		//VkFormat GraphicsUtil::ConvertRenderFormatToVkFormat(RenderFormat _format)
 		//{
 		//	switch (_format)

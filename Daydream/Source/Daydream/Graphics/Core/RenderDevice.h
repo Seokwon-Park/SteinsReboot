@@ -56,6 +56,9 @@ namespace Daydream
 		virtual void Init() = 0;
 		virtual void Shutdown() = 0;
 
+		virtual void WaitIdle() {};
+
+
 		virtual Unique<RenderContext> CreateContext() = 0;
 		virtual Shared<RenderCommandList> CreateRenderCommandList() = 0;
 		virtual Shared<GPUBuffer> CreateGPUBuffer(const BufferDesc& _desc) = 0;

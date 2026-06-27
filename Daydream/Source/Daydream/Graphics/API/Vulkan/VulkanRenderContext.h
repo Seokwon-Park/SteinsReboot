@@ -12,6 +12,7 @@ namespace Daydream
 		VulkanRenderContext(VulkanRenderDevice* _device);
 		virtual ~VulkanRenderContext();
 
+
 		virtual void BeginCommandList() override;
 		virtual void EndCommandList() override;
 		virtual void SetViewport(UInt32 _x, UInt32 _y, UInt32 _width, UInt32 _height) override;

@@ -34,7 +34,7 @@ namespace Daydream
 			_pixelShader
 		));
 
-		shaderGroup->CreateInputReflectionData();
+		shaderGroup->SetIOLayoutData();
 		shaderGroup->CreateShaderBindingMap();
 		shaderGroup->CreateMaterialMap();
 
@@ -71,15 +71,10 @@ namespace Daydream
 		if (pixelShader != nullptr) shaders.push_back(pixelShader);
 	}
 
-	void ShaderGroup::CreateInputReflectionData()
+	void ShaderGroup::SetIOLayoutData()
 	{
-		for (const ShaderReflectionData& data : vertexShader->GetShaderReflectionData())
-		{
-			if (data.shaderResourceType == ShaderReflectionDataType::Input)
-			{
-				inputReflectionData.push_back(data);
-			}
-		}
+		pipelineInputData = vertexShader->GetShaderInputData();
+		if (pixelShader != nullptr) pipelineOutputData = pixelShader->GetShaderOutputData();
 	}
 
 	void ShaderGroup::CreateShaderBindingMap()
@@ -89,11 +84,8 @@ namespace Daydream
 		{
 			for (ShaderReflectionData data : shader->GetShaderReflectionData())
 			{
-				if (data.shaderResourceType != ShaderReflectionDataType::Input)
-				{
-					shaderBindingMap.insert({ data.name, data });
-					setCount = Math::Max(setCount, data.set+1);
-				}
+				shaderBindingMap.insert({ data.name, data });
+				setCount = Math::Max(setCount, data.set + 1);
 			}
 		}
 	}
