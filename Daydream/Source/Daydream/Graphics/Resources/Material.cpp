@@ -3,19 +3,14 @@
 
 #include "Daydream/Graphics/Core/Renderer.h"
 #include "Daydream/Graphics/States/PipelineState/GraphicsPipelineState.h"
-#include "Daydream/Graphics/Manager/ResourceManager.h"
+#include "Daydream/Graphics/Manager/RenderCacheManager.h"
 #include "Daydream/Asset/AssetManager.h"
 
 namespace Daydream
 {
-	Material::Material(const ShaderGroup* _shaderGroup)
+	Material::Material(const ShaderPipeline* _GraphicsPipelineTemplate)
 	{
-		textureBindingMap = _shaderGroup->GetMaterialMap();
-	}
-
-	Material::Material(const GraphicsPipelineState* _pipelineState)
-		:Material(_pipelineState->GetShaderGroup())
-	{
+		textureBindingMap = _GraphicsPipelineTemplate->GetMaterialMap();
 	}
 
 	Material::~Material()
@@ -56,8 +51,12 @@ namespace Daydream
 	//	}
 	//}
 
-	Shared<Material> Daydream::Material::Create(const GraphicsPipelineState* _pipeline)
+	Shared<Material> Material::Create(const GraphicsPipelineState* _pipeline)
 	{
-		return MakeShared<Material>(_pipeline->GetShaderGroup());
+		return MakeShared<Material>(_pipeline->GetShaderPipeline());
+	}
+	Shared<Material> Material::Create(const ShaderPipeline* _shaderPipeline)
+	{
+		return MakeShared<Material>(_shaderPipeline);
 	}
 }

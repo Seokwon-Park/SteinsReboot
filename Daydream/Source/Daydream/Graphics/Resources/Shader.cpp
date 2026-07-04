@@ -30,7 +30,6 @@ namespace Daydream
 		{
 			data.shaderType = shaderType;
 		}
-
 	}
 
 	Shared<Shader> Shader::Create(const ShaderType& _type)

@@ -44,5 +44,11 @@ namespace Daydream
 #define DAYDREAM_RENDERER_ERROR(...)	DAYDREAM_CORE_ERROR("[Renderer] " ##__VA_ARGS__)		
 #define DAYDREAM_RENDERER_FATAL(...)	DAYDREAM_CORE_FATAL("[Renderer] " ##__VA_ARGS__)		
 
-#define DAYDREAM_ASSET_INFO(...)  DAYDREAM_CORE_INFO("[AssetManager] " ##__VA_ARGS__)
-#define DAYDREAM_PHYSICS_INFO(...) DAYDREAM_CORE_INFO("[Physics] " ##__VA_ARGS__)
+#define DAYDREAM_ASSET_TRACE(...)		DAYDREAM_CORE_TRACE("[AssetManager] " ##__VA_ARGS__)
+#define DAYDREAM_ASSET_INFO(...)		DAYDREAM_CORE_INFO("[AssetManager] " ##__VA_ARGS__)
+#define DAYDREAM_ASSET_WARN(...)		DAYDREAM_CORE_WARN("[AssetManager] " ##__VA_ARGS__)
+#define DAYDREAM_ASSET_ERROR(...)		DAYDREAM_CORE_ERROR("[AssetManager] " ##__VA_ARGS__)
+#define DAYDREAM_ASSET_FATAL(...)		DAYDREAM_CORE_FATAL("[AssetManager] " ##__VA_ARGS__)
+
+#define DAYDREAM_PHYSICS_INFO(...)		DAYDREAM_CORE_INFO("[Physics] " ##__VA_ARGS__)
+

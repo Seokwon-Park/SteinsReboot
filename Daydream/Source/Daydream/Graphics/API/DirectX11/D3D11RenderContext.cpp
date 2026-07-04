@@ -74,7 +74,7 @@ namespace Daydream
 	{
 		device->GetContext()->OMSetRenderTargets(0, nullptr, nullptr);
 
-		auto bindingMap = currentGraphicsPipelineState->GetShaderGroup()->GetShaderBindingMap();
+		auto bindingMap = currentGraphicsPipelineState->GetShaderPipeline()->GetShaderBindingMap();
 		ID3D11ShaderResourceView* nullSRV = nullptr;
 		for (auto [name, data] : bindingMap)
 		{

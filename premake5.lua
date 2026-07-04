@@ -41,6 +41,7 @@ workspace "Daydream"
 	IncludeDir["stduuid"] = "Daydream/Vendor/stduuid/include"
 	IncludeDir["yaml"] = "Daydream/Vendor/yaml-cpp/include"
 	IncludeDir["nfd"] = "Daydream/Vendor/nfd-extended/src/include"
+	IncludeDir["xxHash"] = "Daydream/Vendor/xxHash"
 
 	include "Daydream/Vendor/glfw"
 	include "Daydream/Vendor/glad"
@@ -77,6 +78,8 @@ project "Daydream"
  		"%{prj.name}/Vendor/imgui-node-editor/*.h",
  		"%{prj.name}/Vendor/imgui-node-editor/*.cpp",
  		"%{prj.name}/Vendor/imgui-node-editor/*.inl",
+		"%{prj.name}/Vendor/xxHash/*.h",
+        "%{prj.name}/Vendor/xxHash/*.c"
 	}
 	includedirs
 	{
@@ -97,6 +100,7 @@ project "Daydream"
 		"%{IncludeDir.stduuid}",
 		"%{IncludeDir.yaml}",
 		"%{IncludeDir.nfd}",
+		"%{IncludeDir.xxHash}",
 		"$(VULKAN_SDK)/Include",
 	}
 	libdirs 
@@ -129,6 +133,9 @@ project "Daydream"
 		flags {"NoPCH"}
 
 	filter "files:Daydream/Vendor/imgui-node-editor/*.cpp"
+		flags {"NoPCH"}
+
+	filter "files:Daydream/Vendor/xxHash/*.c"
 		flags {"NoPCH"}
 
 	filter "system:windows"

@@ -19,6 +19,5 @@ namespace Daydream
 
 		ViewProjectionData lightViewProjData;
 
-		Shared<ConstantBuffer> lightViewProjectionBuffer;
 	};
 }

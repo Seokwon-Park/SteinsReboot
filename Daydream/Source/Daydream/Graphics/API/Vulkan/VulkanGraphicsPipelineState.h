@@ -11,8 +11,6 @@ namespace Daydream
 		VulkanGraphicsPipelineState(VulkanRenderDevice* _device, const GraphicsPipelineStateDesc& _desc);
 		virtual ~VulkanGraphicsPipelineState() override;
 
-		virtual void Bind() const override;
-		//virtual Shared<Material> CreateMaterial() override;
 
 		//void CreateShaderStageInfo(const Shader>& _shader);
 		Array<vk::DescriptorSetLayout> GetLayout() const { return rawDescriptorSetLayouts; };

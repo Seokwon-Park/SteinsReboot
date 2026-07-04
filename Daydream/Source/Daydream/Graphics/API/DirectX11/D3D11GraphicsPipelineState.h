@@ -10,7 +10,6 @@ namespace Daydream
 	public:
 		D3D11GraphicsPipelineState(D3D11RenderDevice* _device, GraphicsPipelineStateDesc _desc);
 
-		virtual void Bind() const override;
 		void BindPipelineState() const;
 		//virtual Shared<Material> CreateMaterial() override;
 	private:

@@ -13,9 +13,6 @@ namespace Daydream
 		D3D12GraphicsPipelineState(D3D12RenderDevice* _device, GraphicsPipelineStateDesc _desc);
 		virtual ~D3D12GraphicsPipelineState();
 
-		virtual void Bind() const override {};
-		//virtual Shared<Material> CreateMaterial() override;
-
 		ID3D12RootSignature* GetID3D12RootSignature() const { return rootSignature.Get(); }
 		ID3D12PipelineState* GetID3D12PipelineState() const { return pipeline.Get(); }
 		UInt32 GetDescriptorTableIndex(String _resourceName) const;

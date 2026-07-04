@@ -1,60 +1,30 @@
 #include "DaydreamPCH.h"
-#include "ResourceManager.h"
+#include "RenderCacheManager.h"
 
-#include "Daydream/Graphics/Resources/ShaderGroup.h"
+#include "Daydream/Graphics/Resources/ShaderPipeline.h"
 #include "Daydream/Graphics/States/PipelineState/GraphicsPipelineState.h"
 #include "Daydream/Graphics/Resources/Shader.h"
 #include "Daydream/Graphics/Resources/Mesh.h"
 #include "Daydream/Graphics/Resources/Sampler.h"
 
-#include "ShaderRegistry.h"
-#include "ShaderGroupRegistry.h"
-#include "PipelineStateRegistry.h"
-#include "SamplerRegistry.h"
-
-
-
 namespace Daydream
 {
-	ResourceManager::ResourceManager()
+	RenderCacheManager::RenderCacheManager()
 	{
-
+		psoCache = MakeUnique<PipelineStateCache>();
+		samplerCache = MakeUnique<SamplerCache>();
 	}
 
-	void ResourceManager::Init()
+	void RenderCacheManager::Init()
 	{
 		if (instance)
 		{
 			return;
 		}
-		instance = new ResourceManager();
-
-		std::type_index typeIndex = typeid(ShaderGroup);
-		instance->registryList[typeIndex] = MakeUnique<ShaderGroupRegistry>();
-		typeIndex = typeid(Sampler);
-		instance->registryList[typeIndex] = MakeUnique<SamplerRegistry>();
-		typeIndex = typeid(GraphicsPipelineState);
-		instance->registryList[typeIndex] = MakeUnique<PipelineStateRegistry>();
-
-		typeIndex = typeid(ShaderGroup);
-		instance->registryList[typeIndex]->CreateBuiltinResources();
-		typeIndex = typeid(Sampler);
-		instance->registryList[typeIndex]->CreateBuiltinResources();
-		typeIndex = typeid(GraphicsPipelineState);
-		instance->registryList[typeIndex]->CreateBuiltinResources();
-		////instance->meshManager->CreateEssentialMeshes();
-		//instance->samplerManager->CreateEssentialSamplers();
-		//instance->textureManager->CreateEssentialTextures();
-		//instance->textureManager->LoadTexturesFromDirectory("Asset", true);
-		//instance->textureManager->LoadTexturesFromDirectory("Resource", true);
-		//instance->shaderManager->LoadShadersFromDirectory("Asset/Shader", true);
-		////instance->shaderGroupManager->Init();
-		//instance->renderPassManager->CreateEssentialRenderPasses();
-		//instance->pipelineStateManager->CreateEssentialPipelineStates();
-		//instance->modelManager->LoadModelsFromDirectory("Asset", true);
+		instance = new RenderCacheManager();
 	}
 
-	void ResourceManager::Shutdown()
+	void RenderCacheManager::Shutdown()
 	{
 		instance->registryList.clear();
 

@@ -33,14 +33,14 @@ namespace Daydream
 
 		RenderingInfo renderingInfo{};
 
-		pso = ResourceManager::GetResource<GraphicsPipelineState>("SpritePSO");
-		pso3d = ResourceManager::GetResource<GraphicsPipelineState>("ForwardPSO");
-		gBufferPSO = ResourceManager::GetResource<GraphicsPipelineState>("GBufferPSO");
-		skyboxPipeline = ResourceManager::GetResource<GraphicsPipelineState>("CubemapPSO");
-		equirectangleToCubePipeline = ResourceManager::GetResource<GraphicsPipelineState>("EquirectangularPSO");
-		deferredLightingPSO = ResourceManager::GetResource<GraphicsPipelineState>("DeferredPSO");
-		depthPSO = ResourceManager::GetResource<GraphicsPipelineState>("DepthPSO");
-		maskPSO = ResourceManager::GetResource<GraphicsPipelineState>("MaskPSO");
+		pso = RenderCacheManager::GetResource<GraphicsPipelineState>("SpritePSO");
+		pso3d = RenderCacheManager::GetResource<GraphicsPipelineState>("ForwardPSO");
+		gBufferPSO = RenderCacheManager::GetResource<GraphicsPipelineState>("GBufferPSO");
+		skyboxPipeline = RenderCacheManager::GetResource<GraphicsPipelineState>("CubemapPSO");
+		equirectangleToCubePipeline = RenderCacheManager::GetResource<GraphicsPipelineState>("EquirectangularPSO");
+		deferredLightingPSO = RenderCacheManager::GetResource<GraphicsPipelineState>("DeferredPSO");
+		depthPSO = RenderCacheManager::GetResource<GraphicsPipelineState>("DepthPSO");
+		maskPSO = RenderCacheManager::GetResource<GraphicsPipelineState>("MaskPSO");
 
 		///////////////////////////////////////////////////////
 		auto entity = activeScene->GetEntity(activeScene->CreateGameEntity());

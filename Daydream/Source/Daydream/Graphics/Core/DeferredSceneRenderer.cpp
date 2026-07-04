@@ -10,8 +10,6 @@ namespace Daydream
 {
 	DeferredSceneRenderer::DeferredSceneRenderer()
 	{
-		lightViewProjectionBuffer = ConstantBuffer::Create(sizeof(ViewProjectionData));
-
 		skyboxMesh = AssetManager::GetAsset<Mesh>(AssetDefaults::SkyboxSphereHandle);
 
 		Texture2DDesc desc;
@@ -58,6 +56,15 @@ namespace Daydream
 		//srvDesc.baseLayer = 0;
 		//srvDesc.layerCount = 1;
 		//shadowMap.shaderResourceView = TextureView::Create(shadowMap.texture, srvDesc);
+
+
+
+
+
+
+
+
+
 	}
 
 	DeferredSceneRenderer::~DeferredSceneRenderer()
@@ -68,8 +75,6 @@ namespace Daydream
 
 	void DeferredSceneRenderer::RenderScene(const SceneData& _sceneData)
 	{
-		Renderer::UpdateConstantBuffer(lightViewProjectionBuffer, &lightViewProjData);
-
 		UInt32 width = _sceneData.width;
 		UInt32 height = _sceneData.height;
 
@@ -83,9 +88,11 @@ namespace Daydream
 
 		PrepareLighting(scene, cameraData);
 
+		RenderGraphDrawList opaqueDrawList = CreateDrawListFromScene(_sceneData.scene, cameraData);
+
 		renderGraph->Reset();
 
-		RenderGraphDrawList opaqueDrawList = CreateDrawListFromScene(_sceneData.scene, cameraData);
+
 
 		RenderGraphResourceDesc resourceDesc{};
 
@@ -239,11 +246,13 @@ namespace Daydream
 		renderGraph->Write(skyboxPass, resultHandle, AttachmentLoadOp::Load);
 		renderGraph->WriteDepthStencil(skyboxPass, gbufferDepthHandle, AttachmentLoadOp::Load);
 
-		renderGraph->Compile();
-		renderGraph->Execute();
+
 
 		Renderer::TransitionTextureState(result.texture, ResourceState::ShaderResource);
 		Renderer::TransitionTextureState(shadowMap.texture, ResourceState::ShaderResource);
+
+		renderGraph->Compile();
+		renderGraph->Execute();
 	}
 
 }

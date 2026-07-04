@@ -15,7 +15,7 @@ namespace Daydream
 		// 입력 파라미터 정보를 저장할 벡터
 		Array<D3D11_INPUT_ELEMENT_DESC> inputLayoutDesc;
 
-		for (const auto& info : shaderGroup->GetInputLayoutData())
+		for (const auto& info : shaderPipeline->GetInputLayoutData())
 		{
 			D3D11_INPUT_ELEMENT_DESC elementDesc;
 			elementDesc.SemanticName = info.name.c_str();
@@ -29,13 +29,13 @@ namespace Daydream
 			inputLayoutDesc.push_back(elementDesc);
 		}
 
-		for (const auto& shader : shaderGroup->GetShaders())
+		for (const auto& shader : shaderPipeline->GetShaders())
 		{
 			switch (shader->GetType())
 			{
 			case ShaderType::Vertex:
 			{
-				D3D11VertexShader* vs = Cast<D3D11VertexShader*>(shaderGroup->GetShader(ShaderType::Vertex));
+				D3D11VertexShader* vs = Cast<D3D11VertexShader*>(shaderPipeline->GetShader(ShaderType::Vertex));
 				DAYDREAM_CORE_ASSERT(vs, "Vertex Shader is nullptr!");
 
 				// 입력 레이아웃 생성
@@ -53,7 +53,7 @@ namespace Daydream
 			}
 			case ShaderType::Pixel:
 			{
-				D3D11PixelShader* ps = Cast<D3D11PixelShader*>(shaderGroup->GetShader(ShaderType::Pixel));
+				D3D11PixelShader* ps = Cast<D3D11PixelShader*>(shaderPipeline->GetShader(ShaderType::Pixel));
 				pixelShader = ps->GetID3D11PixelShader();
 				break;
 			}
@@ -69,19 +69,15 @@ namespace Daydream
 		//geometryShader = (ID3D11GeometryShader*)shaderGroup->GetShader(ShaderType::Geometry)->GetNativeHandle();
 
 		//CW
-		D3D11_RASTERIZER_DESC rastDesc = GraphicsUtility::DirectX11::ConvertToD3D11RasterizerDesc(_desc.rasterizerState);
+		D3D11_RASTERIZER_DESC rastDesc = GraphicsUtility::DirectX11::ConvertToD3D11RasterizerDesc(shaderPipeline->GetRS());
 		_device->GetDevice()->CreateRasterizerState(&rastDesc, rasterizer.GetAddressOf());
 
-		D3D11_DEPTH_STENCIL_DESC dsDesc = GraphicsUtility::DirectX11::ConvertToD3D11DepthStencilDesc(_desc.depthStencilState);
+		D3D11_DEPTH_STENCIL_DESC dsDesc = GraphicsUtility::DirectX11::ConvertToD3D11DepthStencilDesc(shaderPipeline->GetDSS());
 		_device->GetDevice()->CreateDepthStencilState(&dsDesc, depthStencil.GetAddressOf());
 
 		//D3D11_BLEND_DESC blendDesc;
 	}
 
-	void D3D11GraphicsPipelineState::Bind() const
-	{
-
-	}
 	void D3D11GraphicsPipelineState::BindPipelineState() const 
 	{
 		device->GetContext()->VSSetShader(vertexShader, nullptr, 0);

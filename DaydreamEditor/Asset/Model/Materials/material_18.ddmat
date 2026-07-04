@@ -1,8 +1,4 @@
 Material:
-  PSO: GBufferPSO
+  ShaderPipeline: GBufferPipeline
   Textures:
-    mat_MetallicMap: 5c632221-cc80-4635-be0a-ae2d5048ca24
-    mat_AlbedoMap: 1a246864-aab7-4749-bf2c-a1ead207a058
-    mat_NormalMap: d2617a9f-c05e-4611-9ae6-e5c69b5f705c
-    mat_RoughnessMap: 5c632221-cc80-4635-be0a-ae2d5048ca24
-    mat_AOMap: 5c632221-cc80-4635-be0a-ae2d5048ca24
+    {}

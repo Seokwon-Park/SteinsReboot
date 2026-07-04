@@ -69,6 +69,14 @@ namespace Daydream
 		passes[_afterPass.id].passDependency.push_back(_beforePass.id);
 	}
 
+	void RenderGraph::AddConstantBuffer(ConstantBuffer* _buffer)
+	{
+	}
+
+	void RenderGraph::AddShaderResourceView(TextureView* _shaderResourceView)
+	{
+	}
+
 
 	void RenderGraph::Read(RenderGraphPassHandle _pass, RenderGraphResourceHandle _resource)
 	{

@@ -13,7 +13,7 @@ namespace Daydream
 
 		Array<D3D12_INPUT_ELEMENT_DESC> inputLayoutDesc;
 
-		for (const auto& info : shaderGroup->GetInputLayoutData())
+		for (const auto& info : shaderPipeline->GetInputLayoutData())
 		{
 			D3D12_INPUT_ELEMENT_DESC elementDesc;
 			elementDesc.SemanticName = info.name.c_str();
@@ -27,12 +27,12 @@ namespace Daydream
 			inputLayoutDesc.push_back(elementDesc);
 		}
 
-		UInt64 resourceSize = shaderGroup->GetShaderBindingMap().size();
+		UInt64 resourceSize = shaderPipeline->GetShaderBindingMap().size();
 		srvRanges.reserve(resourceSize);
 		samplerRanges.reserve(resourceSize);
 		
 		UInt32 index = 0;
-		for (auto [name, data] : shaderGroup->GetShaderBindingMap())
+		for (auto [name, data] : shaderPipeline->GetShaderBindingMap())
 		{
 			switch (data.shaderResourceType)
 			{
@@ -158,8 +158,8 @@ namespace Daydream
 		
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC pipelineStateDesc{};
 		pipelineStateDesc.pRootSignature = rootSignature.Get();
-		pipelineStateDesc.VS = Cast<D3D12Shader*>(shaderGroup->GetShader(ShaderType::Vertex))->GetShaderBytecode();
-		Shader* pixelShader = shaderGroup->GetShader(ShaderType::Pixel);
+		pipelineStateDesc.VS = Cast<D3D12Shader*>(shaderPipeline->GetShader(ShaderType::Vertex))->GetShaderBytecode();
+		Shader* pixelShader = shaderPipeline->GetShader(ShaderType::Pixel);
 		if (pixelShader)
 		{
 			// PS가 있으면 바이트코드 설정

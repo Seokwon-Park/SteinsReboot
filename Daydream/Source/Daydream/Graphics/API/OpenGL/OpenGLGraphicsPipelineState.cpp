@@ -15,7 +15,7 @@ namespace Daydream
 		//for (const BufferElement& element : layout)
 		UInt32 offset = 0;
 		UInt32 inputDataIndex = 0;
-		for(const auto& info : shaderGroup->GetInputLayoutData())
+		for(const auto& info : shaderPipeline->GetInputLayoutData())
 		{
 			glEnableVertexArrayAttrib(inputLayoutID, inputDataIndex);
 			glVertexArrayAttribFormat(inputLayoutID, inputDataIndex,
@@ -72,10 +72,7 @@ namespace Daydream
 	{
 
 	}
-	void OpenGLGraphicsPipelineState::Bind() const
-	{
 
-	}
 	void OpenGLGraphicsPipelineState::BindPipelineState() const
 	{
 		///////////////////////////////// Rasterizer State //////////////////////////////////////////////////

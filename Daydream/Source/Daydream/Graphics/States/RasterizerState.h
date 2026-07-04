@@ -15,5 +15,4 @@ namespace Daydream
 		float depthBiasClamp = 0.0f;
 		float slopeScaledDepthBias = 0.0f;
 	};
-
 }

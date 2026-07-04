@@ -17,5 +17,18 @@ namespace Daydream
         static const AssetHandle QuadMeshHandle;        
         static const AssetHandle BoxMeshHandle;   
         static const AssetHandle SkyboxSphereHandle;
+
+        static const AssetHandle DeferredPBRPipelineHandle;
+        static const AssetHandle GBufferPipelineHandle;
+        static const AssetHandle EnvironmentPipelineHandle;
+        static const AssetHandle EquirectangularPipelineHandle;
+        static const AssetHandle IrradiancePipelineHandle;
+        static const AssetHandle PrefilterPipelineHandle;
+        static const AssetHandle SpritePipelineHandle;
+        static const AssetHandle ResizePipelineHandle;
+        static const AssetHandle BRDFPipelineHandle;
+        static const AssetHandle DepthPipelineHandle;
+        static const AssetHandle MaskPipelineHandle;
+        static const AssetHandle ForwardPipelineHandle;
     };
 }

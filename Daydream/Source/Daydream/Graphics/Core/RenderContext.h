@@ -67,8 +67,6 @@ namespace Daydream
 		virtual void BindVertexBuffer(const GPUBuffer* _vertexBuffer, UInt32 _stride) {};
 		virtual void BindIndexBuffer(const GPUBuffer* _indexBuffer) {};
 
-		//virtual void SetTexture2D(const String& _name, Shared<Texture2D> _texture) ;
-		//virtual void SetTextureCube(const String& _name, Shared<TextureCube> _textureCube) {};
 		virtual void BindShaderResourceView(const String& _name, const TextureView* _textureView, const Sampler* _sampler) {};
 		virtual void BindConstantBuffer(const String& _name, const GPUBuffer* _buffer) {};
 

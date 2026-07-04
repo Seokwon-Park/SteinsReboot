@@ -5,7 +5,7 @@
 #include "Daydream/Graphics/Utility/ModelLoader.h"
 #include "Daydream/Graphics/Utility/ShaderCompileHelper.h"
 
-#include "Daydream/Graphics/Manager/ResourceManager.h"
+#include "Daydream/Graphics/Manager/RenderCacheManager.h"
 
 #include "Daydream/Graphics/States/PipelineState/GraphicsPipelineState.h"
 #include "Daydream/Graphics/Resources/Texture/Texture2D.h"
@@ -179,12 +179,12 @@ namespace Daydream
 				}
 				else
 				{
-					//TODO:error msg
+					DAYDREAM_ASSET_ERROR("File is Exist, Material is not loaded!");
 				}
 			}
 			else
 			{
-				Shared<Material> newMaterial = Material::Create(ResourceManager::GetResource<GraphicsPipelineState>("GBufferPSO"));
+				Shared<Material> newMaterial = Material::Create(AssetManager::GetAsset<ShaderPipeline>(AssetDefaults::GBufferPipelineHandle));
 				AssetHandle albedo = AssetManager::GetAssetHandleByPath(modelData->materials[i].albedoMapPath);
 				AssetHandle normal = AssetManager::GetAssetHandleByPath(modelData->materials[i].normalMapPath);
 				AssetHandle roughness = AssetManager::GetAssetHandleByPath(modelData->materials[i].roughnessMapPath);
@@ -238,7 +238,7 @@ namespace Daydream
 				out << YAML::BeginMap;
 				out << YAML::Key << "Material";
 				out << YAML::BeginMap;
-				out << YAML::Key << "PSO" << YAML::Value << "GBufferPSO";
+				out << YAML::Key << "ShaderPipeline" << YAML::Value << "GBufferPipeline";
 
 				//// 파라미터 저장
 				//out << YAML::Key << "Parameters";
@@ -354,12 +354,39 @@ namespace Daydream
 		YAML::Node metaNode = YAML::LoadFile(pathString);
 		if (!metaNode["Material"])
 		{
-			//Error is not material
+			//Error : is not material
 			return nullptr;
 		}
 		YAML::Node matNode = metaNode["Material"];
-		String PSO = matNode["PSO"].as<String>();
-		Shared<Material> newMaterial = Material::Create(ResourceManager::GetResource<GraphicsPipelineState>(PSO));
+		Shared<Material> newMaterial;
+		if (!matNode["ShaderPipeline"]) // when changed file form, this will rewrite new file
+		{
+			newMaterial = Material::Create(AssetManager::GetAsset<ShaderPipeline>(AssetDefaults::GBufferPipelineHandle));
+
+			YAML::Emitter out;
+			out << YAML::BeginMap;
+			out << YAML::Key << "Material";
+			out << YAML::BeginMap;
+			out << YAML::Key << "ShaderPipeline" << YAML::Value << "GBufferPipeline";
+
+			out << YAML::Key << "Textures";
+			out << YAML::BeginMap;
+			for (const auto& [name, textureBinding] : newMaterial->GetTextureBindings())
+			{
+				out << YAML::Key << name << YAML::Value << textureBinding.cache->GetAssetHandle().ToString();
+			}
+			out << YAML::EndMap;
+			out << YAML::EndMap;
+			out << YAML::EndMap;
+
+			std::ofstream fout(materialPath.ToString());
+			fout << out.c_str();
+			fout.close();
+		}
+		else
+		{
+			newMaterial = Material::Create(AssetManager::GetAssetByPath<ShaderPipeline>(matNode["ShaderPipeline"].as<String>()));
+		}
 		YAML::Node textureNode = matNode["Textures"];
 		if (textureNode)
 		{

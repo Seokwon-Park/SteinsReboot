@@ -4,7 +4,6 @@
 #include "D3D12Utility.h"
 #include "D3D12Texture.h"
 
-#include "Daydream/Graphics/Manager/ResourceManager.h"
 #include "Daydream/Graphics/Resources/Mesh.h"
 #include "D3D12GraphicsPipelineState.h"
 

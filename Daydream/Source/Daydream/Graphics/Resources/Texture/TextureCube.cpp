@@ -3,7 +3,6 @@
 
 #include "Daydream/Graphics/Core/Renderer.h"
 #include "Daydream/Graphics/Utility/ImageLoader.h"
-#include "Daydream/Graphics/Manager/ResourceManager.h"
 
 namespace Daydream
 {

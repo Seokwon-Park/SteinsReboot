@@ -114,7 +114,7 @@ namespace Daydream
 
 		void CreateBuiltinTexture2D();
 		void CreateBuiltinMesh();
-
+		void CreateBuiltinShaderPipeline();
 
 		void ProcessDirectory(const Path& _directoryPath, bool _isRecursive = true);
 		void ProcessFile(const Path& _filePath, AssetType _assetType);
@@ -133,6 +133,8 @@ namespace Daydream
 		HashMap<AssetHandle, Shared<Asset>> loadedAssetCache;
 
 		inline static AssetManager* instance = nullptr;
+
+		inline static Path defaultShaderPath = "Asset/Shader";
 
 		static const SortedMap<String, AssetType> assetExtensionMap;
 		static const SortedMap<String, AssetType> assetTypeMap;

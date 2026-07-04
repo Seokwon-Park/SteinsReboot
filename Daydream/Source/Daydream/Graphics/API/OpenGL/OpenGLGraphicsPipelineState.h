@@ -11,8 +11,6 @@ namespace Daydream
 		OpenGLGraphicsPipelineState(GraphicsPipelineStateDesc _desc);
 		virtual ~OpenGLGraphicsPipelineState();
 
-		virtual void Bind() const;
-
 		void BindPipelineState() const;
 
 		//virtual Shared<Material> CreateMaterial() override;

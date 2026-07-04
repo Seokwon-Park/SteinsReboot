@@ -39,7 +39,7 @@ namespace Daydream
 
 		UInt32 offset = 0;
 		Array<vk::VertexInputAttributeDescription> attribDescArray;
-		for (const auto& info : shaderGroup->GetInputLayoutData())
+		for (const auto& info : shaderPipeline->GetInputLayoutData())
 		{
 			vk::VertexInputAttributeDescription attribDesc{};
 			attribDesc.location = info.location;
@@ -53,7 +53,7 @@ namespace Daydream
 			attribDescArray.push_back(attribDesc);
 		}
 
-		for (Shader* shader : shaderGroup->GetShaders())
+		for (Shader* shader : shaderPipeline->GetShaders())
 		{
 			entryPoints[shader->GetType()] = GraphicsUtility::GetShaderEntryPointName(shader->GetType());
 
@@ -67,9 +67,9 @@ namespace Daydream
 			shaderStages.push_back(shaderStageInfo);
 		}
 
-		UInt32 setCount = shaderGroup->GetSetCount();
+		UInt32 setCount = shaderPipeline->GetSetCount();
 		Array<Array<vk::DescriptorSetLayoutBinding>> setBindings(setCount);
-		for (const auto& [name, data] : shaderGroup->GetShaderBindingMap())
+		for (const auto& [name, data] : shaderPipeline->GetShaderBindingMap())
 		{
 			vk::DescriptorSetLayoutBinding binding = {};
 			binding.binding = data.binding;
@@ -84,11 +84,11 @@ namespace Daydream
 
 		for (const auto& bindings : setBindings)
 		{
-			Array<vk::DescriptorBindingFlags> bindingFlags(bindings.size(), vk::DescriptorBindingFlagBits::eUpdateAfterBind);
+			//Array<vk::DescriptorBindingFlags> bindingFlags(bindings.size(), vk::DescriptorBindingFlagBits::eUpdateAfterBind);
 
-			vk::DescriptorSetLayoutBindingFlagsCreateInfo extendedInfo{};
-			extendedInfo.bindingCount = (UInt32)bindingFlags.size();
-			extendedInfo.pBindingFlags = bindingFlags.data();
+			//vk::DescriptorSetLayoutBindingFlagsCreateInfo extendedInfo{};
+			//extendedInfo.bindingCount = (UInt32)bindingFlags.size();
+			//extendedInfo.pBindingFlags = bindingFlags.data();
 
 			vk::DescriptorSetLayoutCreateInfo layoutCreateInfo{};
 			//layoutCreateInfo.pNext = &extendedInfo; // 확장 정보 연결!
@@ -230,10 +230,6 @@ namespace Daydream
 
 	VulkanGraphicsPipelineState::~VulkanGraphicsPipelineState()
 	{
-	}
-	void VulkanGraphicsPipelineState::Bind() const
-	{
-		//vkCmdBindDescriptorSets(device->GetCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, descriptorSets.data(), 0, nullptr);
 	}
 	//Shared<Material> VulkanPipelineState::CreateMaterial()
 	//{

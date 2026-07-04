@@ -3,52 +3,60 @@
 
 namespace Daydream
 {
-    namespace
-    {
-        void ImGuiEx_BeginColumn()
-        {
-            ImGui::BeginGroup();
-        }
+	namespace
+	{
+		void ImGuiEx_BeginColumn()
+		{
+			ImGui::BeginGroup();
+		}
 
-        void ImGuiEx_NextColumn()
-        {
-            ImGui::EndGroup();
-            ImGui::SameLine();
-            ImGui::BeginGroup();
-        }
+		void ImGuiEx_NextColumn()
+		{
+			ImGui::EndGroup();
+			ImGui::SameLine();
+			ImGui::BeginGroup();
+		}
 
-        void ImGuiEx_EndColumn()
-        {
-            ImGui::EndGroup();
-        }
-    }
+		void ImGuiEx_EndColumn()
+		{
+			ImGui::EndGroup();
+		}
+	}
 	RenderGraphPanel::RenderGraphPanel()
 	{
-        nodeEditor = MakeUnique<ImGuiNodeEditor>();
-        nodeEditor->Init();
-        //ImNode::NavigateToContent();
-
-        
+		nodeEditor = MakeUnique<ImGuiNodeEditor>();
+		nodeEditor->Init([&]()
+			{
+				if (ImGui::MenuItem("Add Pass Node")) {}
+				ImGui::MenuItem("Output Action");
+			});
 	}
 
 	RenderGraphPanel::~RenderGraphPanel()
 	{
 	}
+	void RenderGraphPanel::Setup(SceneRenderer* _sceneRenderer)
+	{
+		sceneRenderer = _sceneRenderer;
+		renderGraph = _sceneRenderer->GetRenderGraph();
+	}
 	void RenderGraphPanel::OnImGuiRender()
 	{
-        ImGuiWindowClass rgClass;
-        rgClass.ClassId = ImGui::GetID("RenderGraphFamily");
-        ImGui::Begin("Render Graph Editor");
-        ImGuiID dockspace_id = ImGui::GetID("RGDockSpace");
-        ImGui::DockSpace(dockspace_id, ImVec2(0, 0), ImGuiDockNodeFlags_None, &rgClass);
-        ImGui::End();
+		ImGuiWindowClass rgClass;
+		rgClass.ClassId = ImGui::GetID("RenderGraphFamily");
+		ImGui::Begin("Render Graph Editor");
+		ImGuiID dockspace_id = ImGui::GetID("RGDockSpace");
+		ImGui::DockSpace(dockspace_id, ImVec2(0, 0), ImGuiDockNodeFlags_None, &rgClass);
+		ImGui::End();
 
-        ImGui::SetNextWindowClass(&rgClass); 
-        ImGui::Begin("Pass List");
-        ImGui::End();
+		ImGui::SetNextWindowClass(&rgClass);
+		ImGui::Begin("Pass List");
 
-        ImGui::SetNextWindowClass(&rgClass); 
-        nodeEditor->OnImGuiRender();
+
+		ImGui::End();
+
+		ImGui::SetNextWindowClass(&rgClass);
+		nodeEditor->OnImGuiRender();
 	}
 }
 

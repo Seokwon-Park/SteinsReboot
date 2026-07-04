@@ -3,7 +3,7 @@
 
 #include "Daydream/Asset/AssetManager.h"
 #include "Daydream/Graphics/Core/Renderer.h"
-#include "Daydream/Graphics/Manager/ResourceManager.h"
+#include "Daydream/Graphics/Manager/RenderCacheManager.h"
 #include "Daydream/Graphics/Utility/MeshGenerator.h"
 #include "Daydream/Graphics/Resources/BuiltInResources.h"
 
@@ -48,20 +48,29 @@ namespace Daydream
 
 	void Skybox::CreateResources()
 	{
-		//equirectangularRenderPass = ResourceManager::GetResource<RenderPass>("RGBA16FRenderPass");
-		equirectangularPSO = ResourceManager::GetResource<GraphicsPipelineState>("EquirectangularPSO");
+		GraphicsPipelineStateDesc desc;
+		desc.InitWithShaderPipeline(AssetManager::GetAsset<ShaderPipeline>(AssetDefaults::EquirectangularPipelineHandle));
+		desc.renderTargetFormats = { RenderFormat::R16G16B16A16_FLOAT };
 
-		// Resize Capture setup
-		//resizeRenderPass = ResourceManager::GetResource<RenderPass>("RGBA16FRenderPass");
-		resizePSO = ResourceManager::GetResource<GraphicsPipelineState>("ResizePSO");
+		equirectangularPSO = RenderCacheManager::RequestPipelineState(desc);
 
-		//irradianceRenderPass = ResourceManager::GetResource<RenderPass>("RGBA16FRenderPass");
-		irradiancePSO = ResourceManager::GetResource<GraphicsPipelineState>("IrradiancePSO");
+		desc.InitWithShaderPipeline(AssetManager::GetAsset<ShaderPipeline>(AssetDefaults::ResizePipelineHandle));
+		desc.renderTargetFormats = { RenderFormat::R16G16B16A16_FLOAT };
+		resizePSO = RenderCacheManager::RequestPipelineState(desc);
 
-		prefilterPSO = ResourceManager::GetResource<GraphicsPipelineState>("PrefilterPSO");
+		desc.InitWithShaderPipeline(AssetManager::GetAsset<ShaderPipeline>(AssetDefaults::IrradiancePipelineHandle));
+		desc.renderTargetFormats = { RenderFormat::R16G16B16A16_FLOAT };
+		irradiancePSO = RenderCacheManager::RequestPipelineState(desc);
+
+		desc.InitWithShaderPipeline(AssetManager::GetAsset<ShaderPipeline>(AssetDefaults::PrefilterPipelineHandle));
+		desc.renderTargetFormats = { RenderFormat::R16G16B16A16_FLOAT };
+		prefilterPSO = RenderCacheManager::RequestPipelineState(desc);
+
 		equirectangularDropTarget = AssetManager::GetAssetByPath<Texture2D>("Resource/NoTexture.png");
 
-		brdfPSO = ResourceManager::GetResource<GraphicsPipelineState>("BRDFPSO");
+		desc.InitWithShaderPipeline(AssetManager::GetAsset<ShaderPipeline>(AssetDefaults::BRDFPipelineHandle));
+		desc.renderTargetFormats = { RenderFormat::R16G16B16A16_FLOAT };
+		brdfPSO = RenderCacheManager::RequestPipelineState(desc);
 
 		quadMesh = AssetManager::GetAsset<Mesh>(AssetDefaults::QuadMeshHandle);
 		boxMesh = AssetManager::GetAsset<Mesh>(AssetDefaults::BoxMeshHandle);

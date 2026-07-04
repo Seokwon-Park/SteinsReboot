@@ -98,8 +98,10 @@ namespace Daydream
 		ImGuiNodeEditor();
 		~ImGuiNodeEditor();
 
-		void Init();
+		void Init(FunctionPtr<void()> _contextCallback);
 		void OnImGuiRender();
+
+		void AddNode(int _id, const char* _name, ImColor _color = ImColor(255, 255, 255));
 	protected:
 
 	private:
@@ -108,8 +110,8 @@ namespace Daydream
 		Node* FindNode(ImNode::NodeId _id)
 		{
 			for (auto& node : nodes)
-				if (node.id == _id)
-					return &node;
+				if (node->id == _id)
+					return node.get();
 
 			return nullptr;
 		}
@@ -130,11 +132,11 @@ namespace Daydream
 
 			for (auto& node : nodes)
 			{
-				for (auto& pin : node.inputs)
+				for (auto& pin : node->inputs)
 					if (pin.id == _id)
 						return &pin;
 
-				for (auto& pin : node.outputs)
+				for (auto& pin : node->outputs)
 					if (pin.id == _id)
 						return &pin;
 			}
@@ -206,6 +208,7 @@ namespace Daydream
 
 		void DrawPinIcon(const Pin& _pin, bool _connected, int _alpha);
 
+		FunctionPtr<void()> contextMenuCallback;
 
 		bool styleEditorEnable = true; 
 
@@ -213,7 +216,7 @@ namespace Daydream
 
 		int nextId = 1;
 		const int pinIconSize = 24;
-		Array<Node> nodes;
+		Array<Unique<Node>> nodes;
 		Array<Link> links;
 		Texture2D* headerBackground = nullptr;
 		ImTextureRef saveIcon = nullptr;

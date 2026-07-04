@@ -5,7 +5,7 @@
 
 #include "Daydream/Scene/GameEntity/GameEntity.h"
 #include "Daydream/Graphics/Core/Renderer.h"
-#include "Daydream/Graphics/Manager/ResourceManager.h"
+#include "Daydream/Graphics/Manager/RenderCacheManager.h"
 #include "Daydream/Graphics/Resources/Skybox.h"
 
 namespace Daydream
@@ -15,7 +15,6 @@ namespace Daydream
 		materialCB = ConstantBuffer::Create(sizeof(MaterialConstantBufferData));
 		entityHandle = ConstantBuffer::Create(16);
 
-		maskMaterial = Material::Create(ResourceManager::GetResource<GraphicsPipelineState>("MaskPSO"));
 	}
 
 	ModelRendererComponent::~ModelRendererComponent()

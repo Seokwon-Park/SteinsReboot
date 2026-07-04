@@ -43,7 +43,7 @@
 
 #include "Daydream/Graphics/Resources/Buffer.h"
 #include "Daydream/Graphics/Resources/Shader.h"
-#include "Daydream/Graphics/Resources/ShaderGroup.h"
+#include "Daydream/Graphics/Resources/ShaderPipeline.h"
 #include "Daydream/Graphics/Resources/Framebuffer.h"
 #include "Daydream/Graphics/Resources/Sampler.h"
 #include "Daydream/Graphics/Resources/Material.h"
@@ -56,7 +56,7 @@
 #include "Daydream/Graphics/Resources/Texture/TextureView.h"
 #include "Daydream/Graphics/Resources/Struct/RenderDataStruct.h"
 
-#include "Daydream/Graphics/Manager/ResourceManager.h"
+#include "Daydream/Graphics/Manager/RenderCacheManager.h"
 
 #include "Daydream/Graphics/Utility/MeshGenerator.h"
 // -----------------------------------------------

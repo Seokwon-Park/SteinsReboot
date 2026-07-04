@@ -247,6 +247,10 @@ namespace Daydream
 
 
 
+	void Renderer::BindShaderResourceView(const String& _name, const Texture* _texture)
+	{
+	}
+
 	//void Renderer::SetTexture2D(const String& _name, const Texture2D> _texture)
 	//{
 	//	EnqueueCommand([_name, _texture]()

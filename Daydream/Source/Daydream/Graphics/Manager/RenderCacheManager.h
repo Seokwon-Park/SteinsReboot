@@ -1,18 +1,22 @@
 #pragma once
 
 #include "ResourceRegistry.h"
+#include "PipelineCache.h"
+#include "SamplerCache.h"
 
 namespace Daydream
 {
-	class ResourceManager
+	class RenderCacheManager
 	{
 	public:
-		~ResourceManager() = default;
+		~RenderCacheManager() = default;
 
-		static ResourceManager& GetInstance()
+		static RenderCacheManager& GetInstance()
 		{
 			return *instance;
 		}
+
+		inline static GraphicsPipelineState* RequestPipelineState(const GraphicsPipelineStateDesc& _desc) { return instance->psoCache->RequestPipelineState(_desc); };
 
 		template<typename ResourceType>
 		static ResourceType* GetResource(const String& _name)
@@ -43,11 +47,14 @@ namespace Daydream
 		static void Init();
 		static void Shutdown();
 	protected:
-		ResourceManager();
+		RenderCacheManager();
 
 	private:
 		HashMap<std::type_index, Unique<IResourceRegistry>> registryList;
 
-		inline static ResourceManager* instance = nullptr;
+		Unique<PipelineStateCache> psoCache;
+		Unique<SamplerCache> samplerCache;
+
+		inline static RenderCacheManager* instance = nullptr;
 	};
 }

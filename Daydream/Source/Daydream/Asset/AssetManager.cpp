@@ -54,6 +54,8 @@ namespace Daydream
 		// 씬
 		{".ddscene", AssetType::Scene}, // 예시
 
+		{".ddps", AssetType::ShaderPipeline},
+
 		// 셰이더
 		{".hlsl", AssetType::Shader},
 
@@ -75,6 +77,7 @@ namespace Daydream
 		{"Texture2D", AssetType::Texture2D},
 		{"Model", AssetType::Model},
 		{"Shader", AssetType::Shader},
+		{"ShaderPipeline", AssetType::ShaderPipeline},
 		{"Mesh", AssetType::Mesh},
 		{"Material", AssetType::Material},
 	};
@@ -142,11 +145,6 @@ namespace Daydream
 		{
 			DAYDREAM_CORE_WARN("[AssetManager] AssetManager is already initialized!");
 		}
-
-		if (instance)
-		{
-			instance->CreateBuiltinAssets();
-		}
 	}
 
 	void AssetManager::Shutdown()
@@ -195,6 +193,7 @@ namespace Daydream
 	{
 		instance->CreateBuiltinTexture2D();
 		instance->CreateBuiltinMesh();
+		instance->CreateBuiltinShaderPipeline();
 
 		AssetMetadata metadata;
 		metadata.handle = AssetDefaults::MaterialHandle;
@@ -421,6 +420,138 @@ namespace Daydream
 		loadedAssetCache[AssetDefaults::SkyboxSphereHandle] = Mesh::Create(vertexBuffer, indexBuffer);
 	}
 
+	void AssetManager::CreateBuiltinShaderPipeline()
+	{
+		RasterizerStateDesc defaultRastDesc = {};
+
+		RasterizerStateDesc cubemapRastDesc = {};
+		cubemapRastDesc.cullMode = CullMode::Front;
+
+		RasterizerStateDesc shadowRastDesc = {};
+		shadowRastDesc.cullMode = CullMode::Front;
+		shadowRastDesc.fillMode = FillMode::Solid;
+		shadowRastDesc.depthBias = 1000;
+		shadowRastDesc.slopeScaledDepthBias = 1.0f;
+		shadowRastDesc.depthClipEnable = true;
+
+		DepthStencilStateDesc defaultDssDesc{};
+
+		// 2D / 포스트 프로세스용 (깊이 비활성화)
+		DepthStencilStateDesc depthDisableDesc{};
+		depthDisableDesc.depthEnable = false;
+		depthDisableDesc.depthWriteEnable = false;
+
+		// 스카이박스 전용
+		DepthStencilStateDesc skyboxDssDesc{};
+		skyboxDssDesc.depthEnable = true;
+		skyboxDssDesc.depthWriteEnable = false;
+		skyboxDssDesc.depthFunc = CompareFunction::LessEqual;
+
+		ShaderPipelineDesc desc{};
+		auto ResetDesc = [&]() {
+			desc = ShaderPipelineDesc();            // 구조체 완전 초기화
+			desc.rasterizerState = defaultRastDesc; // 기본값 채우기
+			desc.depthStencilState = defaultDssDesc;// 기본값 채우기
+			};
+
+
+		// [1] Forward 
+		ResetDesc();
+		desc.vertexShader = GetAssetByPath<Shader>(defaultShaderPath / "ModelVS.hlsl");
+		desc.pixelShader = GetAssetByPath<Shader>(defaultShaderPath / "PBRModelPS.hlsl");
+		assetPathMap["ForwardPipeline"] = AssetDefaults::ForwardPipelineHandle;
+		loadedAssetCache[AssetDefaults::ForwardPipelineHandle] = ShaderPipeline::Create(desc);
+
+		// [2] G-Buffer
+		ResetDesc();
+		desc.vertexShader = GetAssetByPath<Shader>(defaultShaderPath / "GBufferVS.hlsl");
+		desc.pixelShader = GetAssetByPath<Shader>(defaultShaderPath / "GBufferPS.hlsl");
+		assetPathMap["GBufferPipeline"] = AssetDefaults::GBufferPipelineHandle; 
+		loadedAssetCache[AssetDefaults::GBufferPipelineHandle] = ShaderPipeline::Create(desc);
+
+		// [3] Mask
+		ResetDesc();
+		desc.vertexShader = GetAssetByPath<Shader>(defaultShaderPath / "MaskVS.hlsl");
+		desc.pixelShader = GetAssetByPath<Shader>(defaultShaderPath / "MaskPS.hlsl");
+		assetPathMap["MaskPipeline"] = AssetDefaults::MaskPipelineHandle;
+		loadedAssetCache[AssetDefaults::MaskPipelineHandle] = ShaderPipeline::Create(desc);
+
+		// [4] Sprite
+		ResetDesc();
+		desc.vertexShader = GetAssetByPath<Shader>(defaultShaderPath / "SpriteVS.hlsl");
+		desc.pixelShader = GetAssetByPath<Shader>(defaultShaderPath / "SpritePS.hlsl");
+		desc.depthStencilState = depthDisableDesc;
+		assetPathMap["SpritePipeline"] = AssetDefaults::SpritePipelineHandle;
+		loadedAssetCache[AssetDefaults::SpritePipelineHandle] = ShaderPipeline::Create(desc);
+
+		// [5] Resize
+		ResetDesc();
+		desc.vertexShader = GetAssetByPath<Shader>(defaultShaderPath / "ResizeVS.hlsl");
+		desc.pixelShader = GetAssetByPath<Shader>(defaultShaderPath / "ResizePS.hlsl");
+		desc.depthStencilState = depthDisableDesc;
+		assetPathMap["ResizePipeline"] = AssetDefaults::ResizePipelineHandle;
+		loadedAssetCache[AssetDefaults::ResizePipelineHandle] = ShaderPipeline::Create(desc);
+
+		// [6] BRDF
+		ResetDesc();
+		desc.vertexShader = GetAssetByPath<Shader>(defaultShaderPath / "BRDFVS.hlsl");
+		desc.pixelShader = GetAssetByPath<Shader>(defaultShaderPath / "BRDFPS.hlsl");
+		desc.depthStencilState = depthDisableDesc;
+		assetPathMap["BRDFPipeline"] = AssetDefaults::BRDFPipelineHandle;
+		loadedAssetCache[AssetDefaults::BRDFPipelineHandle] = ShaderPipeline::Create(desc);
+
+		// [7] Deferred Lighting 
+		ResetDesc();
+		desc.vertexShader = GetAssetByPath<Shader>(defaultShaderPath / "DeferredLightingVS.hlsl");
+		desc.pixelShader = GetAssetByPath<Shader>(defaultShaderPath / "DeferredLightingPS.hlsl");
+		desc.depthStencilState = depthDisableDesc;
+		assetPathMap["DeferredPBRPipeline"] = AssetDefaults::DeferredPBRPipelineHandle;
+		loadedAssetCache[AssetDefaults::DeferredPBRPipelineHandle] = ShaderPipeline::Create(desc);
+
+		// [8] Cubemap / Environment
+		ResetDesc();
+		desc.vertexShader = GetAssetByPath<Shader>(defaultShaderPath / "CubemapVS.hlsl");
+		desc.pixelShader = GetAssetByPath<Shader>(defaultShaderPath / "CubemapPS.hlsl");
+		desc.rasterizerState = cubemapRastDesc;
+		desc.depthStencilState = skyboxDssDesc;
+		assetPathMap["EnvironmentPipeline"] = AssetDefaults::EnvironmentPipelineHandle;
+		loadedAssetCache[AssetDefaults::EnvironmentPipelineHandle] = ShaderPipeline::Create(desc);
+
+		// [9] Equirectangular
+		ResetDesc();
+		desc.vertexShader = GetAssetByPath<Shader>(defaultShaderPath / "CubemapVS.hlsl");
+		desc.pixelShader = GetAssetByPath<Shader>(defaultShaderPath / "EquirectangularPS.hlsl");
+		desc.rasterizerState = cubemapRastDesc;
+		desc.depthStencilState = depthDisableDesc;
+		assetPathMap["EquirectangularPipeline"] = AssetDefaults::EquirectangularPipelineHandle;
+		loadedAssetCache[AssetDefaults::EquirectangularPipelineHandle] = ShaderPipeline::Create(desc);
+
+		// [10] Irradiance
+		ResetDesc();
+		desc.vertexShader = GetAssetByPath<Shader>(defaultShaderPath / "CubemapVS.hlsl");
+		desc.pixelShader = GetAssetByPath<Shader>(defaultShaderPath / "IrradiancePS.hlsl");
+		desc.rasterizerState = cubemapRastDesc;
+		desc.depthStencilState = depthDisableDesc;
+		assetPathMap["IrradiancePipeline"] = AssetDefaults::IrradiancePipelineHandle;
+		loadedAssetCache[AssetDefaults::IrradiancePipelineHandle] = ShaderPipeline::Create(desc);
+
+		// [11] Prefilter
+		ResetDesc();
+		desc.vertexShader = GetAssetByPath<Shader>(defaultShaderPath / "CubemapVS.hlsl");
+		desc.pixelShader = GetAssetByPath<Shader>(defaultShaderPath / "PrefilterPS.hlsl");
+		desc.rasterizerState = cubemapRastDesc;
+		desc.depthStencilState = depthDisableDesc;
+		assetPathMap["PrefilterPipeline"] = AssetDefaults::PrefilterPipelineHandle;
+		loadedAssetCache[AssetDefaults::PrefilterPipelineHandle] = ShaderPipeline::Create(desc);
+
+		// [12] Depth (Shadow 전용 - Pixel Shader가 없음에 유의)
+		ResetDesc();
+		desc.vertexShader = GetAssetByPath<Shader>(defaultShaderPath / "DepthVS.hlsl");
+		desc.rasterizerState = shadowRastDesc;
+		assetPathMap["DepthPipeline"] = AssetDefaults::DepthPipelineHandle;
+		loadedAssetCache[AssetDefaults::DepthPipelineHandle] = ShaderPipeline::Create(desc);
+	}
+
 	void AssetManager::ProcessDirectory(const Path& _directoryPath, bool _isRecursive)
 	{
 		Array<Path> dirEntries = FileSystem::GetDirectoryEntries(_directoryPath);
@@ -505,7 +636,7 @@ namespace Daydream
 		out << YAML::Key << "Type" << YAML::Value << AssetTypeToString(_metadata.type);
 		out << YAML::Key << "Name" << YAML::Value << _metadata.name;
 		out << YAML::EndMap;
-		
+
 		std::ofstream fout(metafilePath.ToString());
 		fout << out.c_str();
 		fout.close();

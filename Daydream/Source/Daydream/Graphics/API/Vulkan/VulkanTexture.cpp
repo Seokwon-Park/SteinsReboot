@@ -3,8 +3,6 @@
 
 #include "VulkanUtility.h"
 #include "Daydream/Graphics/Utility/ImageLoader.h"
-#include "Daydream/Graphics/Manager/ResourceManager.h"
-#include "backends/imgui_impl_vulkan.h"
 
 namespace Daydream
 {

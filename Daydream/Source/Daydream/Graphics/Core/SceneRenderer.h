@@ -46,6 +46,8 @@ namespace Daydream
 
         Texture2D* GetShadowMap() const { return shadowMap.texture.get(); };
         TextureView* GetShadowMapView() const { return shadowMap.texture->GetDefaultSRV(); };
+
+        inline RenderGraph* GetRenderGraph() const { return renderGraph.get(); }
     protected:
         RenderGraphDrawList CreateDrawListFromScene(Scene* _scene, const CameraData& _cameraData);
         void PrepareLighting(Scene* _scene, const CameraData& _cameraData);
@@ -62,5 +64,7 @@ namespace Daydream
         ViewProjectionData lightViewProj;
         ViewProjectionData cameraViewProj;
         Shared<RenderGraph> renderGraph;
+
+        
     };
 }

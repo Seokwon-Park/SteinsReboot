@@ -16,7 +16,7 @@ namespace Daydream
 		D3D12_SHADER_BYTECODE GetShaderBytecode() const { return shaderBytecode; }
 	private:
 		D3D12RenderDevice* device;
-		D3D12_SHADER_BYTECODE shaderBytecode;
+		D3D12_SHADER_BYTECODE shaderBytecode{};
 		Array<UInt8> bytecode;
 	};
 }

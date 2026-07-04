@@ -1,7 +1,6 @@
 #include "DaydreamPCH.h"
 #include "VulkanTextureView.h"
 #include "VulkanUtility.h"
-#include "Daydream/Graphics/Manager/SamplerRegistry.h"
 
 
 namespace Daydream

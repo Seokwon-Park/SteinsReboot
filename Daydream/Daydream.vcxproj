@@ -62,7 +62,7 @@
       <PrecompiledHeaderFile>DaydreamPCH.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>YAML_CPP_STATIC_DEFINE;GLM_FORCE_LEFT_HANDED;GLM_FORCE_DEPTH_ZERO_TO_ONE;DAYDREAM_PLATFORM_WINDOWS;GLFW_INCLUDE_NONE;DAYDREAM_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>Source;Vendor\spdlog\include;Vendor\glfw\include;Vendor\glad\include;Vendor\imgui;Vendor\glm;Vendor\DaydreamMath;Vendor\stb;Vendor\assimp\include;Vendor\dxcompiler\include;Vendor\VulkanMemoryAllocator;Vendor\D3D12MemoryAllocator;Vendor\ImGuizmo;Vendor\imgui-node-editor;Vendor\stduuid\include;Vendor\yaml-cpp\include;Vendor\nfd-extended\src\include;$(VULKAN_SDK)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Source;Vendor\spdlog\include;Vendor\glfw\include;Vendor\glad\include;Vendor\imgui;Vendor\glm;Vendor\DaydreamMath;Vendor\stb;Vendor\assimp\include;Vendor\dxcompiler\include;Vendor\VulkanMemoryAllocator;Vendor\D3D12MemoryAllocator;Vendor\ImGuizmo;Vendor\imgui-node-editor;Vendor\stduuid\include;Vendor\yaml-cpp\include;Vendor\nfd-extended\src\include;Vendor\xxHash;$(VULKAN_SDK)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <MinimalRebuild>false</MinimalRebuild>
@@ -86,7 +86,7 @@
       <PrecompiledHeaderFile>DaydreamPCH.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>YAML_CPP_STATIC_DEFINE;GLM_FORCE_LEFT_HANDED;GLM_FORCE_DEPTH_ZERO_TO_ONE;DAYDREAM_PLATFORM_WINDOWS;GLFW_INCLUDE_NONE;DAYDREAM_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>Source;Vendor\spdlog\include;Vendor\glfw\include;Vendor\glad\include;Vendor\imgui;Vendor\glm;Vendor\DaydreamMath;Vendor\stb;Vendor\assimp\include;Vendor\dxcompiler\include;Vendor\VulkanMemoryAllocator;Vendor\D3D12MemoryAllocator;Vendor\ImGuizmo;Vendor\imgui-node-editor;Vendor\stduuid\include;Vendor\yaml-cpp\include;Vendor\nfd-extended\src\include;$(VULKAN_SDK)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Source;Vendor\spdlog\include;Vendor\glfw\include;Vendor\glad\include;Vendor\imgui;Vendor\glm;Vendor\DaydreamMath;Vendor\stb;Vendor\assimp\include;Vendor\dxcompiler\include;Vendor\VulkanMemoryAllocator;Vendor\D3D12MemoryAllocator;Vendor\ImGuizmo;Vendor\imgui-node-editor;Vendor\stduuid\include;Vendor\yaml-cpp\include;Vendor\nfd-extended\src\include;Vendor\xxHash;$(VULKAN_SDK)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <MinimalRebuild>false</MinimalRebuild>
@@ -226,12 +226,10 @@
     <ClInclude Include="Source\Daydream\Graphics\Core\RenderingInfo.h" />
     <ClInclude Include="Source\Daydream\Graphics\Core\SceneRenderer.h" />
     <ClInclude Include="Source\Daydream\Graphics\Core\Swapchain.h" />
-    <ClInclude Include="Source\Daydream\Graphics\Manager\PipelineStateRegistry.h" />
-    <ClInclude Include="Source\Daydream\Graphics\Manager\ResourceManager.h" />
+    <ClInclude Include="Source\Daydream\Graphics\Manager\PipelineCache.h" />
+    <ClInclude Include="Source\Daydream\Graphics\Manager\RenderCacheManager.h" />
     <ClInclude Include="Source\Daydream\Graphics\Manager\ResourceRegistry.h" />
-    <ClInclude Include="Source\Daydream\Graphics\Manager\SamplerRegistry.h" />
-    <ClInclude Include="Source\Daydream\Graphics\Manager\ShaderGroupRegistry.h" />
-    <ClInclude Include="Source\Daydream\Graphics\Manager\ShaderRegistry.h" />
+    <ClInclude Include="Source\Daydream\Graphics\Manager\SamplerCache.h" />
     <ClInclude Include="Source\Daydream\Graphics\Pools\BufferPool\BufferPoolHandle.h" />
     <ClInclude Include="Source\Daydream\Graphics\Pools\BufferPool\ConstantBufferPool.h" />
     <ClInclude Include="Source\Daydream\Graphics\Pools\BufferPool\UploadBufferPool.h" />
@@ -249,7 +247,7 @@
     <ClInclude Include="Source\Daydream\Graphics\Resources\Model.h" />
     <ClInclude Include="Source\Daydream\Graphics\Resources\Sampler.h" />
     <ClInclude Include="Source\Daydream\Graphics\Resources\Shader.h" />
-    <ClInclude Include="Source\Daydream\Graphics\Resources\ShaderGroup.h" />
+    <ClInclude Include="Source\Daydream\Graphics\Resources\ShaderPipeline.h" />
     <ClInclude Include="Source\Daydream\Graphics\Resources\SkeletalModel.h" />
     <ClInclude Include="Source\Daydream\Graphics\Resources\Skybox.h" />
     <ClInclude Include="Source\Daydream\Graphics\Resources\Sprite.h" />
@@ -739,6 +737,7 @@
     <ClInclude Include="Vendor\imgui-node-editor\imgui_node_editor_internal.h" />
     <ClInclude Include="Vendor\imgui-node-editor\imgui_node_editor_internal.inl" />
     <ClInclude Include="Vendor\stb\stb_image.h" />
+    <ClInclude Include="Vendor\xxHash\xxhash.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Base\IO\File.cpp" />
@@ -839,12 +838,10 @@
     <ClCompile Include="Source\Daydream\Graphics\Core\RenderingInfo.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Core\SceneRenderer.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Core\Swapchain.cpp" />
-    <ClCompile Include="Source\Daydream\Graphics\Manager\PipelineStateRegistry.cpp" />
-    <ClCompile Include="Source\Daydream\Graphics\Manager\ResourceManager.cpp" />
+    <ClCompile Include="Source\Daydream\Graphics\Manager\PipelineCache.cpp" />
+    <ClCompile Include="Source\Daydream\Graphics\Manager\RenderCacheManager.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Manager\ResourceRegistry.cpp" />
-    <ClCompile Include="Source\Daydream\Graphics\Manager\SamplerRegistry.cpp" />
-    <ClCompile Include="Source\Daydream\Graphics\Manager\ShaderGroupRegistry.cpp" />
-    <ClCompile Include="Source\Daydream\Graphics\Manager\ShaderRegistry.cpp" />
+    <ClCompile Include="Source\Daydream\Graphics\Manager\SamplerCache.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Pools\BufferPool\BufferPoolHandle.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Pools\BufferPool\ConstantBufferPool.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Pools\BufferPool\UploadBufferPool.cpp" />
@@ -860,7 +857,7 @@
     <ClCompile Include="Source\Daydream\Graphics\Resources\Model.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Resources\Sampler.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Resources\Shader.cpp" />
-    <ClCompile Include="Source\Daydream\Graphics\Resources\ShaderGroup.cpp" />
+    <ClCompile Include="Source\Daydream\Graphics\Resources\ShaderPipeline.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Resources\Skybox.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Resources\Struct\TransformData.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Resources\Struct\ViewProjectionData.cpp" />
@@ -914,6 +911,9 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Vendor\stb\stb_image.cpp" />
+    <ClCompile Include="Vendor\xxHash\xxhash.c">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Vendor\glfw\GLFW.vcxproj">

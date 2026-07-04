@@ -10,7 +10,7 @@ namespace Daydream
 	GraphicsPipelineState::GraphicsPipelineState(const GraphicsPipelineStateDesc& _desc)
 	{
 		desc = _desc;
-		shaderGroup = _desc.shaderGroup;
+		shaderPipeline = _desc.shaderPipeline;
 	}
 
 	Shared<GraphicsPipelineState> GraphicsPipelineState::Create(const GraphicsPipelineStateDesc& _desc)

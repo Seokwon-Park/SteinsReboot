@@ -62,6 +62,39 @@ namespace Daydream
 		AttachmentStoreOp storeOp = AttachmentStoreOp::Store;
 	};
 
+	struct ResourceNode
+	{
+		String name;
+		RenderFormat format;
+		UInt32 width;
+		UInt32 height;
+
+		UInt32 firstPass;
+		UInt32 lastPass;
+
+		Texture2DAllocation allocation;
+
+		Bool isExternal = false;
+	};
+
+	struct PassNode
+	{
+		String name;
+
+		const GraphicsPipelineState* pipelineState;
+		RenderGraphDrawList drawList;
+		PassDrawType drawType;
+
+		// There's nothing to read from the previous pass, but if the order matters
+		Array<UInt32> passDependency;
+		Array<UInt32> reads;
+		Array<RenderGraphWriteBinding> colorWrites;
+		RenderGraphWriteBinding depthStencilWrite{};
+
+		Array<ExternalConstantBufferData> constantBufferData;
+		Array<ExternalShaderResourceView> shaderResourceViews;
+	};
+
 	class RenderGraph
 	{
 	public:
@@ -72,6 +105,12 @@ namespace Daydream
 		RenderGraphPassHandle AddPass(const String& _name, const RenderGraphPassDesc& _desc);
 		void AddPassDependency(RenderGraphPassHandle _beforePass, RenderGraphPassHandle _afterPass);
 
+		void AddConstantBuffer(ConstantBuffer* _buffer);
+		void AddShaderResourceView(TextureView* _shaderResourceView);
+
+		const Array<ResourceNode> GetResourceNodes() const { return resources; }
+		const Array<PassNode> GetPassNodes() const { return passes; };
+
 		void Read(RenderGraphPassHandle _pass, RenderGraphResourceHandle _resource);
 		void Write(RenderGraphPassHandle _pass, RenderGraphResourceHandle _resource, AttachmentLoadOp _loadOp = AttachmentLoadOp::Clear, AttachmentStoreOp _storeOp = AttachmentStoreOp::Store);
 		void WriteDepthStencil(RenderGraphPassHandle _pass, RenderGraphResourceHandle _resource, AttachmentLoadOp _loadOp = AttachmentLoadOp::Clear, AttachmentStoreOp _storeOp = AttachmentStoreOp::Store);
@@ -81,45 +120,13 @@ namespace Daydream
 		void Reset();
 
 	private:
-		struct ResourceNode
-		{
-			String name;
-			RenderFormat format;
-			UInt32 width;
-			UInt32 height;
-
-			UInt32 firstPass;
-			UInt32 lastPass;
-
-			Texture2DAllocation allocation;
-
-			Bool isExternal = false;
-		};
-
-		struct PassNode
-		{
-			String name;
-
-			const GraphicsPipelineState* pipelineState;
-			RenderGraphDrawList drawList;
-			PassDrawType drawType;
-
-			// There's nothing to read from the previous pass, but if the order matters
-			Array<UInt32> passDependency;
-			Array<UInt32> reads;
-			Array<RenderGraphWriteBinding> colorWrites;
-			RenderGraphWriteBinding depthStencilWrite{};
-
-			Array<ExternalConstantBufferData> constantBufferData;
-			Array<ExternalShaderResourceView> shaderResourceViews;
-		};
-
 		void BuildDependencyGraph(Array<Array<UInt32>>& _edges, Array<UInt32>& _inDegree) const;
 
 		Array<ResourceNode> resources;
 		Array<PassNode> passes;
 		Array<UInt32> executionOrder;
-
+		HashMap<String, ConstantBuffer*> buffers;
+		HashMap<String, TextureView*> views;
 		Mesh* quadMesh;
 	};
 }

@@ -4,6 +4,8 @@
 #include "Daydream/Graphics/Resources/Texture/Texture.h"
 #include "Daydream/Graphics/Resources/Model.h"
 #include "Daydream/Graphics/Resources/Shader.h"
+#include "Daydream/Graphics/Resources/ShaderPipeline.h"
+
 
 namespace Daydream
 {

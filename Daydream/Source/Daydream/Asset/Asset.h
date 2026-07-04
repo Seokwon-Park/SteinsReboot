@@ -13,6 +13,7 @@ namespace Daydream
 		Texture2D,
 		TextureCube,
 		Shader,
+		ShaderPipeline,
 		Scene,
 		Model,
 		Mesh,

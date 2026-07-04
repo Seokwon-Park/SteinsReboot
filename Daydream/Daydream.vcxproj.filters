@@ -169,6 +169,9 @@
     <Filter Include="Vendor\stb">
       <UniqueIdentifier>{6BAF7327-5767-B574-C06E-8ED0AC455065}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Vendor\xxHash">
+      <UniqueIdentifier>{B692A942-2253-2579-EB8D-6EF6570D6A55}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Base\Base.h">
@@ -534,22 +537,16 @@
     <ClInclude Include="Source\Daydream\Graphics\Core\Swapchain.h">
       <Filter>Source\Daydream\Graphics\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Daydream\Graphics\Manager\PipelineStateRegistry.h">
+    <ClInclude Include="Source\Daydream\Graphics\Manager\PipelineCache.h">
       <Filter>Source\Daydream\Graphics\Manager</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Daydream\Graphics\Manager\ResourceManager.h">
+    <ClInclude Include="Source\Daydream\Graphics\Manager\RenderCacheManager.h">
       <Filter>Source\Daydream\Graphics\Manager</Filter>
     </ClInclude>
     <ClInclude Include="Source\Daydream\Graphics\Manager\ResourceRegistry.h">
       <Filter>Source\Daydream\Graphics\Manager</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Daydream\Graphics\Manager\SamplerRegistry.h">
-      <Filter>Source\Daydream\Graphics\Manager</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Daydream\Graphics\Manager\ShaderGroupRegistry.h">
-      <Filter>Source\Daydream\Graphics\Manager</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Daydream\Graphics\Manager\ShaderRegistry.h">
+    <ClInclude Include="Source\Daydream\Graphics\Manager\SamplerCache.h">
       <Filter>Source\Daydream\Graphics\Manager</Filter>
     </ClInclude>
     <ClInclude Include="Source\Daydream\Graphics\Pools\BufferPool\BufferPoolHandle.h">
@@ -603,7 +600,7 @@
     <ClInclude Include="Source\Daydream\Graphics\Resources\Shader.h">
       <Filter>Source\Daydream\Graphics\Resources</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Daydream\Graphics\Resources\ShaderGroup.h">
+    <ClInclude Include="Source\Daydream\Graphics\Resources\ShaderPipeline.h">
       <Filter>Source\Daydream\Graphics\Resources</Filter>
     </ClInclude>
     <ClInclude Include="Source\Daydream\Graphics\Resources\SkeletalModel.h">
@@ -2073,6 +2070,9 @@
     <ClInclude Include="Vendor\stb\stb_image.h">
       <Filter>Vendor\stb</Filter>
     </ClInclude>
+    <ClInclude Include="Vendor\xxHash\xxhash.h">
+      <Filter>Vendor\xxHash</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Base\IO\File.cpp">
@@ -2369,22 +2369,16 @@
     <ClCompile Include="Source\Daydream\Graphics\Core\Swapchain.cpp">
       <Filter>Source\Daydream\Graphics\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Daydream\Graphics\Manager\PipelineStateRegistry.cpp">
+    <ClCompile Include="Source\Daydream\Graphics\Manager\PipelineCache.cpp">
       <Filter>Source\Daydream\Graphics\Manager</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Daydream\Graphics\Manager\ResourceManager.cpp">
+    <ClCompile Include="Source\Daydream\Graphics\Manager\RenderCacheManager.cpp">
       <Filter>Source\Daydream\Graphics\Manager</Filter>
     </ClCompile>
     <ClCompile Include="Source\Daydream\Graphics\Manager\ResourceRegistry.cpp">
       <Filter>Source\Daydream\Graphics\Manager</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Daydream\Graphics\Manager\SamplerRegistry.cpp">
-      <Filter>Source\Daydream\Graphics\Manager</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Daydream\Graphics\Manager\ShaderGroupRegistry.cpp">
-      <Filter>Source\Daydream\Graphics\Manager</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Daydream\Graphics\Manager\ShaderRegistry.cpp">
+    <ClCompile Include="Source\Daydream\Graphics\Manager\SamplerCache.cpp">
       <Filter>Source\Daydream\Graphics\Manager</Filter>
     </ClCompile>
     <ClCompile Include="Source\Daydream\Graphics\Pools\BufferPool\BufferPoolHandle.cpp">
@@ -2432,7 +2426,7 @@
     <ClCompile Include="Source\Daydream\Graphics\Resources\Shader.cpp">
       <Filter>Source\Daydream\Graphics\Resources</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Daydream\Graphics\Resources\ShaderGroup.cpp">
+    <ClCompile Include="Source\Daydream\Graphics\Resources\ShaderPipeline.cpp">
       <Filter>Source\Daydream\Graphics\Resources</Filter>
     </ClCompile>
     <ClCompile Include="Source\Daydream\Graphics\Resources\Skybox.cpp">
@@ -2557,6 +2551,9 @@
     </ClCompile>
     <ClCompile Include="Vendor\stb\stb_image.cpp">
       <Filter>Vendor\stb</Filter>
+    </ClCompile>
+    <ClCompile Include="Vendor\xxHash\xxhash.c">
+      <Filter>Vendor\xxHash</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

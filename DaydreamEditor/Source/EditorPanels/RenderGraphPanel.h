@@ -14,12 +14,14 @@ namespace Daydream
 		virtual ~RenderGraphPanel();
 
 		void Setup(SceneRenderer* _sceneRenderer);
+		void UpdateNodeEditor();
 
 		virtual void OnImGuiRender() override;
 	protected:
 
 	private:
 		SceneRenderer* sceneRenderer;
+		RenderGraph* renderGraph;
 
 		Unique<ImGuiNodeEditor> nodeEditor;
 		

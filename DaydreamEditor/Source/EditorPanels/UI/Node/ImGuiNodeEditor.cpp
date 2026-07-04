@@ -13,8 +13,10 @@ namespace Daydream
 		ImNode::DestroyEditor(editor);
 	}
 
-	void ImGuiNodeEditor::Init()
+	void ImGuiNodeEditor::Init(FunctionPtr<void()> _contextCallback)
 	{
+		contextMenuCallback = _contextCallback;
+
 		config.SettingsFile = "Simple.json";
 		config.UserPointer = this;
 
@@ -52,14 +54,13 @@ namespace Daydream
 
 		headerBackground = AssetManager::GetAssetByPath<Texture2D>("Asset/Texture/BlueprintBackground.png");
 
-		
-		nodes.emplace_back(GetNextId(), "Branch");
-		nodes.back().inputs.emplace_back(GetNextId(), "Condition", PinType::Bool);
-		nodes.back().outputs.emplace_back(GetNextId(), "True", PinType::Flow);
-		nodes.back().outputs.emplace_back(GetNextId(), "False", PinType::Flow);
 
-		BuildNode(&nodes.back());
+		nodes.push_back(MakeUnique<Node>(GetNextId(), "Branch"));
+		nodes.back()->inputs.emplace_back(GetNextId(), "Condition", PinType::Bool);
+		nodes.back()->outputs.emplace_back(GetNextId(), "True", PinType::Flow);
+		nodes.back()->outputs.emplace_back(GetNextId(), "False", PinType::Flow);
 
+		BuildNode(nodes.back().get());
 	}
 	void ImGuiNodeEditor::OnImGuiRender()
 	{
@@ -77,29 +78,29 @@ namespace Daydream
 
 			for (auto& node : nodes)
 			{
-				if (node.type != NodeType::Blueprint && node.type != NodeType::Simple)
+				if (node->type != NodeType::Blueprint && node->type != NodeType::Simple)
 					continue;
 
-				const auto isSimple = node.type == NodeType::Simple;
+				const auto isSimple = node->type == NodeType::Simple;
 
 				bool hasOutputDelegates = false;
-				for (auto& output : node.outputs)
+				for (auto& output : node->outputs)
 					if (output.type == PinType::Delegate)
 						hasOutputDelegates = true;
 
-				builder.Begin(node.id);
+				builder.Begin(node->id);
 				if (!isSimple)
 				{
-					builder.Header(node.color);
+					builder.Header(node->color);
 					ImGui::Spring(0);
-					ImGui::TextUnformatted(node.name.c_str());
+					ImGui::TextUnformatted(node->name.c_str());
 					ImGui::Spring(1);
 					ImGui::Dummy(ImVec2(0, 28));
 					if (hasOutputDelegates)
 					{
 						ImGui::BeginVertical("delegates", ImVec2(0, 28));
 						ImGui::Spring(1, 0);
-						for (auto& output : node.outputs)
+						for (auto& output : node->outputs)
 						{
 							if (output.type != PinType::Delegate)
 								continue;
@@ -135,7 +136,7 @@ namespace Daydream
 					builder.EndHeader();
 				}
 
-				for (auto& input : node.inputs)
+				for (auto& input : node->inputs)
 				{
 					auto alpha = ImGui::GetStyle().Alpha;
 					if (newLinkPin && !CanCreateLink(newLinkPin, &input) && &input != newLinkPin)
@@ -164,11 +165,11 @@ namespace Daydream
 					builder.Middle();
 
 					ImGui::Spring(1, 0);
-					ImGui::TextUnformatted(node.name.c_str());
+					ImGui::TextUnformatted(node->name.c_str());
 					ImGui::Spring(1, 0);
 				}
 
-				for (auto& output : node.outputs)
+				for (auto& output : node->outputs)
 				{
 					if (!isSimple && output.type == PinType::Delegate)
 						continue;
@@ -212,10 +213,35 @@ namespace Daydream
 
 				builder.End();
 			}
+			ImNode::Suspend();
+
+			if (ImNode::ShowBackgroundContextMenu())
+			{
+				ImGui::OpenPopup("EditorContextMenu");
+			}
+			ImNode::Resume();
+
+			ImNode::Suspend();
+
+			if (ImGui::BeginPopup("EditorContextMenu"))
+			{
+				if (contextMenuCallback)
+					contextMenuCallback();
+
+				ImGui::EndPopup();
+			}
+			ImNode::Resume();
+
+
 			ImNode::End();
 		}
 		ImGui::End();
 
+	}
+
+	void ImGuiNodeEditor::AddNode(int _id, const char* _name, ImColor _color)
+	{
+		nodes.push_back(MakeUnique<Node>(_id, _name, _color));
 	}
 
 	void ImGuiNodeEditor::ShowStyleEditor(bool* _show)

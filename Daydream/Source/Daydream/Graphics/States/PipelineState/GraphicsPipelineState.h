@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Daydream/Graphics/Resources/Shader.h"
-#include "Daydream/Graphics/Resources/ShaderGroup.h"
+#include "Daydream/Graphics/Resources/ShaderPipeline.h"
 #include "Daydream/Graphics/Resources/Buffer.h"
 #include "Daydream/Graphics/Resources/Texture/Texture.h"
 #include "Daydream/Graphics/Resources/Texture/TextureView.h"
@@ -10,39 +10,45 @@
 #include "Daydream/Graphics/States/RasterizerState.h"
 #include "Daydream/Graphics/States/DepthStencilState.h"
 
-
 namespace Daydream
 {
-	enum class PrimitiveTopologyType
-	{
-		TriangleList,
-	};
-
-	enum class AttachmentType
-	{
-		None,
-		EntityHandle,
-	};
-
-
-
 	struct GraphicsPipelineStateDesc
 	{
-		ShaderGroup* shaderGroup = nullptr;
-		//Shared<Shader> computeShader; //??
+		ShaderPipeline* shaderPipeline = nullptr;
 
-		//BufferLayout inputLayout;
-		//InputLayoutDesc inputLayout;
-		//Shared<ResourceBindingLayout> resourceBindingLayout; // RootSignature/PipelineLayout
 		RasterizerStateDesc rasterizerState{};
-		//BlendDesc blendState;
 		DepthStencilStateDesc depthStencilState{};
+		BlendStateDesc blendState{};
+
 		Array<RenderFormat> renderTargetFormats; // RTV 포맷들
 		RenderFormat depthStencilFormat = RenderFormat::UNKNOWN; // DSV 포맷
-
 		UInt32 sampleCount = 1;
-		//GraphicsFormat depthStencilFormat = GraphicsFormat::Unknown; // DSV 포맷
-		PrimitiveTopologyType topologyType = PrimitiveTopologyType::TriangleList;
+
+		void InitWithShaderPipeline(ShaderPipeline* _shaderPipeline)
+		{
+			shaderPipeline = _shaderPipeline;
+			rasterizerState = _shaderPipeline->GetRS();
+			depthStencilState = _shaderPipeline->GetDSS();
+			blendState = _shaderPipeline->GetBS();
+		}
+
+		void InitWithMaterial(Material* _material)
+		{
+
+		}
+
+		bool operator==(const GraphicsPipelineStateDesc& other) const
+		{
+			if (shaderPipeline != other.shaderPipeline) return false;
+			if (depthStencilFormat != other.depthStencilFormat) return false;
+			if (sampleCount != other.sampleCount) return false;
+
+			if (renderTargetFormats.size() != other.renderTargetFormats.size()) return false;
+			for (size_t i = 0; i < renderTargetFormats.size(); ++i) {
+				if (renderTargetFormats[i] != other.renderTargetFormats[i]) return false;
+			}
+			return true;
+		}
 	};
 
 	class GraphicsPipelineState
@@ -51,20 +57,16 @@ namespace Daydream
 		GraphicsPipelineState(const GraphicsPipelineStateDesc& _desc);
 		virtual ~GraphicsPipelineState() = default;
 
-		virtual void Bind() const = 0;
-		//virtual Shared<Material> CreateMaterial() = 0;
-		 
-		//ShaderGroup Functions
-		inline const ShaderGroup* GetShaderGroup() const { return shaderGroup; }
-		inline const Array<Shader*>& GetShaders() const { return shaderGroup->GetShaders(); };
-		inline const ShaderReflectionData* GetBindingInfo(const String& _name) const {
-			return shaderGroup->GetShaderBindingInfo(_name);
+		inline const ShaderPipeline* GetShaderPipeline() const { return shaderPipeline; }
+		inline const Array<Shader*>& GetShaders() const { return shaderPipeline->GetShaders(); };
+		inline const ShaderReflectionData* GetBindingInfo(const String& _name) const
+		{
+			return shaderPipeline->GetShaderBindingInfo(_name);
 		}
 
 		static Shared<GraphicsPipelineState> Create(const GraphicsPipelineStateDesc& _desc);
 	protected:
-
-		ShaderGroup* shaderGroup;
+		ShaderPipeline* shaderPipeline;
 
 		GraphicsPipelineStateDesc desc;
 		//rtv, dsv;
