@@ -6,12 +6,12 @@
 #include "Daydream/Graphics/Resources/Struct/TransformData.h"
 #include "Daydream/Graphics/Resources/BuiltInResources.h"
 #include "Daydream/Graphics/Utility/GraphicsUtility.h"
+#include "Daydream/Graphics/Cache/GraphicsCacheRegistry.h"
 
 namespace Daydream
 {
 	RenderGraph::RenderGraph()
 	{
-
 		quadMesh = AssetManager::GetAsset<Mesh>(AssetDefaults::QuadMeshHandle);
 	}
 
@@ -43,39 +43,24 @@ namespace Daydream
 
 		node.allocation = _textureAlloc;
 
-		node.isExternal = true;
-
 		resources.push_back(node);
 		return { static_cast<UInt32>(resources.size() - 1) };
 	}
 
-	RenderGraphPassHandle RenderGraph::AddPass(const String& _name, const RenderGraphPassDesc& _desc)
+	RenderGraphPassHandle RenderGraph::AddRenderPass(const String& _name, const RenderPassDesc& _desc)
 	{
 		PassNode node{};
 		node.name = _name;
-		node.pipelineState = _desc.pipelineState;
-		node.drawType = _desc.drawType;
-		node.drawList = _desc.drawList;
-		node.constantBufferData = _desc.constantBufferData;
-		node.shaderResourceViews = _desc.shaderResourceViews;
-		//node contains Shared pointer
-		passes.push_back(std::move(node));
-		return { static_cast<UInt32>(passes.size() - 1) };
-	}
+		node.pipelineState = GraphicsCacheRegistry::RequestPipelineState(_desc.psoDesc);
+	} 
 
-	void RenderGraph::AddPassDependency(RenderGraphPassHandle _beforePass, RenderGraphPassHandle _afterPass)
-	{
-		if (!_beforePass.IsValid() || !_afterPass.IsValid())return;
-		passes[_afterPass.id].passDependency.push_back(_beforePass.id);
-	}
+	//void RenderGraph::AddPassDependency(RenderGraphPassHandle _beforePass, RenderGraphPassHandle _afterPass)
+	//{
+	//	if (!_beforePass.IsValid() || !_afterPass.IsValid())return;
+	//	passes[_afterPass.id].passDependency.push_back(_beforePass.id); 
+	//}
 
-	void RenderGraph::AddConstantBuffer(ConstantBuffer* _buffer)
-	{
-	}
 
-	void RenderGraph::AddShaderResourceView(TextureView* _shaderResourceView)
-	{
-	}
 
 
 	void RenderGraph::Read(RenderGraphPassHandle _pass, RenderGraphResourceHandle _resource)
@@ -241,26 +226,26 @@ namespace Daydream
 			Renderer::BeginRendering(renderingInfo);
 			Renderer::BindPipelineState(passes[passId].pipelineState);
 
-			for (UInt32 resId : pass.reads)
+			for (UInt32 resId : pass.reads) 
 			{
 				ResourceNode& resource = resources[resId];
 
-				Renderer::BindShaderResourceView(resource.name, resource.allocation.texture->GetDefaultSRV(), BuiltIn::Samplers::LinearClampToEdge());
+				Renderer::BindShaderResourceView(resource.name, resource.allocation.texture);
 			}
 
-			for (auto& cbData : pass.constantBufferData)
-			{
-				Shared<ConstantBuffer> constantBuffer = Renderer::GetConstantBufferPool()->RequestBuffer(cbData.size);
-				Renderer::UpdateConstantBuffer(constantBuffer, cbData.data, cbData.size);
-				Renderer::BindConstantBuffer(cbData.bindName, constantBuffer);
-				Renderer::GetConstantBufferPool()->ReturnResource(cbData.size, std::move(constantBuffer));
-			}
+			//for (auto& cbData : pass.constantBufferData)
+			//{
+			//	Shared<ConstantBuffer> constantBuffer = Renderer::GetConstantBufferPool()->RequestBuffer(cbData.size);
+			//	Renderer::UpdateConstantBuffer(constantBuffer, cbData.data, cbData.size);
+			//	Renderer::BindConstantBuffer(cbData.bindName, constantBuffer);
+			//	Renderer::GetConstantBufferPool()->ReturnResource(cbData.size, std::move(constantBuffer));
+			//}
 
 
-			for (auto& srvData : pass.shaderResourceViews)
-			{
-				Renderer::BindShaderResourceView(srvData.bindName, srvData.SRV, BuiltIn::Samplers::LinearClampToEdge());
-			}
+			//for (auto& srvData : pass.shaderResourceViews)
+			//{
+			//	Renderer::BindShaderResourceView(srvData.bindName, srvData.SRV, BuiltIn::Samplers::LinearClampToEdge());
+			//}
 
 			switch (pass.drawType)
 			{

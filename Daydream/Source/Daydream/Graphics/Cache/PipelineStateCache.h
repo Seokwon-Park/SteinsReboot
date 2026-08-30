@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ResourceRegistry.h"
+#include "GraphicsResourceCache.h"
 #include "Daydream/Graphics/States/PipelineState/GraphicsPipelineState.h"
 
 namespace Daydream
@@ -10,17 +10,15 @@ namespace Daydream
 		UInt64 operator()(const GraphicsPipelineStateDesc& _desc) const;
 	};
 
-	class PipelineStateCache
+	class PipelineStateCache : public GraphicsResourceCache<GraphicsPipelineStateDesc, GraphicsPipelineState, GraphicsPipelineStateHash>
 	{
 	public:
 		PipelineStateCache();
 		virtual ~PipelineStateCache();
 
-		GraphicsPipelineState* RequestPipelineState(const GraphicsPipelineStateDesc& _desc);
+		virtual Shared<GraphicsPipelineState> CreateResource(const GraphicsPipelineStateDesc& _key) override;
 
 	private:
-		HashMap<GraphicsPipelineStateDesc,
-			Shared<GraphicsPipelineState>,
-			GraphicsPipelineStateHash> cache;
+
 	};
 }

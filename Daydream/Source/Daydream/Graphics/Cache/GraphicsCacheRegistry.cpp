@@ -1,5 +1,5 @@
 #include "DaydreamPCH.h"
-#include "RenderCacheManager.h"
+#include "GraphicsCacheRegistry.h"
 
 #include "Daydream/Graphics/Resources/ShaderPipeline.h"
 #include "Daydream/Graphics/States/PipelineState/GraphicsPipelineState.h"
@@ -9,25 +9,23 @@
 
 namespace Daydream
 {
-	RenderCacheManager::RenderCacheManager()
+	GraphicsCacheRegistry::GraphicsCacheRegistry()
 	{
 		psoCache = MakeUnique<PipelineStateCache>();
 		samplerCache = MakeUnique<SamplerCache>();
 	}
 
-	void RenderCacheManager::Init()
+	void GraphicsCacheRegistry::Init()
 	{
 		if (instance)
 		{
 			return;
 		}
-		instance = new RenderCacheManager();
+		instance = new GraphicsCacheRegistry();
 	}
 
-	void RenderCacheManager::Shutdown()
+	void GraphicsCacheRegistry::Shutdown()
 	{
-		instance->registryList.clear();
-
 		delete instance;
 	}
 

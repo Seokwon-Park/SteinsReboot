@@ -425,8 +425,6 @@ namespace Daydream::UI
 
 			for (int i = 0; i < _options.size(); ++i)
 			{
-				// 첫 번째 버튼이 아닌 경우에만 SameLine을 호출 (ItemSpacing이 0이므로 필요 없어 보이지만,
-				// 명시적으로 줄 바꿈을 막기 위해 유지하는 것이 안전합니다.)
 				if (i > 0) {
 					ImGui::SameLine();
 				}

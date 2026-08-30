@@ -33,15 +33,6 @@ namespace Daydream
 
 		RenderingInfo renderingInfo{};
 
-		pso = RenderCacheManager::GetResource<GraphicsPipelineState>("SpritePSO");
-		pso3d = RenderCacheManager::GetResource<GraphicsPipelineState>("ForwardPSO");
-		gBufferPSO = RenderCacheManager::GetResource<GraphicsPipelineState>("GBufferPSO");
-		skyboxPipeline = RenderCacheManager::GetResource<GraphicsPipelineState>("CubemapPSO");
-		equirectangleToCubePipeline = RenderCacheManager::GetResource<GraphicsPipelineState>("EquirectangularPSO");
-		deferredLightingPSO = RenderCacheManager::GetResource<GraphicsPipelineState>("DeferredPSO");
-		depthPSO = RenderCacheManager::GetResource<GraphicsPipelineState>("DepthPSO");
-		maskPSO = RenderCacheManager::GetResource<GraphicsPipelineState>("MaskPSO");
-
 		///////////////////////////////////////////////////////
 		auto entity = activeScene->GetEntity(activeScene->CreateGameEntity());
 		entity->SetName("Test");

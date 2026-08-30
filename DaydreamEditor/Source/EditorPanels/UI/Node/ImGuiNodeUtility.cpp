@@ -22,8 +22,6 @@ namespace Daydream
 		hasHeader = false;
 		headerMin = headerMax = ImVec2();
 
-        // 노드 내부의 기본 Padding을 설정 (좌8, 상4, 우8, 하8)
-        // 위쪽 패딩만 4로 얇게 줄인 이유는, 나중에 칠할 상단 헤더 색상이 노드 테두리에 예쁘고 꽉 차게 맞물리게 만들기 위해서입니다.
 		ImNode::PushStyleVar(ImNode::StyleVar_NodePadding, ImVec4(8, 4, 8, 8));
             
         // 노드 선언

@@ -67,6 +67,7 @@ namespace Daydream
 
 		static Shared<Material> Create(const GraphicsPipelineState* _pipeline);
 		static Shared<Material> Create(const ShaderPipeline* _shaderPipeline);
+
 	protected:
 		bool isOverrideRS = false;
 		bool isOverrideDSS = false;
@@ -74,6 +75,7 @@ namespace Daydream
 
 		HashMap<String, ShaderReflectionDataType> textureBindingMap;
 		HashMap<String, TextureBinding> textures;
+
 	private:
 	};
 }

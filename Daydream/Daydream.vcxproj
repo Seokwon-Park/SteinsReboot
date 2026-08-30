@@ -212,24 +212,31 @@
     <ClInclude Include="Source\Daydream\Graphics\API\Vulkan\VulkanTextureCube.h" />
     <ClInclude Include="Source\Daydream\Graphics\API\Vulkan\VulkanTextureView.h" />
     <ClInclude Include="Source\Daydream\Graphics\API\Vulkan\VulkanUtility.h" />
+    <ClInclude Include="Source\Daydream\Graphics\Cache\GraphicsResourceCache.h" />
     <ClInclude Include="Source\Daydream\Graphics\Camera\Camera.h" />
-    <ClInclude Include="Source\Daydream\Graphics\Core\DeferredSceneRenderer.h" />
     <ClInclude Include="Source\Daydream\Graphics\Core\RenderCommandList.h" />
     <ClInclude Include="Source\Daydream\Graphics\Core\RenderCommandQueue.h" />
     <ClInclude Include="Source\Daydream\Graphics\Core\RenderContext.h" />
     <ClInclude Include="Source\Daydream\Graphics\Core\RenderDevice.h" />
     <ClInclude Include="Source\Daydream\Graphics\Core\RenderGraph\RenderGraph.h" />
     <ClInclude Include="Source\Daydream\Graphics\Core\RenderGraph\RenderGraphDrawList.h" />
+    <ClInclude Include="Source\Daydream\Graphics\Core\RenderGraph\RenderGraphResource.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="Source\Daydream\Graphics\Core\RenderGraph\RenderGraphPass.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
     <ClInclude Include="Source\Daydream\Graphics\Core\RenderThread.h" />
     <ClInclude Include="Source\Daydream\Graphics\Core\Renderer.h" />
     <ClInclude Include="Source\Daydream\Graphics\Core\Renderer2D.h" />
     <ClInclude Include="Source\Daydream\Graphics\Core\RenderingInfo.h" />
     <ClInclude Include="Source\Daydream\Graphics\Core\SceneRenderer.h" />
     <ClInclude Include="Source\Daydream\Graphics\Core\Swapchain.h" />
-    <ClInclude Include="Source\Daydream\Graphics\Manager\PipelineCache.h" />
-    <ClInclude Include="Source\Daydream\Graphics\Manager\RenderCacheManager.h" />
-    <ClInclude Include="Source\Daydream\Graphics\Manager\ResourceRegistry.h" />
-    <ClInclude Include="Source\Daydream\Graphics\Manager\SamplerCache.h" />
+    <ClInclude Include="Source\Daydream\Graphics\Cache\PipelineStateCache.h" />
+    <ClInclude Include="Source\Daydream\Graphics\Cache\GraphicsCacheRegistry.h" />
+    <ClInclude Include="Source\Daydream\Graphics\Cache\SamplerCache.h" />
     <ClInclude Include="Source\Daydream\Graphics\Pools\BufferPool\BufferPoolHandle.h" />
     <ClInclude Include="Source\Daydream\Graphics\Pools\BufferPool\ConstantBufferPool.h" />
     <ClInclude Include="Source\Daydream\Graphics\Pools\BufferPool\UploadBufferPool.h" />
@@ -825,23 +832,30 @@
     <ClCompile Include="Source\Daydream\Graphics\API\Vulkan\VulkanTextureView.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\API\Vulkan\VulkanUtility.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Camera\Camera.cpp" />
-    <ClCompile Include="Source\Daydream\Graphics\Core\DeferredSceneRenderer.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Core\RenderCommandList.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Core\RenderCommandQueue.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Core\RenderContext.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Core\RenderDevice.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Core\RenderGraph\RenderGraph.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Core\RenderGraph\RenderGraphDrawList.cpp" />
+    <ClCompile Include="Source\Daydream\Graphics\Core\RenderGraph\RenderGraphResource.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Daydream\Graphics\Core\RenderGraph\RenderGraphPass.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Daydream\Graphics\Core\RenderThread.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Core\Renderer.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Core\Renderer2D.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Core\RenderingInfo.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Core\SceneRenderer.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Core\Swapchain.cpp" />
-    <ClCompile Include="Source\Daydream\Graphics\Manager\PipelineCache.cpp" />
-    <ClCompile Include="Source\Daydream\Graphics\Manager\RenderCacheManager.cpp" />
-    <ClCompile Include="Source\Daydream\Graphics\Manager\ResourceRegistry.cpp" />
-    <ClCompile Include="Source\Daydream\Graphics\Manager\SamplerCache.cpp" />
+    <ClCompile Include="Source\Daydream\Graphics\Cache\PipelineStateCache.cpp" />
+    <ClCompile Include="Source\Daydream\Graphics\Cache\GraphicsCacheRegistry.cpp" />
+    <ClCompile Include="Source\Daydream\Graphics\Cache\GraphicsResourceCache.cpp" />
+    <ClCompile Include="Source\Daydream\Graphics\Cache\SamplerCache.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Pools\BufferPool\BufferPoolHandle.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Pools\BufferPool\ConstantBufferPool.cpp" />
     <ClCompile Include="Source\Daydream\Graphics\Pools\BufferPool\UploadBufferPool.cpp" />

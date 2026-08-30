@@ -22,6 +22,8 @@ namespace Daydream
         bool comparisonEnable = false;
         ComparisonFunc comparisonFunc = ComparisonFunc::Never;
         float borderColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+
+        bool operator==(const SamplerDesc&) const = default;
     };
 
 	class Sampler

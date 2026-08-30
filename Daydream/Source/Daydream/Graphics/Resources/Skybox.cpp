@@ -3,7 +3,7 @@
 
 #include "Daydream/Asset/AssetManager.h"
 #include "Daydream/Graphics/Core/Renderer.h"
-#include "Daydream/Graphics/Manager/RenderCacheManager.h"
+#include "Daydream/Graphics/Cache/GraphicsCacheRegistry.h"
 #include "Daydream/Graphics/Utility/MeshGenerator.h"
 #include "Daydream/Graphics/Resources/BuiltInResources.h"
 
@@ -52,25 +52,25 @@ namespace Daydream
 		desc.InitWithShaderPipeline(AssetManager::GetAsset<ShaderPipeline>(AssetDefaults::EquirectangularPipelineHandle));
 		desc.renderTargetFormats = { RenderFormat::R16G16B16A16_FLOAT };
 
-		equirectangularPSO = RenderCacheManager::RequestPipelineState(desc);
+		equirectangularPSO = GraphicsCacheRegistry::RequestPipelineState(desc);
 
 		desc.InitWithShaderPipeline(AssetManager::GetAsset<ShaderPipeline>(AssetDefaults::ResizePipelineHandle));
 		desc.renderTargetFormats = { RenderFormat::R16G16B16A16_FLOAT };
-		resizePSO = RenderCacheManager::RequestPipelineState(desc);
+		resizePSO = GraphicsCacheRegistry::RequestPipelineState(desc);
 
 		desc.InitWithShaderPipeline(AssetManager::GetAsset<ShaderPipeline>(AssetDefaults::IrradiancePipelineHandle));
 		desc.renderTargetFormats = { RenderFormat::R16G16B16A16_FLOAT };
-		irradiancePSO = RenderCacheManager::RequestPipelineState(desc);
+		irradiancePSO = GraphicsCacheRegistry::RequestPipelineState(desc);
 
 		desc.InitWithShaderPipeline(AssetManager::GetAsset<ShaderPipeline>(AssetDefaults::PrefilterPipelineHandle));
 		desc.renderTargetFormats = { RenderFormat::R16G16B16A16_FLOAT };
-		prefilterPSO = RenderCacheManager::RequestPipelineState(desc);
+		prefilterPSO = GraphicsCacheRegistry::RequestPipelineState(desc);
 
 		equirectangularDropTarget = AssetManager::GetAssetByPath<Texture2D>("Resource/NoTexture.png");
 
 		desc.InitWithShaderPipeline(AssetManager::GetAsset<ShaderPipeline>(AssetDefaults::BRDFPipelineHandle));
 		desc.renderTargetFormats = { RenderFormat::R16G16B16A16_FLOAT };
-		brdfPSO = RenderCacheManager::RequestPipelineState(desc);
+		brdfPSO = GraphicsCacheRegistry::RequestPipelineState(desc);
 
 		quadMesh = AssetManager::GetAsset<Mesh>(AssetDefaults::QuadMeshHandle);
 		boxMesh = AssetManager::GetAsset<Mesh>(AssetDefaults::BoxMeshHandle);
@@ -289,7 +289,7 @@ namespace Daydream
 			Renderer::BeginRendering(renderingInfo);
 			Renderer::BindPipelineState(equirectangularPSO);
 			Renderer::BindConstantBuffer("Camera", cubeFaceConstantBuffers[i]);
-			Renderer::BindShaderResourceView("Texture", equirectangularTexture->GetDefaultSRV(), BuiltIn::Samplers::LinearClampToEdge());
+			Renderer::BindShaderResourceView("Texture", equirectangularTexture);
 			Renderer::BindMesh(boxMesh);
 			Renderer::DrawIndexed(boxMesh->GetIndexCount());
 			Renderer::EndRendering(renderingInfo);
@@ -316,7 +316,7 @@ namespace Daydream
 			Renderer::BeginRendering(renderingInfo);
 			Renderer::BindPipelineState(irradiancePSO);
 			Renderer::BindConstantBuffer("Camera", cubeFaceConstantBuffers[i]);
-			Renderer::BindShaderResourceView("TextureCubemap", skyboxTextureCube->GetDefaultSRV(), BuiltIn::Samplers::LinearClampToEdge());
+			Renderer::BindShaderResourceView("TextureCubemap", skyboxTextureCube);
 			Renderer::BindMesh(boxMesh);
 			Renderer::DrawIndexed(boxMesh->GetIndexCount());
 			Renderer::EndRendering(renderingInfo);
@@ -353,7 +353,7 @@ namespace Daydream
 				Renderer::BindPipelineState(prefilterPSO);
 				Renderer::BindConstantBuffer("Camera", cubeFaceConstantBuffers[face]);
 				Renderer::BindConstantBuffer("Roughness", roughnessConstantBuffers[mip]);
-				Renderer::BindShaderResourceView("TextureCubemap", skyboxTextureCube->GetDefaultSRV(), BuiltIn::Samplers::LinearClampToEdge());
+				Renderer::BindShaderResourceView("TextureCubemap", skyboxTextureCube);
 				Renderer::BindMesh(boxMesh);
 				Renderer::DrawIndexed(boxMesh->GetIndexCount());
 				Renderer::EndRendering(renderingInfo);

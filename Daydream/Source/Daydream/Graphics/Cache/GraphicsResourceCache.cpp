@@ -1,5 +1,5 @@
 #include "DaydreamPCH.h"
-#include "ResourceRegistry.h"
+#include "GraphicsResourceCache.h"
 
 namespace Daydream
 {

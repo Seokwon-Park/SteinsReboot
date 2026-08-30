@@ -8,6 +8,8 @@ struct VSInput
 
 cbuffer Camera : register(b0)
 {
+    matrix view;
+    matrix projection;
     matrix viewProjection;
 };
 

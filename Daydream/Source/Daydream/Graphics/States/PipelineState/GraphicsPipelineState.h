@@ -32,20 +32,15 @@ namespace Daydream
 			blendState = _shaderPipeline->GetBS();
 		}
 
-		void InitWithMaterial(Material* _material)
+		bool operator==(const GraphicsPipelineStateDesc& _other) const
 		{
+			if (shaderPipeline != _other.shaderPipeline) return false;
+			if (depthStencilFormat != _other.depthStencilFormat) return false;
+			if (sampleCount != _other.sampleCount) return false;
 
-		}
-
-		bool operator==(const GraphicsPipelineStateDesc& other) const
-		{
-			if (shaderPipeline != other.shaderPipeline) return false;
-			if (depthStencilFormat != other.depthStencilFormat) return false;
-			if (sampleCount != other.sampleCount) return false;
-
-			if (renderTargetFormats.size() != other.renderTargetFormats.size()) return false;
+			if (renderTargetFormats.size() != _other.renderTargetFormats.size()) return false;
 			for (size_t i = 0; i < renderTargetFormats.size(); ++i) {
-				if (renderTargetFormats[i] != other.renderTargetFormats[i]) return false;
+				if (renderTargetFormats[i] != _other.renderTargetFormats[i]) return false;
 			}
 			return true;
 		}

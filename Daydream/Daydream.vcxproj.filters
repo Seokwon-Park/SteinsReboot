@@ -498,9 +498,6 @@
     <ClInclude Include="Source\Daydream\Graphics\Camera\Camera.h">
       <Filter>Source\Daydream\Graphics\Camera</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Daydream\Graphics\Core\DeferredSceneRenderer.h">
-      <Filter>Source\Daydream\Graphics\Core</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Daydream\Graphics\Core\RenderCommandList.h">
       <Filter>Source\Daydream\Graphics\Core</Filter>
     </ClInclude>
@@ -537,16 +534,13 @@
     <ClInclude Include="Source\Daydream\Graphics\Core\Swapchain.h">
       <Filter>Source\Daydream\Graphics\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Daydream\Graphics\Manager\PipelineCache.h">
+    <ClInclude Include="Source\Daydream\Graphics\Cache\PipelineStateCache.h">
       <Filter>Source\Daydream\Graphics\Manager</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Daydream\Graphics\Manager\RenderCacheManager.h">
+    <ClInclude Include="Source\Daydream\Graphics\Cache\GraphicsCacheRegistry.h">
       <Filter>Source\Daydream\Graphics\Manager</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Daydream\Graphics\Manager\ResourceRegistry.h">
-      <Filter>Source\Daydream\Graphics\Manager</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Daydream\Graphics\Manager\SamplerCache.h">
+    <ClInclude Include="Source\Daydream\Graphics\Cache\SamplerCache.h">
       <Filter>Source\Daydream\Graphics\Manager</Filter>
     </ClInclude>
     <ClInclude Include="Source\Daydream\Graphics\Pools\BufferPool\BufferPoolHandle.h">
@@ -2073,6 +2067,9 @@
     <ClInclude Include="Vendor\xxHash\xxhash.h">
       <Filter>Vendor\xxHash</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Daydream\Graphics\Cache\GraphicsResourceCache.h" />
+    <ClInclude Include="Source\Daydream\Graphics\Core\RenderGraph\RenderGraphPass.h" />
+    <ClInclude Include="Source\Daydream\Graphics\Core\RenderGraph\RenderGraphResource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Base\IO\File.cpp">
@@ -2330,9 +2327,6 @@
     <ClCompile Include="Source\Daydream\Graphics\Camera\Camera.cpp">
       <Filter>Source\Daydream\Graphics\Camera</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Daydream\Graphics\Core\DeferredSceneRenderer.cpp">
-      <Filter>Source\Daydream\Graphics\Core</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Daydream\Graphics\Core\RenderCommandList.cpp">
       <Filter>Source\Daydream\Graphics\Core</Filter>
     </ClCompile>
@@ -2369,16 +2363,16 @@
     <ClCompile Include="Source\Daydream\Graphics\Core\Swapchain.cpp">
       <Filter>Source\Daydream\Graphics\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Daydream\Graphics\Manager\PipelineCache.cpp">
+    <ClCompile Include="Source\Daydream\Graphics\Cache\PipelineStateCache.cpp">
       <Filter>Source\Daydream\Graphics\Manager</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Daydream\Graphics\Manager\RenderCacheManager.cpp">
+    <ClCompile Include="Source\Daydream\Graphics\Cache\GraphicsCacheRegistry.cpp">
       <Filter>Source\Daydream\Graphics\Manager</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Daydream\Graphics\Manager\ResourceRegistry.cpp">
+    <ClCompile Include="Source\Daydream\Graphics\Cache\GraphicsResourceCache.cpp">
       <Filter>Source\Daydream\Graphics\Manager</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Daydream\Graphics\Manager\SamplerCache.cpp">
+    <ClCompile Include="Source\Daydream\Graphics\Cache\SamplerCache.cpp">
       <Filter>Source\Daydream\Graphics\Manager</Filter>
     </ClCompile>
     <ClCompile Include="Source\Daydream\Graphics\Pools\BufferPool\BufferPoolHandle.cpp">
@@ -2555,5 +2549,7 @@
     <ClCompile Include="Vendor\xxHash\xxhash.c">
       <Filter>Vendor\xxHash</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Daydream\Graphics\Core\RenderGraph\RenderGraphPass.cpp" />
+    <ClCompile Include="Source\Daydream\Graphics\Core\RenderGraph\RenderGraphResource.cpp" />
   </ItemGroup>
 </Project>

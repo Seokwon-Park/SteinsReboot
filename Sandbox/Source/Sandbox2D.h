@@ -30,7 +30,7 @@ namespace Daydream
 
 		Shared<GraphicsPipelineState> pso;
 		Shared<GraphicsPipelineState> pso3d;
-		Shared<RenderPass> renderPass;
+		Shared<RenderGraphPass> renderPass;
 
 		Shared<Material> material;
 		Shared<Material> material3d;

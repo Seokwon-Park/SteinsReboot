@@ -10,7 +10,7 @@
 #include "D3D12Utility.h"
 #include "Daydream/Asset/AssetManager.h"
 #include "Daydream/Graphics/Resources/Mesh.h"
-#include "Daydream/Graphics/Manager/RenderCacheManager.h"
+#include "Daydream/Graphics/Cache/GraphicsCacheRegistry.h"
 #include "Daydream/Graphics/Core/Renderer.h"
 
 
@@ -372,7 +372,7 @@ namespace Daydream
 		}
 
 
-		auto resizePSO = RenderCacheManager::RequestPipelineState({});
+		auto resizePSO = GraphicsCacheRegistry::RequestPipelineState({});
 		auto quadMesh = AssetManager::GetAsset<Mesh>(AssetDefaults::QuadMeshHandle);
 
 		BindPipelineState(resizePSO);

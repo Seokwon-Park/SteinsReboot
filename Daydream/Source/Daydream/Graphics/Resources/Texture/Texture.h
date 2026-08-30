@@ -68,11 +68,14 @@ namespace Daydream
 		inline TextureDesc GetDesc() const { return gpuTexture->GetDesc(); }
 		inline TextureType GetType() const { return gpuTexture->GetDesc().type; }
 
-		inline const SamplerDesc& GetSamplerDesc() const { return sampler; }
+		void SetSampler(const SamplerDesc& _desc);
+		inline const SamplerDesc& GetSamplerDesc() const { return samplerDesc; }
+		inline const Sampler* GetSampler() const { return sampler; }
 	protected:
 		Shared<GPUTexture> gpuTexture = nullptr;
-		Shared<TextureView> defaultSRV;
-		SamplerDesc sampler;
+		Shared<TextureView> defaultSRV = nullptr;
+		SamplerDesc samplerDesc = SamplerDesc();
+		Sampler* sampler = nullptr;
 	};
 
 

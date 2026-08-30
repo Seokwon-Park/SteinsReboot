@@ -8,7 +8,7 @@
 #include "Daydream/Asset/AssetManager.h"
 #include "Daydream/Graphics/Core/Renderer.h"
 #include "Daydream/Scene/Components/ComponentRegistry.h"
-#include "Daydream/Graphics/Manager/RenderCacheManager.h"
+#include "Daydream/Graphics/Cache/GraphicsCacheRegistry.h"
 
 
 namespace Daydream
@@ -85,6 +85,7 @@ namespace Daydream
 			return false;
 		}
 
+		GraphicsCacheRegistry::Init();
 		//에셋 매니저 초기화
 		AssetManager::Init();
 		AssetManager::LoadAssetMetadataFromDirectory("Asset");
@@ -93,7 +94,6 @@ namespace Daydream
 		AssetManager::CreateBuiltinAssets();
 		AssetManager::LoadAssets(LoadPhase::Early);// 셰이더 때문에 renderer초기화 이후로 미룸
 
-		RenderCacheManager::Init();
 
 		imGuiLayer = new ImGuiLayer();
 		AttachOverlay(imGuiLayer);
@@ -168,8 +168,8 @@ namespace Daydream
 		ComponentRegistry::Shutdown();
 		layerStack.Release();
 		Renderer::WaitGPUIdle();
-		RenderCacheManager::Shutdown();
 		AssetManager::Shutdown();
+		GraphicsCacheRegistry::Shutdown();
 		Renderer::Shutdown();
 		WindowManager::Shutdown();
 		mainWindow = nullptr;

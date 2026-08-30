@@ -2,6 +2,7 @@
 #include "SamplerCache.h"
 
 #include "Daydream/Graphics/Resources/BuiltinResources.h"
+#include "xxhash.h"
 
 namespace Daydream
 {
@@ -25,13 +26,15 @@ namespace Daydream
 
 	SamplerCache::~SamplerCache()
 	{
-		cache.clear();
+	
 	}
 
-	Sampler* SamplerCache::RequestSampler(const SamplerDesc& _desc)
+	Shared<Sampler> SamplerCache::CreateResource(const SamplerDesc& _key)
 	{
-		return nullptr;
+		return Sampler::Create(_key);
 	}
+
+
 
 	//void SamplerCache::CreateBuiltinResources()
 	//{
@@ -75,5 +78,10 @@ namespace Daydream
 	//	registry["NearestClampToEdge"] = Sampler::Create(samplerDesc);
 	//	internalNearestClampToEdge = registry["NearestClampToEdge"].get();
 	//}
+
+	UInt64 SamplerHash::operator()(const SamplerDesc& _desc) const
+	{
+		return XXH64(&_desc, sizeof(SamplerDesc), 0);
+	}
 
 }

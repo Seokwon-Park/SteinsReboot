@@ -56,7 +56,7 @@
 #include "Daydream/Graphics/Resources/Texture/TextureView.h"
 #include "Daydream/Graphics/Resources/Struct/RenderDataStruct.h"
 
-#include "Daydream/Graphics/Manager/RenderCacheManager.h"
+#include "Daydream/Graphics/Cache/GraphicsCacheRegistry.h"
 
 #include "Daydream/Graphics/Utility/MeshGenerator.h"
 // -----------------------------------------------

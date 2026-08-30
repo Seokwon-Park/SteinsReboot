@@ -8,9 +8,9 @@ namespace Daydream
 	struct ShaderLayoutData
 	{
 		String name;          
-		UInt32 location;      
-		RenderFormat format;  
-		UInt64 size;          
+		UInt32 location = 0;      
+		RenderFormat format = RenderFormat::UNKNOWN;  
+		UInt64 size = 0;          
 
 		void Save(FileWriter& _writer) const
 		{

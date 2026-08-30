@@ -247,8 +247,14 @@ namespace Daydream
 
 
 
+	void Renderer::BindShaderResourceView(const String& _name, const Shared<Texture> _texture)
+	{
+		BindShaderResourceView(_name, _texture->GetDefaultSRV(), _texture->GetSampler());
+	}
+
 	void Renderer::BindShaderResourceView(const String& _name, const Texture* _texture)
 	{
+		BindShaderResourceView(_name, _texture->GetDefaultSRV(), _texture->GetSampler());
 	}
 
 	//void Renderer::SetTexture2D(const String& _name, const Texture2D> _texture)

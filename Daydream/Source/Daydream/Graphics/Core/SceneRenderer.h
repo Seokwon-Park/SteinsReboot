@@ -39,7 +39,8 @@ namespace Daydream
         SceneRenderer();
         virtual ~SceneRenderer();
 
-        virtual void RenderScene(const SceneData& _sceneData) {};
+        virtual void RenderScene(const SceneData& _sceneData);
+        
 
         Texture2D* GetResult() const { return result.texture.get(); };
         TextureView* GetResultView() const { return result.texture->GetDefaultSRV(); };
@@ -65,6 +66,6 @@ namespace Daydream
         ViewProjectionData cameraViewProj;
         Shared<RenderGraph> renderGraph;
 
-        
+        Mesh* skyboxMesh;
     };
 }

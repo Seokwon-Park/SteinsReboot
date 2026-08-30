@@ -13,6 +13,13 @@ namespace Daydream
 		TriangleList,
 	};
 
+	enum class PipelineType 
+	{
+		Geometry,
+		ScreenSpace,
+		Compute 
+	};
+
 	struct ShaderPipelineDesc
 	{
 		Shader* vertexShader = nullptr;
@@ -54,6 +61,8 @@ namespace Daydream
 		const DepthStencilStateDesc& GetDSS() const { return depthStencilState; }
 		const BlendStateDesc& GetBS() const { return blendState; }
 
+		PipelineType GetPipelineType() const { return pipelineType; }
+
 		UInt32 GetSetCount() const { return setCount; }
 	private:
 
@@ -82,5 +91,7 @@ namespace Daydream
 		RasterizerStateDesc rasterizerState{};
 		DepthStencilStateDesc depthStencilState{};
 		BlendStateDesc blendState{};
+
+		PipelineType pipelineType = PipelineType::ScreenSpace;
 	};
 }

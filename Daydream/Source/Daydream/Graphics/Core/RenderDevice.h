@@ -26,7 +26,7 @@ namespace Daydream
 	class TextureView;
 	//////////////////////////////////////////////////////////
 
-	class RenderPass;
+	class RenderGraphPass;
 	class Framebuffer;
 	class GraphicsPipelineState;
 	class Shader;

@@ -1,5 +1,5 @@
 #include "DaydreamPCH.h"
-#include "PipelineCache.h"
+#include "PipelineStateCache.h"
 
 #include "Daydream/Graphics/States/PipelineState/GraphicsPipelineState.h"
 #include "Daydream/Graphics/Resources/BuiltinResources.h"
@@ -54,29 +54,14 @@ namespace Daydream
 
 	PipelineStateCache::~PipelineStateCache()
 	{
-		cache.clear();
+		
 	}
 
-	GraphicsPipelineState* PipelineStateCache::RequestPipelineState(const GraphicsPipelineStateDesc& _desc) 
+	Shared<GraphicsPipelineState> PipelineStateCache::CreateResource(const GraphicsPipelineStateDesc& _key)
 	{
-		auto itr = cache.find(_desc);
-		//PrintHash(_desc);
-		//UInt64 hashNumber = GraphicsPipelineStateHash()(_desc);
-		//DAYDREAM_CORE_INFO("RequestedHash: {0}", hashNumber);
-		if (itr == cache.end())
-		{
-			auto x = cache.insert({ _desc, GraphicsPipelineState::Create(_desc) });
-			auto desc = x.first->first;
-
-			//PrintHash(desc);
-			//hashNumber = GraphicsPipelineStateHash()(desc);
-			//DAYDREAM_CORE_INFO("RequestedHash: {0}", hashNumber);
-			return cache[_desc].get();
-		}
-		return itr->second.get();
+		return GraphicsPipelineState::Create(_key);
 	}
 
-	
 
 	UInt64 GraphicsPipelineStateHash::operator()(const GraphicsPipelineStateDesc& _desc) const
 	{

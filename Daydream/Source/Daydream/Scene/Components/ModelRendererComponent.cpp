@@ -5,7 +5,7 @@
 
 #include "Daydream/Scene/GameEntity/GameEntity.h"
 #include "Daydream/Graphics/Core/Renderer.h"
-#include "Daydream/Graphics/Manager/RenderCacheManager.h"
+#include "Daydream/Graphics/Cache/GraphicsCacheRegistry.h"
 #include "Daydream/Graphics/Resources/Skybox.h"
 
 namespace Daydream

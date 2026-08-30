@@ -50,7 +50,6 @@ namespace Daydream
 		if (geometryShader != nullptr) shaders.push_back(geometryShader);
 		if (pixelShader != nullptr) shaders.push_back(pixelShader);
 
-
 		rasterizerState = _desc.rasterizerState;
 		depthStencilState = _desc.depthStencilState;
 		blendState = _desc.blendState;
@@ -64,14 +63,20 @@ namespace Daydream
 
 	void ShaderPipeline::CreateShaderBindingMap()
 	{
-		int descriptorTableIndex = 0;
+		bool isGeometry = false;
 		for (const Shader* shader : shaders)
 		{
 			for (ShaderReflectionData data : shader->GetShaderReflectionData())
 			{
+				isGeometry |= data.name == "World";
 				shaderBindingMap.insert({ data.name, data });
 				setCount = Math::Max(setCount, data.set + 1);
 			}
+		}
+		
+		if (isGeometry)
+		{
+			pipelineType = PipelineType::Geometry;
 		}
 	}
 

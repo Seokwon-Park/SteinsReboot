@@ -47,6 +47,7 @@ SamplerState mat_AOMapSampler : register(s4);
 
 PSOutput PSMain(PSInput input)
 {
+    
     PSOutput output = (PSOutput) 0;
     
     float4 albedo = mat_AlbedoMap.Sample(mat_AlbedoMapSampler, input.uv);

@@ -19,7 +19,6 @@ namespace Daydream
 	//		ID3D12Resource* srcResource = entityTexture->GetID3D12Resource(); // 리소스 가져오기
 
 	//		// 3. Readback Buffer 생성 (1픽셀 데이터만 담을 작은 버퍼)
-	//		// 텍스처 복사 시 가로 정렬(Row Pitch) 제약이 있습니다 (D3D12_TEXTURE_DATA_PITCH_ALIGNMENT = 256 byte)
 
 	//		D3D12_RESOURCE_DESC srcDesc = srcResource->GetDesc();
 	//		// 1x1 영역에 대한 레이아웃 계산

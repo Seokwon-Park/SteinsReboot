@@ -5,7 +5,6 @@
 #include "Daydream/Graphics/Resources/Buffer.h"
 #include "Daydream/Graphics/Resources/Mesh.h"
 #include "Daydream/Graphics/States/PipelineState/GraphicsPipelineState.h"
-#include "Daydream/Graphics/Manager/RenderCacheManager.h"
 #include "Daydream/Graphics/Core/Renderer.h"
 #include "Daydream/Asset/AssetManager.h"
 

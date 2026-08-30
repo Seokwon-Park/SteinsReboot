@@ -3,14 +3,14 @@
 
 #include "Daydream/Graphics/Core/Renderer.h"
 #include "Daydream/Graphics/States/PipelineState/GraphicsPipelineState.h"
-#include "Daydream/Graphics/Manager/RenderCacheManager.h"
+#include "Daydream/Graphics/Cache/GraphicsCacheRegistry.h"
 #include "Daydream/Asset/AssetManager.h"
 
 namespace Daydream
 {
-	Material::Material(const ShaderPipeline* _GraphicsPipelineTemplate)
+	Material::Material(const ShaderPipeline* _shaderPipeline)
 	{
-		textureBindingMap = _GraphicsPipelineTemplate->GetMaterialMap();
+		textureBindingMap = _shaderPipeline->GetMaterialMap();
 	}
 
 	Material::~Material()
@@ -28,7 +28,7 @@ namespace Daydream
 			//{
 			//	_texture->SetSampler(ResourceManager::GetResource<Sampler>("LinearRepeat"));
 			//}
-			DAYDREAM_CORE_ERROR("[Material] There is no Texture Name {}", _name);
+			DAYDREAM_CORE_ERROR("[Material] There is no material Texture. Binding Name : {}", _name);
 			return;
 		}
 		textures[_name].handle = _textureHandle;

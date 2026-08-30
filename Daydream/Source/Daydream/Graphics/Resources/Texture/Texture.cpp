@@ -1,5 +1,6 @@
 #include "DaydreamPCH.h"
 #include "Daydream/Graphics/Resources/Texture/Texture.h"
+#include "Daydream/Graphics/Cache/GraphicsCacheRegistry.h"
 
 #include "TextureView.h"
 
@@ -15,6 +16,7 @@ namespace Daydream
 			DAYDREAM_CORE_WARN("mipLevel is to Large {} -> {}", std::max(desc.width, desc.height), maxMips);
 			desc.mipLevels = maxMips;
 		}
+
 	}
 	Texture::Texture(Shared<GPUTexture> _texture)
 		: gpuTexture(_texture)
@@ -27,9 +29,16 @@ namespace Daydream
 		srvDesc.layerCount = GetLayerCount();
 
 		defaultSRV = TextureView::Create(this, srvDesc);
+
+		SetSampler(samplerDesc);
 	}
 	Texture::~Texture()
 	{
 		defaultSRV = nullptr;
+	}
+	void Texture::SetSampler(const SamplerDesc& _desc)
+	{
+		samplerDesc = _desc;
+		sampler = GraphicsCacheRegistry::RequestSampler(_desc);
 	}
 }

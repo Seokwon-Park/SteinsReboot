@@ -1,8 +1,9 @@
 #pragma once
 
+#include "RenderGraphPass.h"
 #include "RenderGraphDrawList.h"
+
 #include "Daydream/Graphics/Pools/TexturePool/Texture2DPool.h"
-#include "Daydream/Graphics/States/PipelineState/GraphicsPipelineState.h"
 
 namespace Daydream
 {
@@ -21,7 +22,7 @@ namespace Daydream
 		UInt32 size;
 	};
 
-	struct ExternalShaderResourceView
+	struct ExternalSth
 	{
 		String bindName;
 		TextureView* SRV;
@@ -34,14 +35,7 @@ namespace Daydream
 		UInt32 height;
 	};
 
-	struct RenderGraphPassDesc
-	{
-		const GraphicsPipelineState* pipelineState;
-		RenderGraphDrawList drawList;
-		PassDrawType drawType;
-		Array<ExternalConstantBufferData> constantBufferData;
-		Array<ExternalShaderResourceView> shaderResourceViews;
-	};
+
 
 	struct RenderGraphResourceHandle
 	{
@@ -55,12 +49,7 @@ namespace Daydream
 		bool IsValid() const { return id != UINT32_MAX; }
 	};
 
-	struct RenderGraphWriteBinding
-	{
-		UInt32 resourceId = UINT32_MAX;
-		AttachmentLoadOp loadOp = AttachmentLoadOp::Clear;
-		AttachmentStoreOp storeOp = AttachmentStoreOp::Store;
-	};
+
 
 	struct ResourceNode
 	{
@@ -73,8 +62,6 @@ namespace Daydream
 		UInt32 lastPass;
 
 		Texture2DAllocation allocation;
-
-		Bool isExternal = false;
 	};
 
 	struct PassNode
@@ -88,11 +75,7 @@ namespace Daydream
 		// There's nothing to read from the previous pass, but if the order matters
 		Array<UInt32> passDependency;
 		Array<UInt32> reads;
-		Array<RenderGraphWriteBinding> colorWrites;
-		RenderGraphWriteBinding depthStencilWrite{};
 
-		Array<ExternalConstantBufferData> constantBufferData;
-		Array<ExternalShaderResourceView> shaderResourceViews;
 	};
 
 	class RenderGraph
@@ -100,16 +83,19 @@ namespace Daydream
 	public:
 		RenderGraph();
 		~RenderGraph();
+
 		RenderGraphResourceHandle AddResource(const String& _name, const RenderGraphResourceDesc& _desc);
+		void RemoveResource(RenderGraphResourceHandle _handle);
 		RenderGraphResourceHandle AddExternalWriteResource(const String& _name, const Texture2DAllocation& _texture);
-		RenderGraphPassHandle AddPass(const String& _name, const RenderGraphPassDesc& _desc);
-		void AddPassDependency(RenderGraphPassHandle _beforePass, RenderGraphPassHandle _afterPass);
+		RenderGraphPassHandle AddRenderPass(const String& _name, const RenderPassDesc& _desc);
+		void RemoveRenderPass(RenderGraphPassHandle _handle);
+		/*void AddPassDependency(RenderGraphPassHandle _beforePass, RenderGraphPassHandle _afterPass);*/
 
-		void AddConstantBuffer(ConstantBuffer* _buffer);
-		void AddShaderResourceView(TextureView* _shaderResourceView);
+		void AddConstantBuffer(const String& _name, ConstantBuffer* _buffer);
+		void AddShaderResourceView(const String& _name, TextureView* _shaderResourceView);
 
-		const Array<ResourceNode> GetResourceNodes() const { return resources; }
-		const Array<PassNode> GetPassNodes() const { return passes; };
+		const Array<ResourceNode>& GetResourceNodes() const { return resources; }
+		const Array<RenderGraphPass>& GetRenderPasses() const { return passes; };
 
 		void Read(RenderGraphPassHandle _pass, RenderGraphResourceHandle _resource);
 		void Write(RenderGraphPassHandle _pass, RenderGraphResourceHandle _resource, AttachmentLoadOp _loadOp = AttachmentLoadOp::Clear, AttachmentStoreOp _storeOp = AttachmentStoreOp::Store);
@@ -122,11 +108,13 @@ namespace Daydream
 	private:
 		void BuildDependencyGraph(Array<Array<UInt32>>& _edges, Array<UInt32>& _inDegree) const;
 
+		Array<UInt32> freeResHandles;
+		Array<UInt32> freePassHandles;
+
 		Array<ResourceNode> resources;
-		Array<PassNode> passes;
+		Array<RenderGraphPass> passes;
 		Array<UInt32> executionOrder;
 		HashMap<String, ConstantBuffer*> buffers;
-		HashMap<String, TextureView*> views;
-		Mesh* quadMesh;
+		HashMap<String, Texture*> textures;
 	};
 }

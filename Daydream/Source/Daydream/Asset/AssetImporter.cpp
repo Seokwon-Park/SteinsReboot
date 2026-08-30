@@ -5,7 +5,7 @@
 #include "Daydream/Graphics/Utility/ModelLoader.h"
 #include "Daydream/Graphics/Utility/ShaderCompileHelper.h"
 
-#include "Daydream/Graphics/Manager/RenderCacheManager.h"
+#include "Daydream/Graphics/Cache/GraphicsCacheRegistry.h"
 
 #include "Daydream/Graphics/States/PipelineState/GraphicsPipelineState.h"
 #include "Daydream/Graphics/Resources/Texture/Texture2D.h"
